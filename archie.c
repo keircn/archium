@@ -343,13 +343,13 @@ void display_version() {
 
     char *pm_version = get_package_manager_version(package_manager);
 
-    printf("    __     Archium v1.4 - Fast & easy package management for Arch Linux\n"
+    printf("    __     Archie v1.4 - Fast & easy package management for Arch Linux\n"
            " .:--.'.   Written in C, powered by YAY, Paru, and Pacman.\n"
            "/ |   \\ |  %s %s\n"  // Package manager and version
            "`\" __ | |  \n"
            " .'.''| |  \n"
            "/ /   | |_ This program may be freely redistributed under the terms of the GNU General Public License.\n"
-           "\\ \\._,\\ '/ Maintained by Keiran, originally created by gurov\n"
+           "\\ \\._,\\ '/ Created & maintained by Gurov\n"
            " `--'  `\"  With enhancements by the community\n", package_manager, pm_version);
     free(pm_version);
 }
