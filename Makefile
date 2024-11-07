@@ -10,21 +10,21 @@ OBJ = $(SRC:%.c=$(BUILD_DIR)/%.o)
 all: $(BUILD_DIR) $(TARGET)
 
 $(BUILD_DIR):
-    mkdir -p $(BUILD_DIR)
+	mkdir -p $(BUILD_DIR)
 
 $(TARGET): $(OBJ)
-    $(CC) $(OBJ) -o $(BUILD_DIR)/$(TARGET) $(LDFLAGS)
+	$(CC) $(OBJ) -o $(BUILD_DIR)/$(TARGET) $(LDFLAGS)
 
 $(BUILD_DIR)/%.o: %.c archium.h
-    $(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 install: $(BUILD_DIR)/$(TARGET)
-    install -m 755 $(BUILD_DIR)/$(TARGET) $(INSTALL_DIR)
+	install -m 755 $(BUILD_DIR)/$(TARGET) $(INSTALL_DIR)
 
 uninstall:
-    rm -f $(INSTALL_DIR)/$(TARGET)
+	rm -f $(INSTALL_DIR)/$(TARGET)
 
 clean:
-    rm -rf $(BUILD_DIR)
+	rm -rf $(BUILD_DIR)
 
 .PHONY: all install uninstall clean $(BUILD_DIR)
