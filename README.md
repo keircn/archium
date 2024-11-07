@@ -18,7 +18,7 @@ Archium is a command-line tool for managing packages on Arch Linux, providing a 
 
     ```sh
     git clone https://github.com/KeiranScript/archium.git
-    cd archie
+    cd archium
     ```
 
 2. **Compile the program:**
@@ -35,23 +35,29 @@ Archium is a command-line tool for managing packages on Arch Linux, providing a 
 
 ## Usage
 
-When you run `archie`, you will see the following prompt:
+When you run `archium`, you will see the following prompt:
 ```
-Welcome to Archie, type "h" for help
-$
+Welcome to Archium, type "h" for help
+Archium $
 ```
 
 You can then use the following commands:
 
-- `u` - Update the system
-- `i` - Install a package
-- `r` - Remove a package
-- `p` - Purge a package
-- `c` - Clean cache
-- `o` - Clean orphaned packages
-- `s` - Search for a package
-- `h` - Display help
-- `q` - Quit the application
+- `u` [package] - Update the system or specific package
+- `i`         - Install packages
+- `r`         - Remove packages
+- `p`         - Purge packages
+- `c`         - Clean cache
+- `cc`        - clean build cache
+- `o`         - Clean orphaned packages
+- `lo`        - List orphaned packages
+- `s`         - Search for packages
+- `l`         - List installed packages
+- `?`         - Display package information
+- `dt`        - Display package dependency tree
+- `cu`        - Check for updates
+- `h`         - Display help
+- `q`         - Quit the application
 
 ### Example
 
@@ -66,35 +72,43 @@ To install a package, type `i` and follow the prompt:
 
 - `--exec <command>` - Execute a specific command without entering the interactive prompt. The `<command>` can be one of the following:
 
-   - `u` - Update the system
-   - `i` - Install a package
-   - `r` - Remove a package
-   - `p` - Purge a package
-   - `c` - Clean cache
-   - `o` - Clean orphaned packages
-   - `s` - Search for a package
-   - `h` - Display help
+
+- `u` [package] - Update the system or specific package
+- `i`         - Install packages
+- `r`         - Remove packages
+- `p`         - Purge packages
+- `c`         - Clean cache
+- `cc`        - clean build cache
+- `o`         - Clean orphaned packages
+- `lo`        - List orphaned packages
+- `s`         - Search for packages
+- `l`         - List installed packages
+- `?`         - Display package information
+- `dt`        - Display package dependency tree
+- `cu`        - Check for updates
+- `h`         - Display help
+- `q`         - Quit the application
 
    Example:
 
    ```sh
-   archie --exec u
+   archium --exec u
    ```
 
-   This command will update the system directly from the command line. If you run `archie --exec` without specifying a command, you will be prompted to enter a command interactively.
+   This command will update the system directly from the command line. If you run `archium --exec` without specifying a command, you will be prompted to enter a command interactively.
 
 - `--version` - Display the version information:
 
     ```sh
-    archie --version
+    archium --version
     ```
 
     Output:
 
     ```
-        __     Archium v1.3 - Fast & easy package management for Arch Linux
+        __     Archium v1.4 - Fast & easy package management for Arch Linux
      .:--.'.   Written in C, powered by YAY and Pacman.
-    / |   \ |  paru v2.0.3 - libalpm v14.0.0
+    / |   \ |  paru v2.0.4 - libalpm v15.0.0
     `" __ | |  
      .'.''| |  
     / /   | |_ This program may be freely redistributed under the terms of the GNU General Public License.
@@ -115,13 +129,15 @@ To install a package, type `i` and follow the prompt:
     Archie uses yay by default, but if you only have paru installed it'll use it. If you have both and you want to use `paru` instead of `yay` create a file in `$HOME` called `.archie-use-paru`, and it will install `paru` instead of `yay`
 
 ```sh
-touch $HOME/.archie-use-paru
+touch $HOME/.archium-use-paru
 ```
 
 > [!NOTE]
-     if Archie fails to upgrade to a newer version, try cleaning cache using your prefered AUR helper of choice and installing it again, example given
+     if Archium fails to upgrade to a newer version, try cleaning cache using your prefered AUR helper of choice and installing it again, example given
 ```sh
- yay -Scc --noconfirm && yay -S archie --noconfirm
+ yay -Scc --noconfirm && yay -S archium --noconfirm
+
+ paru -Scc --noconfirm && paru -S archium --noconfirm
 ```
 
 ## License

@@ -15,7 +15,7 @@ void display_version() {
 
     char *pm_version = get_package_manager_version(package_manager);
 
-    printf("\033[1;36m    __     Archium v1.6 - Fast & easy package management for Arch Linux\n"
+    printf("\033[1;36m    __     Archium v1.4 - Fast & easy package management for Arch Linux\n"
            " .:--.'.   Written in C, powered by YAY, Paru, and Pacman.\n"
            "/ |   \\ |  %s %s\n"
            "`\" __ | |  \n"

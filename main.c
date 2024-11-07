@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
 
     cache_pacman_commands();
 
-    printf("\033[1;36mWelcome to Archium v1.6, type \"h\" for help\033[0m\n");
+    printf("\033[1;36mWelcome to Archium, type \"h\" for help\033[0m\n");
 
     while (1) {
         char input_line[MAX_INPUT_LENGTH];
