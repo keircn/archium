@@ -30,18 +30,18 @@ void display_version() {
 void display_help() {
     printf("\033[1;33mAvailable commands:\033[0m\n");
     printf("\033[1;32mu\033[0m [package] - Update system or specific package\n");
-    printf("\033[1;32mi\033[0m          - Install packages\n");
-    printf("\033[1;32mr\033[0m          - Remove packages\n");
-    printf("\033[1;32mp\033[0m          - Purge packages\n");
-    printf("\033[1;32mc\033[0m          - Clean cache\n");
-    printf("\033[1;32mccache\033[0m     - Clear package build cache\n");
-    printf("\033[1;32mo\033[0m          - Clean orphaned packages\n");
-    printf("\033[1;32mlo\033[0m         - List orphaned packages\n");
-    printf("\033[1;32ms\033[0m          - Search for packages\n");
-    printf("\033[1;32ml\033[0m          - List installed packages\n");
-    printf("\033[1;32minfo\033[0m       - Show package information\n");
-    printf("\033[1;32mdep\033[0m        - Display package dependency tree\n");
-    printf("\033[1;32mcheck\033[0m      - Check for updates\n");
-    printf("\033[1;32mh\033[0m          - Help\n");
-    printf("\033[1;32mq\033[0m          - Quit\n");
+    printf("\033[1;32mi\033[0m           - Install packages\n");
+    printf("\033[1;32mr\033[0m           - Remove packages\n");
+    printf("\033[1;32mp\033[0m           - Purge packages\n");
+    printf("\033[1;32mc\033[0m           - Clean cache\n");
+    printf("\033[1;32mcc\033[0m          - Clear package build cache\n");
+    printf("\033[1;32mo\033[0m           - Clean orphaned packages\n");
+    printf("\033[1;32mlo\033[0m          - List orphaned packages\n");
+    printf("\033[1;32ms\033[0m           - Search for packages\n");
+    printf("\033[1;32ml\033[0m           - List installed packages\n");
+    printf("\033[1;32m?\033[0m           - Show package information\n");
+    printf("\033[1;32mdt\033[0m          - Display package dependency tree\n");
+    printf("\033[1;32mcu\033[0m          - Check for updates\n");
+    printf("\033[1;32mh\033[0m           - Help\n");
+    printf("\033[1;32mq\033[0m           - Quit\n");
 }

@@ -28,7 +28,7 @@ void handle_command(const char *input, const char *package_manager) {
             purge_package(package_manager, packages);
         } else if (strcmp(input, "c") == 0) {
             clean_cache(package_manager);
-        } else if (strcmp(input, "ccache") == 0) {
+        } else if (strcmp(input, "cc") == 0) {
             clear_build_cache();
         } else if (strcmp(input, "o") == 0) {
             clean_orphans(package_manager);
@@ -42,15 +42,15 @@ void handle_command(const char *input, const char *package_manager) {
             search_package(package_manager, package);
         } else if (strcmp(input, "l") == 0) {
             list_installed_packages();
-        } else if (strcmp(input, "info") == 0) {
+        } else if (strcmp(input, "?") == 0) {
             char package[MAX_INPUT_LENGTH];
             rl_attempted_completion_function = command_completion;
             get_input(package, "Enter package name to show info: ");
             rl_attempted_completion_function = NULL;
             show_package_info(package_manager, package);
-        } else if (strcmp(input, "check") == 0) {
+        } else if (strcmp(input, "cu") == 0) {
             check_package_updates();
-        } else if (strcmp(input, "dep") == 0) {
+        } else if (strcmp(input, "dt") == 0) {
             char package[MAX_INPUT_LENGTH];
             rl_attempted_completion_function = command_completion;
             get_input(package, "Enter package name to view dependencies: ");
