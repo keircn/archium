@@ -109,3 +109,109 @@ void display_dependency_tree(const char *package_manager, const char *package) {
     snprintf(command, sizeof(command), "pactree %s", package);
     system(command);
 }
+
+void install_package(const char *package_manager, const char *packages) {
+    printf("\033[1;34mInstalling packages: %s\033[0m\n", packages);
+    char command[COMMAND_BUFFER_SIZE];
+    snprintf(command, sizeof(command), "%s -S %s", package_manager, packages);
+    system(command);
+    char log_entry[COMMAND_BUFFER_SIZE];
+    snprintf(log_entry, sizeof(log_entry), "Installed packages: %s", packages);
+    log_action(log_entry);
+}
+
+void remove_package(const char *package_manager, const char *packages) {
+    printf("\033[1;34mRemoving packages: %s\033[0m\n", packages);
+    char command[COMMAND_BUFFER_SIZE];
+    snprintf(command, sizeof(command), "%s -R %s", package_manager, packages);
+    system(command);
+    char log_entry[COMMAND_BUFFER_SIZE];
+    snprintf(log_entry, sizeof(log_entry), "Removed packages: %s", packages);
+    log_action(log_entry);
+}
+
+void purge_package(const char *package_manager, const char *packages) {
+    printf("\033[1;34mPurging packages: %s\033[0m\n", packages);
+    char command[COMMAND_BUFFER_SIZE];
+    snprintf(command, sizeof(command), "%s -Rns %s", package_manager, packages);
+    system(command);
+    char log_entry[COMMAND_BUFFER_SIZE];
+    snprintf(log_entry, sizeof(log_entry), "Purged packages: %s", packages);
+    log_action(log_entry);
+}
+
+void clean_cache(const char *package_manager) {
+    printf("\033[1;34mCleaning package cache...\033[0m\n");
+    char command[COMMAND_BUFFER_SIZE];
+    snprintf(command, sizeof(command), "%s -Sc --noconfirm", package_manager);
+    system(command);
+    log_action("Cache cleaned");
+}
+
+void clean_orphans(const char *package_manager) {
+    printf("\033[1;34mCleaning orphaned packages...\033[0m\n");
+    char command[COMMAND_BUFFER_SIZE];
+    snprintf(command, sizeof(command), "%s -Rns $(pacman -Qdtq)", package_manager);
+    system(command);
+    log_action("Orphaned packages cleaned");
+}
+
+void search_package(const char *package_manager, const char *package) {
+    printf("\033[1;34mSearching for package: %s\033[0m\n", package);
+    char command[COMMAND_BUFFER_SIZE];
+    snprintf(command, sizeof(command), "%s -Ss %s", package_manager, package);
+    system(command);
+}
+
+void list_installed_packages(void) {
+    printf("\033[1;34mListing installed packages...\033[0m\n");
+    system("pacman -Qe");
+}
+
+void show_package_info(const char *package_manager, const char *package) {
+    printf("\033[1;34mShowing information for package: %s\033[0m\n", package);
+    char command[COMMAND_BUFFER_SIZE];
+    snprintf(command, sizeof(command), "%s -Si %s", package_manager, package);
+    system(command);
+}
+
+void check_package_updates(void) {
+    printf("\033[1;34mChecking for package updates...\033[0m\n");
+    system("pacman -Qu");
+    log_action("Checked for updates");
+}
+
+// Fix the unused parameter warning
+void display_dependency_tree(const char *package_manager, const char *package) {
+    (void)package_manager; // Silence unused parameter warning
+    printf("\033[1;34mDisplaying dependency tree for package: %s\033[0m\n", package);
+    char command[COMMAND_BUFFER_SIZE];
+    snprintf(command, sizeof(command), "pactree %s", package);
+    system(command);
+}
+
+char *get_package_manager_version(const char *package_manager) {
+    char command[COMMAND_BUFFER_SIZE];
+    snprintf(command, sizeof(command), "%s --version", package_manager);
+    FILE *fp = popen(command, "r");
+    if (fp == NULL) {
+        return strdup("unknown");
+    }
+
+    char version[COMMAND_BUFFER_SIZE];
+    if (fgets(version, sizeof(version), fp) != NULL) {
+        version[strcspn(version, "\n")] = '\0';
+    } else {
+        strcpy(version, "unknown");
+    }
+    pclose(fp);
+
+    char *version_start = strstr(version, " ");
+    if (version_start != NULL) {
+        version_start++;
+    } else {
+        version_start = version;
+    }
+
+    return strdup(version_start);
+}
