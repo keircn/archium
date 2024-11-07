@@ -1,6 +1,6 @@
-# Archie - Fast & Easy Package Management for Arch Linux
+# Archium - Fast & Easy Package Management for Arch Linux
 
-Archie is a command-line tool for managing packages on Arch Linux, providing a simple interface for common package management tasks using `yay` or `paru`.
+Archium is a command-line tool for managing packages on Arch Linux, providing a simple interface for common package management tasks using `yay` or `paru`.
 
 ## Features
 
@@ -17,7 +17,7 @@ Archie is a command-line tool for managing packages on Arch Linux, providing a s
 1. **Clone the repository:**
 
     ```sh
-    git clone https://github.com/zackychann/archie.git
+    git clone https://github.com/KeiranScript/archium.git
     cd archie
     ```
 
@@ -31,14 +31,6 @@ Archie is a command-line tool for managing packages on Arch Linux, providing a s
 
     ```sh
     sudo make install
-    ```
-
-4. **AUR**
-
-    Archie is also available on the [AUR](https://aur.archlinux.org/packages/archie). You can install it using your preferred AUR helper. For example, with `yay`:
-
-    ```sh
-    yay -S archie
     ```
 
 ## Usage
@@ -100,14 +92,14 @@ To install a package, type `i` and follow the prompt:
     Output:
 
     ```
-        __     Archie v1.3 - Fast & easy package management for Arch Linux
+        __     Archium v1.3 - Fast & easy package management for Arch Linux
      .:--.'.   Written in C, powered by YAY and Pacman.
     / |   \ |  paru v2.0.3 - libalpm v14.0.0
     `" __ | |  
      .'.''| |  
     / /   | |_ This program may be freely redistributed under the terms of the GNU General Public License.
-    \ \._,\ '/ Created & maintained by Gurov
-     `--'  `"  With the help of scklss and Keiran
+    \ \._,\ '/ Archie originally created & maintained by Gurov with the help of scklss
+     `--'  `"  
     ```
 
 ## Dependencies
