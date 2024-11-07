@@ -103,13 +103,6 @@ void list_orphans() {
     system("pacman -Qdt");
 }
 
-void display_dependency_tree(const char *package_manager, const char *package) {
-    printf("\033[1;34mDisplaying dependency tree for package: %s\033[0m\n", package);
-    char command[COMMAND_BUFFER_SIZE];
-    snprintf(command, sizeof(command), "pactree %s", package);
-    system(command);
-}
-
 void install_package(const char *package_manager, const char *packages) {
     printf("\033[1;34mInstalling packages: %s\033[0m\n", packages);
     char command[COMMAND_BUFFER_SIZE];
@@ -181,9 +174,8 @@ void check_package_updates(void) {
     log_action("Checked for updates");
 }
 
-// Fix the unused parameter warning
 void display_dependency_tree(const char *package_manager, const char *package) {
-    (void)package_manager; // Silence unused parameter warning
+    (void)package_manager;
     printf("\033[1;34mDisplaying dependency tree for package: %s\033[0m\n", package);
     char command[COMMAND_BUFFER_SIZE];
     snprintf(command, sizeof(command), "pactree %s", package);
