@@ -7,15 +7,16 @@
 #include <readline/history.h>
 #include <signal.h>
 #include <time.h>
+#include <ctype.h>
 
 #define MAX_INPUT_LENGTH 256
 #define COMMAND_BUFFER_SIZE 512
-#define LOG_FILE_PATH "/var/log/archie.log"
+#define LOG_FILE_PATH "/var/log/archium.log"
 
 // Function Prototypes
 void log_action(const char *action);
 void handle_signal(int signal);
-int check_archie_file();
+int check_archium_file();
 int check_package_manager();
 int check_git();
 void install_git();
@@ -27,10 +28,13 @@ void purge_package(const char *package_manager, const char *packages);
 void clean_cache(const char *package_manager);
 void clean_orphans(const char *package_manager);
 void search_package(const char *package_manager, const char *package);
+void list_installed_packages();
+void show_package_info(const char *package_manager, const char *package);
+void check_package_updates();
 void display_help();
 void prompt_install_yay();
 void get_input(char *input, const char *prompt);
-int is_valid_command(char command);
+int is_valid_command(const char *command);
 void handle_command(const char *input, const char *package_manager);
 void handle_exec_command(const char *command, const char *package_manager);
 void display_version();
@@ -59,16 +63,16 @@ void handle_signal(int signal) {
     }
 }
 
-int check_archie_file() {
+int check_archium_file() {
     const char *home = getenv("HOME");
     char path[MAX_INPUT_LENGTH];
-    snprintf(path, sizeof(path), "%s/.archie-use-paru", home);
+    snprintf(path, sizeof(path), "%s/.archium-use-paru", home);
     struct stat buffer;
     return (stat(path, &buffer) == 0);
 }
 
 int check_package_manager() {
-    if (check_archie_file()) {
+    if (check_archium_file()) {
         return 2;  // paru
     }
     if (system("command -v yay > /dev/null 2>&1") == 0) {
@@ -88,23 +92,24 @@ int check_git() {
 }
 
 void install_git() {
-    printf("Installing git...\n");
+    printf("\033[1;32mInstalling git...\033[0m\n");
     system("sudo pacman -S --noconfirm git");
 }
 
 void install_yay() {
-    printf("Installing yay...\n");
-    system("mkdir -p $HOME/.cache/archie/made-by-gurov && "
-           "cd $HOME/.cache/archie/made-by-gurov && "
+    printf("\033[1;32mInstalling yay...\033[0m\n");
+    system("mkdir -p $HOME/.cache/archium/setup && "
+           "cd $HOME/.cache/archium/setup && "
            "git clone https://aur.archlinux.org/yay-bin.git && "
            "cd yay-bin && "
            "makepkg -scCi && "
            "cd && "
-           "rm -rf $HOME/.cache/archie/");
-    printf("Installation of yay is complete. Please restart your shell and relaunch the script.\n");
+           "rm -rf $HOME/.cache/archium/");
+    printf("\033[1;32mInstallation of yay is complete. Please restart your shell and relaunch Archium.\033[0m\n");
 }
 
 void update_system(const char *package_manager) {
+    printf("\033[1;34mUpdating system...\033[0m\n");
     char command[COMMAND_BUFFER_SIZE];
     snprintf(command, sizeof(command), "%s -Syu --noconfirm", package_manager);
     system(command);
@@ -112,6 +117,7 @@ void update_system(const char *package_manager) {
 }
 
 void install_package(const char *package_manager, const char *packages) {
+    printf("\033[1;34mInstalling packages: %s\033[0m\n", packages);
     char command[COMMAND_BUFFER_SIZE];
     snprintf(command, sizeof(command), "%s -S %s", package_manager, packages);
     system(command);
@@ -121,6 +127,7 @@ void install_package(const char *package_manager, const char *packages) {
 }
 
 void remove_package(const char *package_manager, const char *packages) {
+    printf("\033[1;34mRemoving packages: %s\033[0m\n", packages);
     char command[COMMAND_BUFFER_SIZE];
     snprintf(command, sizeof(command), "%s -R %s", package_manager, packages);
     system(command);
@@ -130,6 +137,7 @@ void remove_package(const char *package_manager, const char *packages) {
 }
 
 void purge_package(const char *package_manager, const char *packages) {
+    printf("\033[1;34mPurging packages: %s\033[0m\n", packages);
     char command[COMMAND_BUFFER_SIZE];
     snprintf(command, sizeof(command), "%s -Rns %s", package_manager, packages);
     system(command);
@@ -139,6 +147,7 @@ void purge_package(const char *package_manager, const char *packages) {
 }
 
 void clean_cache(const char *package_manager) {
+    printf("\033[1;34mCleaning cache...\033[0m\n");
     char command[COMMAND_BUFFER_SIZE];
     snprintf(command, sizeof(command), "%s -Sc --noconfirm", package_manager);
     system(command);
@@ -146,6 +155,7 @@ void clean_cache(const char *package_manager) {
 }
 
 void clean_orphans(const char *package_manager) {
+    printf("\033[1;34mCleaning orphaned packages...\033[0m\n");
     char command[COMMAND_BUFFER_SIZE];
     snprintf(command, sizeof(command), "%s -Rns $(pacman -Qdtq)", package_manager);
     system(command);
@@ -153,38 +163,59 @@ void clean_orphans(const char *package_manager) {
 }
 
 void search_package(const char *package_manager, const char *package) {
+    printf("\033[1;34mSearching for package: %s\033[0m\n", package);
     char command[COMMAND_BUFFER_SIZE];
     snprintf(command, sizeof(command), "%s -Ss %s", package_manager, package);
     system(command);
 }
 
+void list_installed_packages() {
+    printf("\033[1;34mListing installed packages...\033[0m\n");
+    system("pacman -Qe");
+}
+
+void show_package_info(const char *package_manager, const char *package) {
+    printf("\033[1;34mShowing info for package: %s\033[0m\n", package);
+    char command[COMMAND_BUFFER_SIZE];
+    snprintf(command, sizeof(command), "%s -Qi %s", package_manager, package);
+    system(command);
+}
+
+void check_package_updates() {
+    printf("\033[1;34mChecking for package updates...\033[0m\n");
+    system("pacman -Qu");
+}
+
 void display_help() {
-    printf("Available options are:\n");
-    printf("u - Update the system\n");
-    printf("i - Install packages (space-separated for multiple packages)\n");
-    printf("r - Remove packages (space-separated for multiple packages)\n");
-    printf("p - Purge packages (space-separated for multiple packages)\n");
-    printf("c - Clean cache\n");
-    printf("o - Clean orphaned packages\n");
-    printf("s - Search for a package\n");
-    printf("h - Help\n");
-    printf("q - Quit\n");
+    printf("\033[1;33mAvailable commands:\033[0m\n");
+    printf("\033[1;32mu\033[0m    - Update the system\n");
+    printf("\033[1;32mi\033[0m    - Install packages (space-separated for multiple packages)\n");
+    printf("\033[1;32mr\033[0m    - Remove packages (space-separated for multiple packages)\n");
+    printf("\033[1;32mp\033[0m    - Purge packages (space-separated for multiple packages)\n");
+    printf("\033[1;32mc\033[0m    - Clean cache\n");
+    printf("\033[1;32mo\033[0m    - Clean orphaned packages\n");
+    printf("\033[1;32ms\033[0m    - Search for a package\n");
+    printf("\033[1;32ml\033[0m    - List installed packages\n");
+    printf("\033[1;32minfo\033[0m - Show package information\n");
+    printf("\033[1;32mcheck\033[0m - Check for package updates\n");
+    printf("\033[1;32mh\033[0m    - Help\n");
+    printf("\033[1;32mq\033[0m    - Quit\n");
 }
 
 void prompt_install_yay() {
     char response[10];
-    printf("Error: No suitable package manager is installed.\n");
+    printf("\033[1;31mError: No suitable package manager is installed.\033[0m\n");
     sleep(1);
-    printf("Do you want to install yay? (y/n): ");
+    printf("Do you want to install yay? (\033[1;32my\033[0m/\033[1;31mn\033[0m): ");
     scanf("%s", response);
 
-    if (strcmp(response, "y") == 0 || strcmp(response, "yes") == 0) {
+    if (strcasecmp(response, "y") == 0 || strcasecmp(response, "yes") == 0) {
         if (!check_git()) {
             install_git();
         }
         install_yay();
     } else {
-        printf("Exiting the program.\n");
+        printf("\033[1;31mExiting Archium.\033[0m\n");
         exit(0);
     }
 }
@@ -198,106 +229,83 @@ void get_input(char *input, const char *prompt) {
         input[0] = '\0';  // Handle EOF
     }
 
-    // Remove newline character
-    input[strcspn(input, "\n")] = 0;
+    // Remove leading and trailing whitespace
+    char *start = input;
+    while (isspace((unsigned char)*start)) start++;
+    memmove(input, start, strlen(start) + 1);
+    char *end = input + strlen(input) - 1;
+    while (end > input && isspace((unsigned char)*end)) end--;
+    end[1] = '\0';
 
     if (strlen(input) == 0) {
         get_input(input, prompt);
     }
 }
 
-int is_valid_command(char command) {
-    return command == 'u' || command == 'i' || command == 'r' ||
-           command == 'p' || command == 'c' || command == 'o' ||
-           command == 's' || command == 'h' || command == 'q';
+int is_valid_command(const char *command) {
+    return strcmp(command, "u") == 0 || strcmp(command, "i") == 0 || strcmp(command, "r") == 0 ||
+           strcmp(command, "p") == 0 || strcmp(command, "c") == 0 || strcmp(command, "o") == 0 ||
+           strcmp(command, "s") == 0 || strcmp(command, "h") == 0 || strcmp(command, "q") == 0 ||
+           strcmp(command, "l") == 0 || strcmp(command, "info") == 0 || strcmp(command, "check") == 0;
 }
 
 void handle_command(const char *input, const char *package_manager) {
-    char choice = input[0];
-    if (strlen(input) == 1 && is_valid_command(choice)) {
-        switch (choice) {
-            case 'u':
-                update_system(package_manager);
-                break;
-            case 'i': {
-                char packages[MAX_INPUT_LENGTH];
-                rl_attempted_completion_function = command_completion;
-                get_input(packages, "Enter package names to install: ");
-                rl_attempted_completion_function = NULL;
-                install_package(package_manager, packages);
-                break;
-            }
-            case 'r': {
-                char packages[MAX_INPUT_LENGTH];
-                rl_attempted_completion_function = command_completion;
-                get_input(packages, "Enter package names to remove: ");
-                rl_attempted_completion_function = NULL;
-                remove_package(package_manager, packages);
-                break;
-            }
-            case 'p': {
-                char packages[MAX_INPUT_LENGTH];
-                rl_attempted_completion_function = command_completion;
-                get_input(packages, "Enter package names to purge: ");
-                rl_attempted_completion_function = NULL;
-                purge_package(package_manager, packages);
-                break;
-            }
-            case 'c':
-                clean_cache(package_manager);
-                break;
-            case 'o':
-                clean_orphans(package_manager);
-                break;
-            case 's': {
-                char package[MAX_INPUT_LENGTH];
-                get_input(package, "Enter package name to search: ");
-                search_package(package_manager, package);
-                break;
-            }
-            case 'h':
-                display_help();
-                break;
-            case 'q':
-                exit(0);
-                break;
-            default:
-                printf("Invalid option.\n");
-                break;
+    if (is_valid_command(input)) {
+        if (strcmp(input, "u") == 0) {
+            update_system(package_manager);
+        } else if (strcmp(input, "i") == 0) {
+            char packages[MAX_INPUT_LENGTH];
+            rl_attempted_completion_function = command_completion;
+            get_input(packages, "Enter package names to install: ");
+            rl_attempted_completion_function = NULL;
+            install_package(package_manager, packages);
+        } else if (strcmp(input, "r") == 0) {
+            char packages[MAX_INPUT_LENGTH];
+            rl_attempted_completion_function = command_completion;
+            get_input(packages, "Enter package names to remove: ");
+            rl_attempted_completion_function = NULL;
+            remove_package(package_manager, packages);
+        } else if (strcmp(input, "p") == 0) {
+            char packages[MAX_INPUT_LENGTH];
+            rl_attempted_completion_function = command_completion;
+            get_input(packages, "Enter package names to purge: ");
+            rl_attempted_completion_function = NULL;
+            purge_package(package_manager, packages);
+        } else if (strcmp(input, "c") == 0) {
+            clean_cache(package_manager);
+        } else if (strcmp(input, "o") == 0) {
+            clean_orphans(package_manager);
+        } else if (strcmp(input, "s") == 0) {
+            char package[MAX_INPUT_LENGTH];
+            get_input(package, "Enter package name to search: ");
+            search_package(package_manager, package);
+        } else if (strcmp(input, "l") == 0) {
+            list_installed_packages();
+        } else if (strcmp(input, "info") == 0) {
+            char package[MAX_INPUT_LENGTH];
+            get_input(package, "Enter package name to show info: ");
+            show_package_info(package_manager, package);
+        } else if (strcmp(input, "check") == 0) {
+            check_package_updates();
+        } else if (strcmp(input, "h") == 0) {
+            display_help();
+        } else if (strcmp(input, "q") == 0) {
+            printf("\033[1;31mExiting Archium.\033[0m\n");
+            exit(0);
+        } else {
+            printf("\033[1;31mInvalid option.\033[0m\n");
         }
     } else {
-        printf("Invalid input. Please input a valid command.\n");
+        printf("\033[1;31mInvalid input. Please input a valid command.\033[0m\n");
         display_help();
     }
 }
 
 void handle_exec_command(const char *command, const char *package_manager) {
-    if (strcmp(command, "u") == 0) {
-        update_system(package_manager);
-    } else if (strcmp(command, "i") == 0) {
-        char packages[MAX_INPUT_LENGTH];
-        get_input(packages, "Enter package names to install: ");
-        install_package(package_manager, packages);
-    } else if (strcmp(command, "r") == 0) {
-        char packages[MAX_INPUT_LENGTH];
-        get_input(packages, "Enter package names to remove: ");
-        remove_package(package_manager, packages);
-    } else if (strcmp(command, "p") == 0) {
-        char packages[MAX_INPUT_LENGTH];
-        get_input(packages, "Enter package names to purge: ");
-        purge_package(package_manager, packages);
-    } else if (strcmp(command, "c") == 0) {
-        clean_cache(package_manager);
-    } else if (strcmp(command, "o") == 0) {
-        clean_orphans(package_manager);
-    } else if (strcmp(command, "s") == 0) {
-        char package[MAX_INPUT_LENGTH];
-        get_input(package, "Enter package name to search: ");
-        search_package(package_manager, package);
-    } else if (strcmp(command, "h") == 0) {
-        display_help();
+    if (is_valid_command(command)) {
+        handle_command(command, package_manager);
     } else {
-        printf("Invalid command for --exec: %s\n", command);
+        printf("\033[1;31mInvalid command for --exec: %s\033[0m\n", command);
     }
 }
 
@@ -343,14 +351,14 @@ void display_version() {
 
     char *pm_version = get_package_manager_version(package_manager);
 
-    printf("    __     Archie v1.4 - Fast & easy package management for Arch Linux\n"
+    printf("\033[1;36m    __     Archium v1.5 - Fast & easy package management for Arch Linux\n"
            " .:--.'.   Written in C, powered by YAY, Paru, and Pacman.\n"
-           "/ |   \\ |  %s %s\n"  // Package manager and version
+           "/ |   \\ |  %s %s\n"
            "`\" __ | |  \n"
            " .'.''| |  \n"
-           "/ /   | |_ This program may be freely redistributed under the terms of the GNU General Public License.\n"
-           "\\ \\._,\\ '/ Created & maintained by Gurov\n"
-           " `--'  `\"  With enhancements by the community\n", package_manager, pm_version);
+           "/ /   | |_ \033[0mThis program may be freely redistributed under the terms of the GNU General Public License.\n"
+           "\033[1;36m\\ \\._,\\ '/ \033[0mCreated & maintained by Keiran\n"
+           "\033[1;36m `--'  `\"  \033[0mWith enhancements by the community\n", package_manager, pm_version);
     free(pm_version);
 }
 
@@ -366,7 +374,7 @@ void cache_pacman_commands() {
     // Execute the pacman -Ssq command
     fp = popen("pacman -Ssq", "r");
     if (fp == NULL) {
-        printf("Failed to run command\n");
+        printf("\033[1;31mFailed to run command\033[0m\n");
         exit(1);
     }
 
@@ -482,11 +490,11 @@ int main(int argc, char *argv[]) {
 
     cache_pacman_commands();
 
-    printf("Welcome to Archie v1.4, type \"h\" for help\n");
+    printf("\033[1;36mWelcome to Archium v1.5, type \"h\" for help\033[0m\n");
 
     while (1) {
         char input_line[MAX_INPUT_LENGTH];
-        get_input(input_line, "$ ");
+        get_input(input_line, "\033[1;32mArchium$ \033[0m");
         if (*input_line) {
             add_history(input_line);
             handle_command(input_line, package_manager);
