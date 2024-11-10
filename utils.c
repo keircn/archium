@@ -12,7 +12,7 @@ void log_action(const char *action) {
 void handle_signal(int signal) {
     if (signal == SIGINT) {
         printf("\nInterrupt received. Exiting gracefully.\n");
-        exit(0);
+        exit(EXIT_SUCCESS);
     }
 }
 

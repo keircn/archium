@@ -1,6 +1,6 @@
 #include "archium.h"
 
-void cache_pacman_commands() {
+void cache_pacman_commands(void) {
     if (cached_commands) {
         return;
     }
@@ -11,8 +11,8 @@ void cache_pacman_commands() {
 
     fp = popen("pacman -Ssq", "r");
     if (fp == NULL) {
-        printf("\033[1;31mFailed to run command\033[0m\n");
-        exit(1);
+        fprintf(stderr, "\033[1;31mFailed to run command\033[0m\n");
+        exit(EXIT_FAILURE);
     }
 
     while (fgets(path, sizeof(path), fp) != NULL) {

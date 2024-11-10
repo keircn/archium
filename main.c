@@ -13,15 +13,19 @@ int main(int argc, char *argv[]) {
     const char *package_manager;
     int pm_check = check_package_manager();
 
-    if (pm_check == 1) {
-        package_manager = "yay";
-    } else if (pm_check == 2) {
-        package_manager = "paru";
-    } else if (pm_check == 3) {
-        package_manager = "pacman";
-    } else {
-        prompt_install_yay();
-        return 1;
+    switch (pm_check) {
+        case 1:
+            package_manager = "yay";
+            break;
+        case 2:
+            package_manager = "paru";
+            break;
+        case 3:
+            package_manager = "pacman";
+            break;
+        default:
+            prompt_install_yay();
+            return 1;
     }
 
     if (argc > 2 && strcmp(argv[1], "--exec") == 0) {

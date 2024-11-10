@@ -1,6 +1,6 @@
 #include "archium.h"
 
-int check_archium_file() {
+int check_archium_file(void) {
     const char *home = getenv("HOME");
     char path[MAX_INPUT_LENGTH];
     snprintf(path, sizeof(path), "%s/.archium-use-paru", home);
@@ -8,7 +8,7 @@ int check_archium_file() {
     return (stat(path, &buffer) == 0);
 }
 
-int check_package_manager() {
+int check_package_manager(void) {
     if (check_archium_file()) {
         return 2;  // paru
     }
@@ -24,16 +24,16 @@ int check_package_manager() {
     return 0;  // none
 }
 
-int check_git() {
+int check_git(void) {
     return system("command -v git > /dev/null 2>&1") == 0;
 }
 
-void install_git() {
+void install_git(void) {
     printf("\033[1;32mInstalling git...\033[0m\n");
     system("sudo pacman -S --noconfirm git");
 }
 
-void install_yay() {
+void install_yay(void) {
     printf("\033[1;32mInstalling yay...\033[0m\n");
     system("mkdir -p $HOME/.cache/archium/setup && "
            "cd $HOME/.cache/archium/setup && "
@@ -45,7 +45,7 @@ void install_yay() {
     printf("\033[1;32mInstallation of yay is complete. Please restart your shell and relaunch Archium.\033[0m\n");
 }
 
-void prompt_install_yay() {
+void prompt_install_yay(void) {
     char response[10];
     printf("\033[1;31mError: No suitable package manager is installed.\033[0m\n");
     sleep(1);
@@ -59,6 +59,6 @@ void prompt_install_yay() {
         install_yay();
     } else {
         printf("\033[1;31mExiting Archium.\033[0m\n");
-        exit(0);
+        exit(EXIT_FAILURE);
     }
 }

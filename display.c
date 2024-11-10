@@ -1,16 +1,20 @@
 #include "archium.h"
 
-void display_version() {
+void display_version(void) {
     int pm_check = check_package_manager();
     const char *package_manager;
-    if (pm_check == 1) {
-        package_manager = "yay";
-    } else if (pm_check == 2) {
-        package_manager = "paru";
-    } else if (pm_check == 3) {
-        package_manager = "pacman";
-    } else {
-        package_manager = "none";
+    switch (pm_check) {
+        case 1:
+            package_manager = "yay";
+            break;
+        case 2:
+            package_manager = "paru";
+            break;
+        case 3:
+            package_manager = "pacman";
+            break;
+        default:
+            package_manager = "none";
     }
 
     char *pm_version = get_package_manager_version(package_manager);
@@ -27,7 +31,7 @@ void display_version() {
     free(pm_version);
 }
 
-void display_help() {
+void display_help(void) {
     printf("\033[1;33mAvailable commands:\033[0m\n");
     printf("\033[1;32mu\033[0m [package] - Update system or specific package\n");
     printf("\033[1;32mi\033[0m           - Install packages\n");
