@@ -22,10 +22,9 @@ void get_input(char *input, const char *prompt) {
         strcpy(input, line);
         free(line);
     } else {
-        input[0] = '\0';  // Handle EOF
+        input[0] = '\0';
     }
 
-    // Remove leading and trailing whitespace
     char *start = input;
     while (isspace((unsigned char)*start)) start++;
     memmove(input, start, strlen(start) + 1);

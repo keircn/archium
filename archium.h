@@ -16,7 +16,6 @@
 #define COMMAND_BUFFER_SIZE 512
 #define LOG_FILE_PATH "/var/log/archium.log"
 
-// Function Prototypes
 void log_action(const char *action);
 void handle_signal(int signal);
 int check_archium_file();
@@ -50,7 +49,6 @@ char **command_completion(const char *text, int start, int end);
 char *get_package_manager_version(const char *package_manager);
 void cache_pacman_commands();
 
-// Global Variables
 extern char **cached_commands;
 
-#endif // ARCHIUM_H
+#endif
