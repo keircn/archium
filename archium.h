@@ -37,18 +37,28 @@ typedef enum {
 extern ArchiumConfig config;
 ArchiumError parse_arguments(int argc, char *argv[]);
 
+// Package manager functions
+int check_package_manager(void);
+void prompt_install_yay(void);
+
+// Display functions
+void display_version(void);
+void display_help(void);
+
+// Command completion functions
+char** command_completion(const char *text, int start, int end);
+char* command_generator(const char *text, int state);
+void cache_pacman_commands(void);
+
+// Logging functions
 void log_action(const char *action);
 void log_error(const char *error_message, ArchiumError error_code);
 void log_debug(const char *debug_message);
 void log_info(const char *info_message);
 
-const char* get_error_string(ArchiumError error_code);
-void handle_error(ArchiumError error_code, const char *context);
-
+// Other functions
 void handle_signal(int signal);
 int check_archium_file(void);
-int check_package_manager(void);
-int check_git(void);
 void install_git(void);
 void install_yay(void);
 void update_system(const char *package_manager, const char *package);
@@ -66,16 +76,11 @@ void check_package_updates(void);
 void display_dependency_tree(const char *package_manager, const char *package);
 void clear_build_cache(void);
 void list_orphans(void);
-void display_help(void);
-void prompt_install_yay(void);
 void get_input(char *input, const char *prompt);
 int is_valid_command(const char *command);
-void display_version(void);
 char **get_pacman_commands(void);
 char *command_generator(const char *text, int state);
-char **command_completion(const char *text, int start, int end);
 char *get_package_manager_version(const char *package_manager);
-void cache_pacman_commands(void);
 
 extern char **cached_commands;
 

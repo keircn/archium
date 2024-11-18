@@ -3,7 +3,7 @@ CFLAGS = -Wall -Wextra -O2 -g
 LDFLAGS = -lreadline -lncurses
 
 BUILD_DIR = build
-SRC = main.c commands.c error_handling.c utils.c
+SRC = main.c commands.c error_handling.c utils.c package_manager.c display.c autocomplete.c
 OBJ = $(SRC:%.c=$(BUILD_DIR)/%.o)
 TARGET = $(BUILD_DIR)/archium
 
