@@ -61,7 +61,6 @@ void display_help(void);
 void prompt_install_yay(void);
 void get_input(char *input, const char *prompt);
 int is_valid_command(const char *command);
-void handle_exec_command(const char *command, const char *package_manager);
 void display_version(void);
 char **get_pacman_commands(void);
 char *command_generator(const char *text, int state);
