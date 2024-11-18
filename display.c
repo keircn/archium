@@ -19,14 +19,14 @@ void display_version(void) {
 
     char *pm_version = get_package_manager_version(package_manager);
 
-    printf("\033[1;36m    __     Archium v1.4 - Fast & easy package management for Arch Linux\n"
+    printf("\033[1;36m    __     Archium v1.5 - Fast & easy package management for Arch Linux\n"
            " .:--.'.   Written in C, powered by YAY, Paru, and Pacman.\n"
            "/ |   \\ |  %s %s\n"
            "`\" __ | |  \n"
            " .'.''| |  \n"
            "/ /   | |_ \033[0mThis program may be freely redistributed under the terms of the GNU General Public License.\n"
-           "\033[1;36m\\ \\._,\\ '/ \033[0mCreated & maintained by Keiran\n"
-           "\033[1;36m `--'  `\"  \033[0mWith enhancements by the community\n", 
+           "\033[1;36m\\ \\._,\\ '/ \033[0mOriginally created & maintained by Gurov\n"
+           "\033[1;36m `--'  `\"  \033[0mArchium forked and maintained by Keiran\n", 
            package_manager, pm_version);
     free(pm_version);
 }

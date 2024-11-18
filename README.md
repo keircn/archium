@@ -103,24 +103,12 @@ To install a package, type `i` and follow the prompt:
     archium --version
     ```
 
-    Output:
-
-    ```
-        __     Archium v1.4 - Fast & easy package management for Arch Linux
-     .:--.'.   Written in C, powered by YAY and Pacman.
-    / |   \ |  paru v2.0.4 - libalpm v15.0.0
-    `" __ | |  
-     .'.''| |  
-    / /   | |_ This program may be freely redistributed under the terms of the GNU General Public License.
-    \ \._,\ '/ Archie originally created & maintained by Gurov
-     `--'  `"  
-    ```
-
 ## Dependencies
 
 - `gcc` - GNU Compiler Collection
 - `yay` or `paru` - AUR helpers for Arch Linux
 - `git` - For installing `yay` if it is not already installed
+ 
 - `readline` - A library for command-line input, probably preinstalled
 - `ncurses` - A library for text-based user interfaces, probably preinstalled
 
