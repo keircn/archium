@@ -3,7 +3,10 @@
 char **cached_commands = NULL;
 
 int main(int argc, char *argv[]) {
-    ArchiumError status = ARCHIUM_SUCCESS;
+    ArchiumError status = parse_arguments(argc, argv);
+    if (status != ARCHIUM_SUCCESS) {
+        return status;
+    }
     
     signal(SIGINT, handle_signal);
     signal(SIGTERM, handle_signal);
@@ -11,7 +14,7 @@ int main(int argc, char *argv[]) {
 
     log_info("Archium started");
 
-    if (argc > 1 && strcmp(argv[1], "--version") == 0) {
+    if (config.version) {
         display_version();
         return ARCHIUM_SUCCESS;
     }
@@ -47,15 +50,9 @@ int main(int argc, char *argv[]) {
     rl_attempted_completion_function = command_completion;
     cache_pacman_commands();
 
-    if (argc > 2 && strcmp(argv[1], "--exec") == 0) {
-        status = handle_exec_command(argv[2], package_manager);
+    if (config.exec) {
+        status = handle_exec_command(config.exec_command, package_manager);
         log_info("Executed command in exec mode");
-        return status;
-    } else if (argc == 2 && strcmp(argv[1], "--exec") == 0) {
-        char command[MAX_INPUT_LENGTH];
-        get_input(command, "\033[1;36mEnter command to execute (type 'h' for help): \033[0m");
-        status = handle_exec_command(command, package_manager);
-        log_info("Executed interactive command in exec mode");
         return status;
     }
 

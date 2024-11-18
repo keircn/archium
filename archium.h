@@ -17,6 +17,13 @@
 #define MAX_RETRIES 3
 #define TIMEOUT_SECONDS 30
 
+typedef struct {
+    int verbose;
+    int version;
+    int exec_mode;
+    char *exec_command;
+} ArchiumConfig;
+
 typedef enum {
     ARCHIUM_SUCCESS = 0,
     ARCHIUM_ERROR_INVALID_INPUT = -1,
@@ -25,6 +32,10 @@ typedef enum {
     ARCHIUM_ERROR_PERMISSION = -4,
     ARCHIUM_ERROR_TIMEOUT = -5
 } ArchiumError;
+
+// Configuration
+extern ArchiumConfig config;
+ArchiumError parse_arguments(int argc, char *argv[]);
 
 void log_action(const char *action);
 void log_error(const char *error_message, ArchiumError error_code);
