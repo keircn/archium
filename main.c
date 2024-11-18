@@ -9,11 +9,6 @@ int main(int argc, char *argv[]) {
     signal(SIGTERM, handle_signal);
     signal(SIGABRT, handle_signal);
 
-    if (access(LOG_FILE_PATH, W_OK) != 0) {
-        fprintf(stderr, "\033[1;31mError: Cannot access log file. Please run with appropriate permissions.\033[0m\n");
-        return ARCHIUM_ERROR_PERMISSION;
-    }
-
     log_info("Archium started");
 
     if (argc > 1 && strcmp(argv[1], "--version") == 0) {
