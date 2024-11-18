@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
     rl_attempted_completion_function = command_completion;
     cache_pacman_commands();
 
-    if (config.exec) {
+    if (config.exec_mode) {
         status = handle_exec_command(config.exec_command, package_manager);
         log_info("Executed command in exec mode");
         return status;
