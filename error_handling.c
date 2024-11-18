@@ -3,6 +3,11 @@
 #include <time.h>
 #include <sys/stat.h>
 #include <pwd.h>
+#include <limits.h>
+
+#ifndef PATH_MAX
+#define PATH_MAX 4096
+#endif
 
 static const char* error_messages[] = {
     "Success",
@@ -33,14 +38,26 @@ static char* get_log_path(const char* relative_path) {
 }
 
 static void ensure_log_directory() {
-    char* log_dir = get_log_path(".local");
-    if (log_dir) {
-        mkdir(log_dir, 0755);
-        snprintf(log_dir, PATH_MAX, "%s/share", log_dir);
-        mkdir(log_dir, 0755);
-        snprintf(log_dir, PATH_MAX, "%s/archium", log_dir);
-        mkdir(log_dir, 0755);
+    char log_dir[PATH_MAX];
+    const char* home = getenv("HOME");
+    
+    if (!home) {
+        struct passwd* pwd = getpwuid(getuid());
+        if (pwd) {
+            home = pwd->pw_dir;
+        } else {
+            return;
+        }
     }
+    
+    snprintf(log_dir, sizeof(log_dir), "%s/.local", home);
+    mkdir(log_dir, 0755);
+    
+    snprintf(log_dir, sizeof(log_dir), "%s/.local/share", home);
+    mkdir(log_dir, 0755);
+    
+    snprintf(log_dir, sizeof(log_dir), "%s/.local/share/archium", home);
+    mkdir(log_dir, 0755);
 }
 
 const char* get_error_string(ArchiumError error_code) {
@@ -82,17 +99,17 @@ void log_error(const char *error_message, ArchiumError error_code) {
     char full_message[COMMAND_BUFFER_SIZE];
     snprintf(full_message, sizeof(full_message), "%s (Error code: %d - %s)", 
              error_message, error_code, get_error_string(error_code));
-    write_log(".local/share/archium/error.log", "ERROR", full_message);
+    write_log(".local/share/archium/archium.log", "ERROR", full_message);
 }
 
 void log_debug(const char *debug_message) {
-    write_log(".local/share/archium/debug.log", "DEBUG", debug_message);
+    write_log(".local/share/archium/archium.log", "DEBUG", debug_message);
 }
 
 void log_info(const char *info_message) {
-    write_log(".local/share/archium/info.log", "INFO", info_message);
+    write_log(".local/share/archium/archium.log", "INFO", info_message);
 }
 
 void log_action(const char *action) {
-    write_log(".local/share/archium/action.log", "ACTION", action);
+    write_log(".local/share/archium/archium.log", "ACTION", action);
 }
