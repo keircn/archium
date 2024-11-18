@@ -1,14 +1,5 @@
 #include "archium.h"
 
-void log_action(const char *action) {
-    FILE *log_file = fopen(LOG_FILE_PATH, "a");
-    if (log_file) {
-        time_t now = time(NULL);
-        fprintf(log_file, "%s: %s\n", ctime(&now), action);
-        fclose(log_file);
-    }
-}
-
 void handle_signal(int signal) {
     if (signal == SIGINT) {
         printf("\nInterrupt received. Exiting gracefully.\n");

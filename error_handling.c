@@ -1,6 +1,8 @@
 #include "archium.h"
 #include <errno.h>
 #include <time.h>
+#include <sys/stat.h>
+#include <pwd.h>
 
 static const char* error_messages[] = {
     "Success",
@@ -10,6 +12,36 @@ static const char* error_messages[] = {
     "Permission denied",
     "Operation timed out"
 };
+
+static char* get_log_path(const char* relative_path) {
+    static char full_path[PATH_MAX];
+    const char* home = getenv("HOME");
+    
+    if (!home) {
+        struct passwd* pwd = getpwuid(getuid());
+        if (pwd) {
+            home = pwd->pw_dir;
+        }
+    }
+    
+    if (!home) {
+        return NULL;
+    }
+    
+    snprintf(full_path, sizeof(full_path), "%s/%s", home, relative_path);
+    return full_path;
+}
+
+static void ensure_log_directory() {
+    char* log_dir = get_log_path(".local");
+    if (log_dir) {
+        mkdir(log_dir, 0755);
+        snprintf(log_dir, PATH_MAX, "%s/share", log_dir);
+        mkdir(log_dir, 0755);
+        snprintf(log_dir, PATH_MAX, "%s/archium", log_dir);
+        mkdir(log_dir, 0755);
+    }
+}
 
 const char* get_error_string(ArchiumError error_code) {
     size_t index = (error_code < 0) ? (size_t)(-error_code) : (size_t)error_code;
@@ -24,7 +56,13 @@ void handle_error(ArchiumError error_code, const char *context) {
     fprintf(stderr, "\033[1;31mError: %s - %s\033[0m\n", context, error_str);
 }
 
-static void write_log(const char *log_file, const char *level, const char *message) {
+static void write_log(const char *relative_path, const char *level, const char *message) {
+    ensure_log_directory();
+    char* full_path = get_log_path(relative_path);
+    if (!full_path) {
+        return;
+    }
+
     time_t now;
     char timestamp[26];
     FILE *fp;
@@ -33,7 +71,7 @@ static void write_log(const char *log_file, const char *level, const char *messa
     ctime_r(&now, timestamp);
     timestamp[24] = '\0';
 
-    fp = fopen(log_file, "a");
+    fp = fopen(full_path, "a");
     if (fp) {
         fprintf(fp, "[%s] [%s] %s\n", timestamp, level, message);
         fclose(fp);
@@ -44,17 +82,17 @@ void log_error(const char *error_message, ArchiumError error_code) {
     char full_message[COMMAND_BUFFER_SIZE];
     snprintf(full_message, sizeof(full_message), "%s (Error code: %d - %s)", 
              error_message, error_code, get_error_string(error_code));
-    write_log(ERROR_LOG_FILE_PATH, "ERROR", full_message);
+    write_log(".local/share/archium/error.log", "ERROR", full_message);
 }
 
 void log_debug(const char *debug_message) {
-    write_log(LOG_FILE_PATH, "DEBUG", debug_message);
+    write_log(".local/share/archium/debug.log", "DEBUG", debug_message);
 }
 
 void log_info(const char *info_message) {
-    write_log(LOG_FILE_PATH, "INFO", info_message);
+    write_log(".local/share/archium/info.log", "INFO", info_message);
 }
 
 void log_action(const char *action) {
-    write_log(LOG_FILE_PATH, "ACTION", action);
+    write_log(".local/share/archium/action.log", "ACTION", action);
 }

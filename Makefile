@@ -18,18 +18,11 @@ $(TARGET): $(OBJS)
 
 install: $(TARGET)
 	@mkdir -p $(DESTDIR)/usr/local/bin
-	@mkdir -p $(DESTDIR)/var/log
 	@install -m 755 $(TARGET) $(DESTDIR)/usr/local/bin/
-	@touch $(DESTDIR)/var/log/archium.log
-	@touch $(DESTDIR)/var/log/archium_error.log
-	@chmod 644 $(DESTDIR)/var/log/archium.log
-	@chmod 644 $(DESTDIR)/var/log/archium_error.log
 	@echo "Installation complete!"
 
 uninstall:
 	@rm -f $(DESTDIR)/usr/local/bin/$(TARGET)
-	@rm -f $(DESTDIR)/var/log/archium.log
-	@rm -f $(DESTDIR)/var/log/archium_error.log
 	@echo "Uninstallation complete!"
 
 clean:

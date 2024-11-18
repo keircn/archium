@@ -14,8 +14,8 @@
 
 #define MAX_INPUT_LENGTH 256
 #define COMMAND_BUFFER_SIZE 512
-#define LOG_FILE_PATH "/var/log/archium.log"
-#define ERROR_LOG_FILE_PATH "/var/log/archium_error.log"
+#define LOG_FILE_PATH ".local/share/archium/archium.log"
+#define ERROR_LOG_FILE_PATH ".local/share/archium/archium_error.log"
 #define MAX_RETRIES 3
 #define TIMEOUT_SECONDS 30
 
