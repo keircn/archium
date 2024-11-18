@@ -112,7 +112,7 @@ To install a package, type `i` and follow the prompt:
     `" __ | |  
      .'.''| |  
     / /   | |_ This program may be freely redistributed under the terms of the GNU General Public License.
-    \ \._,\ '/ Archie originally created & maintained by Gurov with the help of scklss
+    \ \._,\ '/ Archie originally created & maintained by Gurov
      `--'  `"  
     ```
 
@@ -126,14 +126,15 @@ To install a package, type `i` and follow the prompt:
 
 ## Notes
 > [!NOTE]
-    Archie uses yay by default, but if you only have paru installed it'll use it. If you have both and you want to use `paru` instead of `yay` create a file in `$HOME` called `.archie-use-paru`, and it will install `paru` instead of `yay`
+    Archium uses yay by default, but if you only have paru installed it'll use it. If you have both and you want to use `paru` instead of `yay` create a file in `$HOME` called `.archium-use-paru`, and it will install `paru` instead of `yay`
 
 ```sh
 touch $HOME/.archium-use-paru
 ```
 
 > [!NOTE]
-     if Archium fails to upgrade to a newer version, try cleaning cache using your prefered AUR helper of choice and installing it again, example given
+    If Archium fails to upgrade to a newer version, try cleaning cache using your prefered AUR helper of choice and installing it again, example given below
+
 ```sh
  yay -Scc --noconfirm && yay -S archium --noconfirm
 
@@ -142,4 +143,4 @@ touch $HOME/.archium-use-paru
 
 ## License
 
-This program is licensed under the GNU General Public License. See the [LICENSE](https://gurov.likes.cat/6ppr9lvz.mp4) file for details.
+This program is licensed under the GNU General Public License. See the [LICENSE](https://github.com/KeiranScript/archium/blob/main/LICENSE) file for details.
