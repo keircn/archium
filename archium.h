@@ -15,8 +15,27 @@
 #define MAX_INPUT_LENGTH 256
 #define COMMAND_BUFFER_SIZE 512
 #define LOG_FILE_PATH "/var/log/archium.log"
+#define ERROR_LOG_FILE_PATH "/var/log/archium_error.log"
+#define MAX_RETRIES 3
+#define TIMEOUT_SECONDS 30
+
+typedef enum {
+    ARCHIUM_SUCCESS = 0,
+    ARCHIUM_ERROR_INVALID_INPUT = -1,
+    ARCHIUM_ERROR_SYSTEM_CALL = -2,
+    ARCHIUM_ERROR_PACKAGE_MANAGER = -3,
+    ARCHIUM_ERROR_PERMISSION = -4,
+    ARCHIUM_ERROR_TIMEOUT = -5
+} ArchiumError;
 
 void log_action(const char *action);
+void log_error(const char *error_message, ArchiumError error_code);
+void log_debug(const char *debug_message);
+void log_info(const char *info_message);
+
+const char* get_error_string(ArchiumError error_code);
+void handle_error(ArchiumError error_code, const char *context);
+
 void handle_signal(int signal);
 int check_archium_file(void);
 int check_package_manager(void);
