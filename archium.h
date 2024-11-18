@@ -33,30 +33,27 @@ typedef enum {
     ARCHIUM_ERROR_TIMEOUT = -5
 } ArchiumError;
 
-// Configuration
+const char* get_error_string(ArchiumError error_code);
+void handle_error(ArchiumError error_code, const char *context);
+
 extern ArchiumConfig config;
 ArchiumError parse_arguments(int argc, char *argv[]);
 
-// Package manager functions
 int check_package_manager(void);
 void prompt_install_yay(void);
 
-// Display functions
 void display_version(void);
 void display_help(void);
 
-// Command completion functions
 char** command_completion(const char *text, int start, int end);
 char* command_generator(const char *text, int state);
 void cache_pacman_commands(void);
 
-// Logging functions
 void log_action(const char *action);
 void log_error(const char *error_message, ArchiumError error_code);
 void log_debug(const char *debug_message);
 void log_info(const char *info_message);
 
-// Other functions
 void handle_signal(int signal);
 int check_archium_file(void);
 void install_git(void);

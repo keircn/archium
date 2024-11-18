@@ -1,7 +1,7 @@
 #include "archium.h"
 #include <time.h>
 
-ArchiumConfig config = {0};  // Global configuration
+ArchiumConfig config = {0};
 
 static const char* error_messages[] = {
     "Success",
@@ -35,13 +35,12 @@ static void write_log(const char *level, const char *message) {
     
     time(&now);
     ctime_r(&now, timestamp);
-    timestamp[24] = '\0';  // Remove newline
+    timestamp[24] = '\0';
 
     fprintf(stderr, "[%s] [%s] %s\n", timestamp, level, message);
 }
 
 void log_error(const char *error_message, ArchiumError error_code) {
-    // Always show errors regardless of verbose mode
     char full_message[COMMAND_BUFFER_SIZE];
     snprintf(full_message, sizeof(full_message), "%s (Error code: %d - %s)", 
              error_message, error_code, get_error_string(error_code));
