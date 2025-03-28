@@ -3,7 +3,7 @@ CFLAGS = -Wall -Wextra -O2 -g
 LDFLAGS = -lreadline -lncurses
 
 BUILD_DIR = build
-SRC_DIR = .
+SRC_DIR = src
 DESTDIR ?= /usr/local
 VERSION = $(shell git describe --tags --abbrev=0)
 TARNAME = archium-$(VERSION)
