@@ -21,21 +21,21 @@ void display_version(void)
 
     char *pm_version = get_package_manager_version(package_manager);
 
-    // this is completely unnecessary but fuck it i like pretty short timestamps
     char build_time[6];
     strncpy(build_time, __TIME__, 5);
     build_time[5] = '\0';
 
     printf("\033[1;34m"
-           "    __     \033[1;36mArchium v1.5\033[0m - \033[1;32mFast & easy package management for Arch Linux\033[0m\n"
-           "\033[1;34m .:--.'.   \033[0mWritten in \033[1;33mC\033[0m, powered by \033[1;35mYAY\033[0m, \033[1;35mParu\033[0m, and \033[1;35mPacman\033[0m.\n"
+           "    __     \033[1;36mArchium v%s\033[0m - \033[1;32mFast & easy package management for Arch Linux\033[0m\n"
+           "\033[1;34m .:--.'.   \033[0mWritten in \033[1mC\033[0m and powered by \033[1mYAY\033[0m, \033[1mParu\033[0m, and \033[1mPacman\033[0m.\n"
            "\033[1;34m/ |   \\ |  \033[0mPackage Manager: \033[1;36m%s\033[0m (Version: \033[1;36m%s\033[0m)\n"
            "\033[1;34m`\" __ | |  \033[0mBuild Date: \033[1;33m%s %s\033[0m\n"
            "\033[1;34m .'.''| |  \n"
            "/ /   | |_ \033[0mThis program is subject to the terms of the \033[1;31mGPL License\033[0m.\n"
            "\033[1;34m\\ \\._,\\ '/ \033[0mOriginally created & maintained by \033[1;36mGurov\033[0m\n"
            "\033[1;34m `--'  `\"  \033[0mArchium forked and maintained by \033[1;36mKeiran\033[0m\n",
-           package_manager, pm_version, __DATE__, build_time);
+           ARCHIUM_VERSION, package_manager, pm_version, __DATE__, build_time);
+
     free(pm_version);
 }
 
