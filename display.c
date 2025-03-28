@@ -34,8 +34,8 @@ void display_version(void) {
 void display_help(void) {
     printf("\n\033[1;33mCommand-line arguments:\033[0m\n");
     printf("\033[1;32m--verbose\033[0m, \033[1;32m-v\033[0m       - Enable verbose logging\n");
-    printf("\033[1;32m--version\033[0m           - Display version information\n");
-    printf("\033[1;32m--help\033[0m, \033[1;32m-h\033[0m         - Display this help message\n");
+    printf("\033[1;32m--version\033[0m, \033[1;32m-V\033[0m       - Display version information\n");
+    printf("\033[1;32m--help\033[0m,    \033[1;32m-h\033[0m       - Display this help message\n");
     printf("\033[1;32m--exec <command>\033[0m    - Execute a specific command directly\n");
     printf("\n");
     printf("\033[1;33mAvailable commands:\033[0m\n");
