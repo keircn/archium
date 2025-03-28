@@ -76,6 +76,10 @@ ArchiumError parse_arguments(int argc, char *argv[]) {
         else if (strcmp(argv[i], "--version") == 0) {
             config.version = 1;
         }
+        else if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
+            display_help();
+            exit(ARCHIUM_SUCCESS);
+        }
         else if (strcmp(argv[i], "--exec") == 0) {
             config.exec_mode = 1;
             if (i + 1 < argc) {
@@ -84,7 +88,7 @@ ArchiumError parse_arguments(int argc, char *argv[]) {
         }
         else if (argv[i][0] == '-') {
             fprintf(stderr, "\033[1;31mError: Unknown option: %s\033[0m\n", argv[i]);
-            fprintf(stderr, "Usage: archium [--verbose|-v] [--version] [--exec command]\n");
+            fprintf(stderr, "Usage: archium [--verbose|-v] [--version] [--help|-h] [--exec command]\n");
             return ARCHIUM_ERROR_INVALID_INPUT;
         }
     }
