@@ -1,7 +1,5 @@
 # 🌟 Archium - Fast & Easy Package Management for Arch Linux
 
-![Archium Logo](https://via.placeholder.com/728x90.png?text=Archium+-+Package+Management+Made+Easy)
-
 ## 🚀 Current Version
 
 **Archium v1.5.1**
