@@ -1,11 +1,13 @@
 #ifndef ARCHIUM_H
 #define ARCHIUM_H
 
-#include <ctype.h>
+#include <stdio.h>
+
 #include <readline/history.h>
 #include <readline/readline.h>
+
+#include <ctype.h>
 #include <signal.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>

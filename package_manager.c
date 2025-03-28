@@ -10,18 +10,18 @@ int check_archium_file(void) {
 
 int check_package_manager(void) {
   if (check_archium_file()) {
-    return 2; // paru
+    return 2;  // paru
   }
   if (system("command -v yay > /dev/null 2>&1") == 0) {
-    return 1; // yay
+    return 1;  // yay
   }
   if (system("command -v paru > /dev/null 2>&1") == 0) {
-    return 2; // paru
+    return 2;  // paru
   }
   if (system("command -v pacman > /dev/null 2>&1") == 0) {
-    return 3; // pacman
+    return 3;  // pacman
   }
-  return 0; // none
+  return 0;  // none
 }
 
 int check_git(void) { return system("command -v git > /dev/null 2>&1") == 0; }
@@ -33,15 +33,17 @@ void install_git(void) {
 
 void install_yay(void) {
   printf("\033[1;32mInstalling yay...\033[0m\n");
-  system("mkdir -p $HOME/.cache/archium/setup && "
-         "cd $HOME/.cache/archium/setup && "
-         "git clone https://aur.archlinux.org/yay-bin.git && "
-         "cd yay-bin && "
-         "makepkg -scCi && "
-         "cd && "
-         "rm -rf $HOME/.cache/archium/");
-  printf("\033[1;32mInstallation of yay is complete. Please restart your shell "
-         "and relaunch Archium.\033[0m\n");
+  system(
+      "mkdir -p $HOME/.cache/archium/setup && "
+      "cd $HOME/.cache/archium/setup && "
+      "git clone https://aur.archlinux.org/yay-bin.git && "
+      "cd yay-bin && "
+      "makepkg -scCi && "
+      "cd && "
+      "rm -rf $HOME/.cache/archium/");
+  printf(
+      "\033[1;32mInstallation of yay is complete. Please restart your shell "
+      "and relaunch Archium.\033[0m\n");
 }
 
 void prompt_install_yay(void) {

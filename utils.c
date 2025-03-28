@@ -17,12 +17,10 @@ void get_input(char *input, const char *prompt) {
   }
 
   char *start = input;
-  while (isspace((unsigned char)*start))
-    start++;
+  while (isspace((unsigned char)*start)) start++;
   memmove(input, start, strlen(start) + 1);
   char *end = input + strlen(input) - 1;
-  while (end > input && isspace((unsigned char)*end))
-    end--;
+  while (end > input && isspace((unsigned char)*end)) end--;
   end[1] = '\0';
 
   if (strlen(input) == 0) {

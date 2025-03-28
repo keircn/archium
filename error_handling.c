@@ -1,5 +1,6 @@
-#include "archium.h"
 #include <time.h>
+
+#include "archium.h"
 
 ArchiumConfig config = {0};
 

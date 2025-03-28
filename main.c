@@ -22,9 +22,9 @@ int main(int argc, char *argv[]) {
   if (geteuid() != 0 && access("/usr/bin/sudo", X_OK) != 0) {
     log_error("Insufficient privileges and sudo not available",
               ARCHIUM_ERROR_PERMISSION);
-    fprintf(
-        stderr,
-        "\033[1;31mError: This operation requires root privileges.\033[0m\n");
+    fprintf(stderr,
+            "\033[1;31mError: This operation requires root "
+            "privileges.\033[0m\n");
     return ARCHIUM_ERROR_PERMISSION;
   }
 
@@ -32,23 +32,23 @@ int main(int argc, char *argv[]) {
   int pm_check = check_package_manager();
 
   switch (pm_check) {
-  case 1:
-    package_manager = "yay";
-    log_info("Using package manager: yay");
-    break;
-  case 2:
-    package_manager = "paru";
-    log_info("Using package manager: paru");
-    break;
-  case 3:
-    package_manager = "pacman";
-    log_info("Using package manager: pacman");
-    break;
-  default:
-    log_error("No supported package manager found",
-              ARCHIUM_ERROR_PACKAGE_MANAGER);
-    prompt_install_yay();
-    return ARCHIUM_ERROR_PACKAGE_MANAGER;
+    case 1:
+      package_manager = "yay";
+      log_info("Using package manager: yay");
+      break;
+    case 2:
+      package_manager = "paru";
+      log_info("Using package manager: paru");
+      break;
+    case 3:
+      package_manager = "pacman";
+      log_info("Using package manager: pacman");
+      break;
+    default:
+      log_error("No supported package manager found",
+                ARCHIUM_ERROR_PACKAGE_MANAGER);
+      prompt_install_yay();
+      return ARCHIUM_ERROR_PACKAGE_MANAGER;
   }
 
   rl_attempted_completion_function = command_completion;
