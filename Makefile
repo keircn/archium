@@ -5,12 +5,14 @@ LDFLAGS = -lreadline -lncurses
 BUILD_DIR = build
 SRC_DIR = .
 DESTDIR ?= /usr/local
+VERSION = $(shell git describe --tags --abbrev=0)
+TARNAME = archium-$(VERSION)
 
 SRC = $(wildcard $(SRC_DIR)/*.c)
 OBJ = $(SRC:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
 TARGET = $(BUILD_DIR)/archium
 
-.PHONY: all clean install uninstall test debug
+.PHONY: all clean install uninstall test debug release format
 
 all: $(BUILD_DIR) $(TARGET)
 
@@ -43,14 +45,16 @@ debug:
 	@echo "Build directory: $(BUILD_DIR)"
 	@echo "Install directory: $(DESTDIR)/bin"
 
-release: clean $(BUILD_DIR) $(TARGET)
+release: clean all
 	strip $(TARGET)
-	@echo "Release binary built: $(TARGET)"
+	mkdir -p $(BUILD_DIR)/release
+	cp $(TARGET) $(BUILD_DIR)/release/archium
+	tar -czvf $(BUILD_DIR)/$(TARNAME).tar.gz -C $(BUILD_DIR) release
+	@echo "Release archive built: $(BUILD_DIR)/$(TARNAME).tar.gz"
 
 format:
 	clang-format -i $(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/*.h)
 	@echo "Codebase formatted with clang-format"
 
-# TODO: Add tests
 test: $(TARGET)
 	@echo "Not implemented yet. Please run the binary manually for testing."
