@@ -24,7 +24,7 @@ void display_version(void) {
            "/ |   \\ |  %s %s\n"
            "`\" __ | |  \n"
            " .'.''| |  \n"
-           "/ /   | |_ \033[0mThis program may be freely redistributed under the terms of the GNU General Public License.\n"
+           "/ /   | |_ \033[0mThis program is subject to the terms of the GPL License.\n"
            "\033[1;36m\\ \\._,\\ '/ \033[0mOriginally created & maintained by Gurov\n"
            "\033[1;36m `--'  `\"  \033[0mArchium forked and maintained by Keiran\n", 
            package_manager, pm_version);
