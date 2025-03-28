@@ -16,7 +16,7 @@
 #define COMMAND_BUFFER_SIZE 512
 #define MAX_RETRIES 3
 #define TIMEOUT_SECONDS 30
-#define ARCHIUM_VERSION "1.5"
+#define ARCHIUM_VERSION "1.5.1"
 
 typedef struct {
     int verbose;
@@ -44,6 +44,7 @@ int check_package_manager(void);
 void prompt_install_yay(void);
 
 void display_version(void);
+void display_cli_help(void); 
 void display_help(void);
 
 char** command_completion(const char *text, int start, int end);

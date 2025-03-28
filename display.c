@@ -39,6 +39,17 @@ void display_version(void)
     free(pm_version);
 }
 
+void display_cli_help(void) {
+    printf("\n\033[1;33mCommand-line arguments:\033[0m\n");
+    printf("\033[1;32m--help\033[0m,    \033[1;32m-h\033[0m       - Display this help message\n");
+    printf("\033[1;32m--version\033[0m, \033[1;32m-v\033[0m       - Display version information\n");
+    printf("\033[1;32m--verbose\033[0m, \033[1;32m-V\033[0m       - Enable verbose logging\n");
+    printf("\033[1;32m--exec <command>\033[0m    - Execute a specific command directly\n");
+    printf("\n\033[1;33mExample:\033[0m\n");
+    printf("  \033[1;32marchium --exec u\033[0m - Update the system\n");
+    printf("  \033[1;32marchium --exec i\033[0m - Install packages\n");
+}
+
 void display_help(void)
 {
     printf("\n\033[1;33mCommand-line arguments:\033[0m\n");

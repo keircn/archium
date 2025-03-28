@@ -70,14 +70,14 @@ ArchiumError parse_arguments(int argc, char *argv[]) {
     config.exec_command = NULL;
 
     for (int i = 1; i < argc; i++) {
-        if (strcmp(argv[i], "--verbose") == 0 || strcmp(argv[i], "-v") == 0) {
+        if (strcmp(argv[i], "--verbose") == 0 || strcmp(argv[i], "-V") == 0) {
             config.verbose = 1;
         }
-        else if (strcmp(argv[i], "--version") == 0 || strcmp(argv[i], "-V") == 0) {
+        else if (strcmp(argv[i], "--version") == 0 || strcmp(argv[i], "-v") == 0) {
             config.version = 1;
         }
         else if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
-            display_help();
+            display_cli_help();
             exit(ARCHIUM_SUCCESS);
         }
         else if (strcmp(argv[i], "--exec") == 0) {
@@ -88,7 +88,7 @@ ArchiumError parse_arguments(int argc, char *argv[]) {
         }
         else if (argv[i][0] == '-') {
             fprintf(stderr, "\033[1;31mError: Unknown option: %s\033[0m\n", argv[i]);
-            fprintf(stderr, "Usage: archium [--verbose|-v] [--version|-V] [--help|-h] [--exec command]\n");
+            fprintf(stderr, "Use \033[1;32marchium --help\033[0m for usage information.\n");
             return ARCHIUM_ERROR_INVALID_INPUT;
         }
     }
