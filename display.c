@@ -1,37 +1,46 @@
 #include "archium.h"
 
-void display_version(void) {
+void display_version(void)
+{
     int pm_check = check_package_manager();
     const char *package_manager;
-    switch (pm_check) {
-        case 1:
-            package_manager = "yay";
-            break;
-        case 2:
-            package_manager = "paru";
-            break;
-        case 3:
-            package_manager = "pacman";
-            break;
-        default:
-            package_manager = "none";
+    switch (pm_check)
+    {
+    case 1:
+        package_manager = "yay";
+        break;
+    case 2:
+        package_manager = "paru";
+        break;
+    case 3:
+        package_manager = "pacman";
+        break;
+    default:
+        package_manager = "none";
     }
 
     char *pm_version = get_package_manager_version(package_manager);
 
-    printf("\033[1;36m    __     Archium v1.5 - Fast & easy package management for Arch Linux\n"
-           " .:--.'.   Written in C, powered by YAY, Paru, and Pacman.\n"
-           "/ |   \\ |  %s %s\n"
-           "`\" __ | |  \n"
-           " .'.''| |  \n"
-           "/ /   | |_ \033[0mThis program is subject to the terms of the GPL License.\n"
-           "\033[1;36m\\ \\._,\\ '/ \033[0mOriginally created & maintained by Gurov\n"
-           "\033[1;36m `--'  `\"  \033[0mArchium forked and maintained by Keiran\n", 
-           package_manager, pm_version);
+    // this is completely unnecessary but fuck it i like pretty short timestamps
+    char build_time[6];
+    strncpy(build_time, __TIME__, 5);
+    build_time[5] = '\0';
+
+    printf("\033[1;34m"
+           "    __     \033[1;36mArchium v1.5\033[0m - \033[1;32mFast & easy package management for Arch Linux\033[0m\n"
+           "\033[1;34m .:--.'.   \033[0mWritten in \033[1;33mC\033[0m, powered by \033[1;35mYAY\033[0m, \033[1;35mParu\033[0m, and \033[1;35mPacman\033[0m.\n"
+           "\033[1;34m/ |   \\ |  \033[0mPackage Manager: \033[1;36m%s\033[0m (Version: \033[1;36m%s\033[0m)\n"
+           "\033[1;34m`\" __ | |  \033[0mBuild Date: \033[1;33m%s %s\033[0m\n"
+           "\033[1;34m .'.''| |  \n"
+           "/ /   | |_ \033[0mThis program is subject to the terms of the \033[1;31mGPL License\033[0m.\n"
+           "\033[1;34m\\ \\._,\\ '/ \033[0mOriginally created & maintained by \033[1;36mGurov\033[0m\n"
+           "\033[1;34m `--'  `\"  \033[0mArchium forked and maintained by \033[1;36mKeiran\033[0m\n",
+           package_manager, pm_version, __DATE__, build_time);
     free(pm_version);
 }
 
-void display_help(void) {
+void display_help(void)
+{
     printf("\n\033[1;33mCommand-line arguments:\033[0m\n");
     printf("\033[1;32m--verbose\033[0m, \033[1;32m-v\033[0m       - Enable verbose logging\n");
     printf("\033[1;32m--version\033[0m, \033[1;32m-V\033[0m       - Display version information\n");
