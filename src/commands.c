@@ -16,70 +16,66 @@ static void get_user_input(char *buffer, const char *prompt) {
 }
 
 ArchiumError handle_command(const char *input, const char *package_manager) {
-    if (!input || !package_manager) {
-        return ARCHIUM_ERROR_INVALID_INPUT;
-    }
+  log_action(input);
 
-    log_action(input);
+  if (!is_valid_command(input)) {
+      fprintf(stderr, "Error: Invalid command. Type 'h' for help.\n");
+      return ARCHIUM_ERROR_INVALID_INPUT;
+  }
 
-    if (strcmp(input, "h") == 0 || strcmp(input, "help") == 0) {
-        display_help();
-        return ARCHIUM_SUCCESS;
-    }
+  if (strcmp(input, "h") == 0 || strcmp(input, "help") == 0) {
+      display_help();
+      return ARCHIUM_SUCCESS;
+  }
 
-    if (strcmp(input, "q") == 0 || strcmp(input, "quit") == 0 || strcmp(input, "exit") == 0) {
-        printf("\033[1;31mExiting Archium.\033[0m\n");
-        exit(0);
-    }
+  if (strcmp(input, "q") == 0 || strcmp(input, "quit") == 0 || strcmp(input, "exit") == 0) {
+      printf("Exiting Archium.\n");
+      exit(0);
+  }
 
-    if (!is_valid_command(input)) {
-        fprintf(stderr, "\033[1;31mError: Invalid command. Type 'h' for help.\033[0m\n");
-        return ARCHIUM_ERROR_INVALID_INPUT;
-    }
+  if (strcmp(input, "u") == 0) {
+      update_system(package_manager, NULL);
+  } else if (strncmp(input, "u ", 2) == 0) {
+      update_system(package_manager, input + 2);
+  } else if (strcmp(input, "i") == 0) {
+      char packages[MAX_INPUT_LENGTH];
+      get_user_input(packages, "Enter package names to install: ");
+      install_package(package_manager, packages);
+  } else if (strcmp(input, "r") == 0) {
+      char packages[MAX_INPUT_LENGTH];
+      get_user_input(packages, "Enter package names to remove: ");
+      remove_package(package_manager, packages);
+  } else if (strcmp(input, "p") == 0) {
+      char packages[MAX_INPUT_LENGTH];
+      get_user_input(packages, "Enter package names to purge: ");
+      purge_package(package_manager, packages);
+  } else if (strcmp(input, "c") == 0) {
+      clean_cache(package_manager);
+  } else if (strcmp(input, "cc") == 0) {
+      clear_build_cache();
+  } else if (strcmp(input, "o") == 0) {
+      clean_orphans(package_manager);
+  } else if (strcmp(input, "lo") == 0) {
+      list_orphans();
+  } else if (strcmp(input, "s") == 0) {
+      char package[MAX_INPUT_LENGTH];
+      get_user_input(package, "Enter package name to search: ");
+      search_package(package_manager, package);
+  } else if (strcmp(input, "l") == 0) {
+      list_installed_packages();
+  } else if (strcmp(input, "?") == 0) {
+      char package[MAX_INPUT_LENGTH];
+      get_user_input(package, "Enter package name to show info: ");
+      show_package_info(package_manager, package);
+  } else if (strcmp(input, "cu") == 0) {
+      check_package_updates();
+  } else if (strcmp(input, "dt") == 0) {
+      char package[MAX_INPUT_LENGTH];
+      get_user_input(package, "Enter package name to view dependencies: ");
+      display_dependency_tree(package_manager, package);
+  }
 
-    if (strcmp(input, "u") == 0) {
-        update_system(package_manager, NULL);
-    } else if (strncmp(input, "u ", 2) == 0) {
-        update_system(package_manager, input + 2);
-    } else if (strcmp(input, "i") == 0) {
-        char packages[MAX_INPUT_LENGTH];
-        get_user_input(packages, "Enter package names to install: ");
-        install_package(package_manager, packages);
-    } else if (strcmp(input, "r") == 0) {
-        char packages[MAX_INPUT_LENGTH];
-        get_user_input(packages, "Enter package names to remove: ");
-        remove_package(package_manager, packages);
-    } else if (strcmp(input, "p") == 0) {
-        char packages[MAX_INPUT_LENGTH];
-        get_user_input(packages, "Enter package names to purge: ");
-        purge_package(package_manager, packages);
-    } else if (strcmp(input, "c") == 0) {
-        clean_cache(package_manager);
-    } else if (strcmp(input, "cc") == 0) {
-        clear_build_cache();
-    } else if (strcmp(input, "o") == 0) {
-        clean_orphans(package_manager);
-    } else if (strcmp(input, "lo") == 0) {
-        list_orphans();
-    } else if (strcmp(input, "s") == 0) {
-        char package[MAX_INPUT_LENGTH];
-        get_user_input(package, "Enter package name to search: ");
-        search_package(package_manager, package);
-    } else if (strcmp(input, "l") == 0) {
-        list_installed_packages();
-    } else if (strcmp(input, "?") == 0) {
-        char package[MAX_INPUT_LENGTH];
-        get_user_input(package, "Enter package name to show info: ");
-        show_package_info(package_manager, package);
-    } else if (strcmp(input, "cu") == 0) {
-        check_package_updates();
-    } else if (strcmp(input, "dt") == 0) {
-        char package[MAX_INPUT_LENGTH];
-        get_user_input(package, "Enter package name to view dependencies: ");
-        display_dependency_tree(package_manager, package);
-    }
-
-    return ARCHIUM_SUCCESS;
+  return ARCHIUM_SUCCESS;
 }
 
 ArchiumError handle_exec_command(const char *command, const char *package_manager) {
@@ -88,11 +84,6 @@ ArchiumError handle_exec_command(const char *command, const char *package_manage
     }
 
     log_action(command);
-
-    if (!is_valid_command(command)) {
-        fprintf(stderr, "\033[1;31mError: Invalid command. Type 'h' for help.\033[0m\n");
-        return ARCHIUM_ERROR_INVALID_INPUT;
-    }
 
     return handle_command(command, package_manager);
 }
