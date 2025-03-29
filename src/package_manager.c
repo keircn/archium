@@ -42,6 +42,32 @@ int check_package_manager(void) {
     return 0;  // none
 }
 
+char *get_package_manager_version(const char *package_manager) {
+  if (!package_manager || strcmp(package_manager, "none") == 0) {
+      return strdup("unknown");
+  }
+
+  char command[COMMAND_BUFFER_SIZE];
+  snprintf(command, sizeof(command), "%s --version | head -n 1", package_manager);
+
+  FILE *fp = popen(command, "r");
+  if (!fp) {
+      fprintf(stderr, "\033[1;31mError: Failed to retrieve version for %s\033[0m\n", package_manager);
+      return strdup("unknown");
+  }
+
+  char version[COMMAND_BUFFER_SIZE];
+  if (!fgets(version, sizeof(version), fp)) {
+      pclose(fp);
+      return strdup("unknown");
+  }
+  pclose(fp);
+
+  version[strcspn(version, "\n")] = '\0';
+
+  return strdup(version);
+}
+
 int check_git(void) {
     return check_command("git");
 }
