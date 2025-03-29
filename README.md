@@ -2,7 +2,7 @@
 
 ## 🚀 Current Version
 
-**Archium v1.5.1**
+**Archium v1.5.3**
 
 Archium is a command-line tool for managing packages on Arch Linux. It provides a simple and intuitive interface for common package management tasks using `yay`, `paru`, or `pacman`.
 
