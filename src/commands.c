@@ -148,10 +148,29 @@ void clean_cache(const char *package_manager) {
 }
 
 void clean_orphans(const char *package_manager) {
-    char command[COMMAND_BUFFER_SIZE];
-    snprintf(command, sizeof(command), "%s -Rns $(pacman -Qdtq)", package_manager);
-    printf("\033[1;34mCleaning orphaned packages...\033[0m\n");
-    execute_command(command, "Orphaned packages cleaned");
+  char orphan_check_command[COMMAND_BUFFER_SIZE];
+  snprintf(orphan_check_command, sizeof(orphan_check_command), "pacman -Qdtq");
+
+  FILE *fp = popen(orphan_check_command, "r");
+  if (!fp) {
+      fprintf(stderr, "\033[1;31mError: Failed to check for orphaned packages.\033[0m\n");
+      return;
+  }
+
+  char orphaned_packages[COMMAND_BUFFER_SIZE] = {0};
+  if (!fgets(orphaned_packages, sizeof(orphaned_packages), fp)) {
+      pclose(fp);
+      printf("\033[1;32mNo orphaned packages found.\033[0m\n");
+      return;
+  }
+  pclose(fp);
+
+  orphaned_packages[strcspn(orphaned_packages, "\n")] = '\0';
+
+  char command[COMMAND_BUFFER_SIZE];
+  snprintf(command, sizeof(command), "%s -Rns %s", package_manager, orphaned_packages);
+  printf("\033[1;34mCleaning orphaned packages...\033[0m\n");
+  execute_command(command, "Orphaned packages cleaned");
 }
 
 void search_package(const char *package_manager, const char *package) {
