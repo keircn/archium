@@ -1,29 +1,29 @@
 #include "archium.h"
 
 int check_archium_file(void) {
-    const char *home = getenv("HOME");
-    if (!home) {
-        fprintf(stderr, "\033[1;31mError: Unable to get HOME environment variable.\033[0m\n");
-        return 0;
-    }
+  const char *home = getenv("HOME");
+  if (!home) {
+      fprintf(stderr, "\033[1;31mError: Unable to get HOME environment variable.\033[0m\n");
+      return 0;
+  }
 
-    char path[MAX_INPUT_LENGTH];
-    if (snprintf(path, sizeof(path), "%s/.archium-use-paru", home) >= sizeof(path)) {
-        fprintf(stderr, "\033[1;31mError: Path buffer overflow.\033[0m\n");
-        return 0;
-    }
+  char path[MAX_INPUT_LENGTH];
+  if (snprintf(path, sizeof(path), "%s/.archium-use-paru", home) >= (int)sizeof(path)) {
+      fprintf(stderr, "\033[1;31mError: Path buffer overflow.\033[0m\n");
+      return 0;
+  }
 
-    struct stat buffer;
-    return (stat(path, &buffer) == 0);
+  struct stat buffer;
+  return (stat(path, &buffer) == 0);
 }
 
 int check_command(const char *command) {
-    char cmd[COMMAND_BUFFER_SIZE];
-    if (snprintf(cmd, sizeof(cmd), "command -v %s > /dev/null 2>&1", command) >= sizeof(cmd)) {
-        fprintf(stderr, "\033[1;31mError: Command buffer overflow.\033[0m\n");
-        return 0;
-    }
-    return (system(cmd) == 0);
+  char cmd[COMMAND_BUFFER_SIZE];
+  if (snprintf(cmd, sizeof(cmd), "command -v %s > /dev/null 2>&1", command) >= (int)sizeof(cmd)) {
+      fprintf(stderr, "\033[1;31mError: Command buffer overflow.\033[0m\n");
+      return 0;
+  }
+  return (system(cmd) == 0);
 }
 
 int check_package_manager(void) {
