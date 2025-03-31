@@ -81,7 +81,7 @@ Enter package name to install:
 
 ---
 
-## ⚙️ Command-Line Arguments
+### Command-Line Arguments
 
 | Argument            | Description                                      |
 |----------------------|--------------------------------------------------|
@@ -89,6 +89,7 @@ Enter package name to install:
 | `--version`, `-v`    | Display version information                      |
 | `--verbose`, `-V`    | Enable verbose logging                           |
 | `--help`, `-h`       | Display help for command-line arguments          |
+| `--self-update`      | Update Archium to the latest version            |
 
 ### Example
 To update the system directly from the command line:
@@ -96,9 +97,17 @@ To update the system directly from the command line:
 archium --exec u
 ```
 
-To display version information:
+To update Archium itself (only for manual installations):
 ```bash
-archium --version
+archium --self-update
+```
+
+**Note**: The `--self-update` option only works if you installed Archium manually. 
+If you installed Archium from the AUR, please use your AUR helper to update:
+```bash
+yay -Syu archium
+# or
+paru -Syu archium
 ```
 
 ---
