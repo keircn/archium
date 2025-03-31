@@ -69,11 +69,11 @@ ArchiumError handle_command(const char *input, const char *package_manager) {
       show_package_info(package_manager, package);
   } else if (strcmp(input, "cu") == 0) {
       check_package_updates();
-  } else if (strcmp(input, "dt") == 0) {
-      char package[MAX_INPUT_LENGTH];
-      get_user_input(package, "Enter package name to view dependencies: ");
-      display_dependency_tree(package_manager, package);
-  }
+    } else if (strcmp(input, "dt") == 0) {
+        char package[MAX_INPUT_LENGTH];
+        get_user_input(package, "Enter package name to view dependencies: ");
+        display_dependency_tree(package_manager, package);
+    }
 
   return ARCHIUM_SUCCESS;
 }
@@ -194,4 +194,54 @@ void display_dependency_tree(const char *package_manager, const char *package) {
     snprintf(command, sizeof(command), "pactree %s", package);
     printf("\033[1;34mDisplaying dependency tree for package: %s\033[0m\n", package);
     execute_command(command, NULL);
+}
+
+void perform_self_update(void) {
+    char clone_dir[COMMAND_BUFFER_SIZE];
+    char command[COMMAND_BUFFER_SIZE];
+    
+    snprintf(clone_dir, sizeof(clone_dir), "/tmp/archium-update-%d", (int)time(NULL));
+    
+    printf("\033[1;34mUpdating Archium...\033[0m\n");
+    log_info("Starting self-update process");
+
+    if (mkdir(clone_dir, 0755) != 0) {
+        log_error("Failed to create temporary directory", ARCHIUM_ERROR_SYSTEM_CALL);
+        return;
+    }
+
+    snprintf(command, sizeof(command), "git clone %s %s", ARCHIUM_REPO_URL, clone_dir);
+    if (system(command) != 0) {
+        log_error("Failed to clone repository", ARCHIUM_ERROR_SYSTEM_CALL);
+        rmdir(clone_dir);
+        return;
+    }
+
+    if (chdir(clone_dir) != 0) {
+        log_error("Failed to change to clone directory", ARCHIUM_ERROR_SYSTEM_CALL);
+        snprintf(command, sizeof(command), "rm -rf %s", clone_dir);
+        system(command);
+        return;
+    }
+
+    if (system("make") != 0) {
+        log_error("Failed to build project", ARCHIUM_ERROR_SYSTEM_CALL);
+        snprintf(command, sizeof(command), "rm -rf %s", clone_dir);
+        system(command);
+        return;
+    }
+
+    printf("\033[1;33mRequesting elevated privileges to install updates...\033[0m\n");
+    if (system("sudo make install") != 0) {
+        log_error("Failed to install updates", ARCHIUM_ERROR_SYSTEM_CALL);
+        snprintf(command, sizeof(command), "rm -rf %s", clone_dir);
+        system(command);
+        return;
+    }
+
+    snprintf(command, sizeof(command), "rm -rf %s", clone_dir);
+    system(command);
+
+    printf("\033[1;32mArchium has been updated successfully!\033[0m\n");
+    log_info("Self-update completed successfully");
 }

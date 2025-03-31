@@ -19,6 +19,7 @@
 #define MAX_RETRIES 3
 #define TIMEOUT_SECONDS 30
 #define ARCHIUM_VERSION "1.5.3"
+#define ARCHIUM_REPO_URL "https://github.com/q4ow/archium.git"
 
 typedef struct {
   int verbose;
@@ -83,6 +84,7 @@ int is_valid_command(const char *command);
 char **get_pacman_commands(void);
 char *command_generator(const char *text, int state);
 char *get_package_manager_version(const char *package_manager);
+void perform_self_update(void);
 
 extern char **cached_commands;
 

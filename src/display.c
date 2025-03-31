@@ -35,7 +35,7 @@ void display_version(void) {
       "\033[1;34m .'.''| |  \n"
       "/ /   | |_ \033[0mThis program is subject to the terms of the "
       "\033[1;31mGPL License\033[0m.\n"
-      "\033[1;34m\\ \\._,\\ '/ \033[0mOriginally created & maintained by "
+      "\033[1;34m\\ \\._,\\ '/ \033[0mArchie originally created & maintained by "
       "\033[1;36mGurov\033[0m\n"
       "\033[1;34m `--'  `\"  \033[0mArchium forked and maintained by "
       "\033[1;36mKeiran\033[0m\n",
@@ -58,6 +58,9 @@ void display_cli_help(void) {
   printf(
       "\033[1;32m--exec <command>\033[0m    - Execute a specific command "
       "directly\n");
+  printf(
+      "\033[1;32m--self-update\033[0m - Update Archium to the latest "
+      "version\n");
   printf("\n\033[1;33mExample:\033[0m\n");
   printf("  \033[1;32marchium --exec u\033[0m - Update the system\n");
   printf("  \033[1;32marchium --exec i\033[0m - Install packages\n");

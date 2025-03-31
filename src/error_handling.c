@@ -74,14 +74,17 @@ ArchiumError parse_arguments(int argc, char *argv[]) {
     } else if (strcmp(argv[i], "--exec") == 0) {
       config.exec_mode = 1;
       if (i + 1 < argc) {
-        config.exec_command = argv[++i];
+          config.exec_command = argv[++i];
       }
-    } else if (argv[i][0] == '-') {
+  } else if (strcmp(argv[i], "--self-update") == 0) {
+      perform_self_update();
+      exit(ARCHIUM_SUCCESS);
+  } else if (argv[i][0] == '-') {
       fprintf(stderr, "\033[1;31mError: Unknown option: %s\033[0m\n", argv[i]);
       fprintf(stderr,
               "Use \033[1;32marchium --help\033[0m for usage information.\n");
       return ARCHIUM_ERROR_INVALID_INPUT;
-    }
+  }
   }
 
   return ARCHIUM_SUCCESS;
