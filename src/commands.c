@@ -199,8 +199,13 @@ void display_dependency_tree(const char *package_manager, const char *package) {
 void perform_self_update(void) {
     char clone_dir[COMMAND_BUFFER_SIZE];
     char command[COMMAND_BUFFER_SIZE];
+    int ret;
     
-    snprintf(clone_dir, sizeof(clone_dir), "/tmp/archium-update-%d", (int)time(NULL));
+    ret = snprintf(clone_dir, sizeof(clone_dir), "/tmp/archium-update-%d", (int)time(NULL));
+    if (ret >= (int)sizeof(clone_dir)) {
+        log_error("Clone directory path too long", ARCHIUM_ERROR_INVALID_INPUT);
+        return;
+    }
     
     printf("\033[1;34mUpdating Archium...\033[0m\n");
     log_info("Starting self-update process");
@@ -210,7 +215,14 @@ void perform_self_update(void) {
         return;
     }
 
-    snprintf(command, sizeof(command), "git clone %s %s", ARCHIUM_REPO_URL, clone_dir);
+    ret = snprintf(command, sizeof(command), "git clone %.256s %.256s", 
+                  ARCHIUM_REPO_URL, clone_dir);
+    if (ret >= (int)sizeof(command)) {
+        log_error("Command string too long", ARCHIUM_ERROR_INVALID_INPUT);
+        rmdir(clone_dir);
+        return;
+    }
+
     if (system(command) != 0) {
         log_error("Failed to clone repository", ARCHIUM_ERROR_SYSTEM_CALL);
         rmdir(clone_dir);
@@ -219,28 +231,36 @@ void perform_self_update(void) {
 
     if (chdir(clone_dir) != 0) {
         log_error("Failed to change to clone directory", ARCHIUM_ERROR_SYSTEM_CALL);
-        snprintf(command, sizeof(command), "rm -rf %s", clone_dir);
-        system(command);
+        ret = snprintf(command, sizeof(command), "rm -rf %.256s", clone_dir);
+        if (ret < (int)sizeof(command)) {
+            system(command);
+        }
         return;
     }
 
     if (system("make") != 0) {
         log_error("Failed to build project", ARCHIUM_ERROR_SYSTEM_CALL);
-        snprintf(command, sizeof(command), "rm -rf %s", clone_dir);
-        system(command);
+        ret = snprintf(command, sizeof(command), "rm -rf %.256s", clone_dir);
+        if (ret < (int)sizeof(command)) {
+            system(command);
+        }
         return;
     }
 
     printf("\033[1;33mRequesting elevated privileges to install updates...\033[0m\n");
     if (system("sudo make install") != 0) {
         log_error("Failed to install updates", ARCHIUM_ERROR_SYSTEM_CALL);
-        snprintf(command, sizeof(command), "rm -rf %s", clone_dir);
-        system(command);
+        ret = snprintf(command, sizeof(command), "rm -rf %.256s", clone_dir);
+        if (ret < (int)sizeof(command)) {
+            system(command);
+        }
         return;
     }
 
-    snprintf(command, sizeof(command), "rm -rf %s", clone_dir);
-    system(command);
+    ret = snprintf(command, sizeof(command), "rm -rf %.256s", clone_dir);
+    if (ret < (int)sizeof(command)) {
+        system(command);
+    }
 
     printf("\033[1;32mArchium has been updated successfully!\033[0m\n");
     log_info("Self-update completed successfully");
