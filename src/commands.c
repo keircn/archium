@@ -197,6 +197,24 @@ void display_dependency_tree(const char *package_manager, const char *package) {
 }
 
 void perform_self_update(void) {
+    FILE *fp = popen("pacman -Qm | grep '^archium '", "r");
+    if (!fp) {
+        log_error("Failed to check installation source", ARCHIUM_ERROR_SYSTEM_CALL);
+        return;
+    }
+
+    char buffer[COMMAND_BUFFER_SIZE];
+    if (fgets(buffer, sizeof(buffer), fp) != NULL) {
+        pclose(fp);
+        printf("\033[1;33mWarning: Archium appears to be installed via AUR.\n");
+        printf("Please use your AUR helper to update instead:\n");
+        printf("yay -Syu archium\n");
+        printf("or\n");
+        printf("paru -Syu archium\033[0m\n");
+        return;
+    }
+    pclose(fp);
+
     char clone_dir[COMMAND_BUFFER_SIZE];
     char command[COMMAND_BUFFER_SIZE];
     int ret;
