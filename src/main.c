@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
   }
 
   printf("\033[1;36m╔════════════════════════════════════════╗\033[0m\n");
-  printf("\033[1;36m║      Welcome to Archium v%s           ║\033[0m\n",
+  printf("\033[1;36m║      Welcome to Archium v%s         ║\033[0m\n",
          ARCHIUM_VERSION);
   printf("\033[1;36m║      Type \"h\" for help                 ║\033[0m\n");
   printf("\033[1;36m╚════════════════════════════════════════╝\033[0m\n");

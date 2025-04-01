@@ -73,6 +73,18 @@ ArchiumError handle_command(const char *input, const char *package_manager) {
         char package[MAX_INPUT_LENGTH];
         get_user_input(package, "Enter package name to view dependencies: ");
         display_dependency_tree(package_manager, package);
+    } else if (strcmp(input, "size") == 0) {
+        list_packages_by_size();
+    } else if (strcmp(input, "recent") == 0) {
+        list_recent_installs();
+    } else if (strcmp(input, "explicit") == 0) {
+        list_explicit_installs();
+    } else if (strcmp(input, "owns") == 0) {
+        char file[MAX_INPUT_LENGTH];
+        get_user_input(file, "Enter file path: ");
+        find_package_owner(file);
+    } else if (strcmp(input, "backup") == 0) {
+        backup_pacman_config();
     }
 
   return ARCHIUM_SUCCESS;
@@ -282,4 +294,49 @@ void perform_self_update(void) {
 
     printf("\033[1;32mArchium has been updated successfully!\033[0m\n");
     log_info("Self-update completed successfully");
+}
+
+void list_packages_by_size(void) {
+    printf("\033[1;34mListing installed packages by size...\033[0m\n");
+    execute_command("pacman -Qi | awk '/^Name/{name=$3} /^Installed Size/{size=$4$5; print size, name}' | sort -h",
+                   "Listed packages by size");
+}
+
+void list_recent_installs(void) {
+    printf("\033[1;34mListing recently installed packages...\033[0m\n");
+    execute_command("grep -i installed /var/log/pacman.log | tail -n 20", 
+                   "Listed recent installations");
+}
+
+void list_explicit_installs(void) {
+    printf("\033[1;34mListing explicitly installed packages...\033[0m\n");
+    execute_command("pacman -Qei | awk '/^Name/ { name=$3 } /^Groups/ { if ($3 != \"base\" && $3 != \"base-devel\") { print name } }'",
+                   "Listed explicit installations");
+}
+
+void find_package_owner(const char *file) {
+    char command[COMMAND_BUFFER_SIZE];
+    snprintf(command, sizeof(command), "pacman -Qo %s", file);
+    printf("\033[1;34mFinding package owner for: %s\033[0m\n", file);
+    execute_command(command, NULL);
+}
+
+void backup_pacman_config(void) {
+    time_t now = time(NULL);
+    char timestamp[32];
+    strftime(timestamp, sizeof(timestamp), "%Y%m%d_%H%M%S", localtime(&now));
+    
+    char command[COMMAND_BUFFER_SIZE];
+    snprintf(command, sizeof(command), 
+             "sudo cp /etc/pacman.conf /etc/pacman.conf.backup_%s", timestamp);
+    
+    printf("\033[1;34mBacking up pacman configuration...\033[0m\n");
+    if (system(command) == 0) {
+        printf("\033[1;32mBackup created: /etc/pacman.conf.backup_%s\033[0m\n", 
+               timestamp);
+        log_info("Pacman configuration backed up");
+    } else {
+        log_error("Failed to backup pacman configuration", 
+                 ARCHIUM_ERROR_SYSTEM_CALL);
+    }
 }

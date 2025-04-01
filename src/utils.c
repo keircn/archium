@@ -29,8 +29,11 @@ void get_input(char *input, const char *prompt) {
 }
 
 int is_valid_command(const char *command) {
-  const char *valid_commands[] = {"u", "i", "r", "p",  "c",  "o",  "s", "h",
-                                  "q", "l", "?", "cu", "dt", "cc", "lo"};
+  const char *valid_commands[] = {
+      "u", "i", "r", "p", "c", "o", "s", "h",
+      "q", "l", "?", "cu", "dt", "cc", "lo",
+      "size", "recent", "explicit", "owns", "backup"
+  };
   int num_commands = sizeof(valid_commands) / sizeof(valid_commands[0]);
   for (int i = 0; i < num_commands; i++) {
     if (strcmp(command, valid_commands[i]) == 0 ||
