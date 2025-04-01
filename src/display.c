@@ -35,7 +35,7 @@ void display_version(void) {
       "\033[1;34m .'.''| |  \n"
       "/ /   | |_ \033[0mThis program is subject to the terms of the "
       "\033[1;31mGPL License\033[0m.\n"
-      "\033[1;34m\\ \\._,\\ '/ \033[0mArchie originally created & maintained by "
+      "\033[1;34m\\ \\._,\\ '/ \033[0mArchie originally created by "
       "\033[1;36mGurov\033[0m\n"
       "\033[1;34m `--'  `\"  \033[0mArchium forked and maintained by "
       "\033[1;36mKeiran\033[0m\n",
