@@ -315,6 +315,17 @@ void list_explicit_installs(void) {
 }
 
 void find_package_owner(const char *file) {
+    struct stat st;
+    if (stat(file, &st) != 0) {
+        fprintf(stderr, "\033[1;31mError: File '%s' does not exist or cannot be accessed.\033[0m\n", file);
+        return;
+    }
+
+    if (access(file, R_OK) != 0) {
+        fprintf(stderr, "\033[1;31mError: Insufficient permissions to read '%s'.\033[0m\n", file);
+        return;
+    }
+
     char command[COMMAND_BUFFER_SIZE];
     snprintf(command, sizeof(command), "pacman -Qo %s", file);
     printf("\033[1;34mFinding package owner for: %s\033[0m\n", file);
