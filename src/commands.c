@@ -73,17 +73,17 @@ ArchiumError handle_command(const char *input, const char *package_manager) {
         char package[MAX_INPUT_LENGTH];
         get_user_input(package, "Enter package name to view dependencies: ");
         display_dependency_tree(package_manager, package);
-    } else if (strcmp(input, "size") == 0) {
+    } else if (strcmp(input, "si") == 0) {
         list_packages_by_size();
-    } else if (strcmp(input, "recent") == 0) {
+    } else if (strcmp(input, "re") == 0) {
         list_recent_installs();
-    } else if (strcmp(input, "explicit") == 0) {
+    } else if (strcmp(input, "ex") == 0) {
         list_explicit_installs();
-    } else if (strcmp(input, "owns") == 0) {
+    } else if (strcmp(input, "ow") == 0) {
         char file[MAX_INPUT_LENGTH];
         get_user_input(file, "Enter file path: ");
         find_package_owner(file);
-    } else if (strcmp(input, "backup") == 0) {
+    } else if (strcmp(input, "ba") == 0) {
         backup_pacman_config();
     }
 

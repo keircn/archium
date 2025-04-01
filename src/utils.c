@@ -32,7 +32,7 @@ int is_valid_command(const char *command) {
   const char *valid_commands[] = {
       "u", "i", "r", "p", "c", "o", "s", "h",
       "q", "l", "?", "cu", "dt", "cc", "lo",
-      "size", "recent", "explicit", "owns", "backup"
+      "si", "re", "ex", "ow", "ba"
   };
   int num_commands = sizeof(valid_commands) / sizeof(valid_commands[0]);
   for (int i = 0; i < num_commands; i++) {
