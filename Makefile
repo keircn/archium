@@ -17,44 +17,44 @@ TARGET = $(BUILD_DIR)/archium
 all: $(BUILD_DIR) $(TARGET)
 
 $(BUILD_DIR):
-    mkdir -p $(BUILD_DIR)
+	mkdir -p $(BUILD_DIR)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
-    $(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 $(TARGET): $(OBJ)
-    $(CC) $(OBJ) -o $@ $(LDFLAGS)
-    @echo "Build complete! Binary is at: $(TARGET)"
+	$(CC) $(OBJ) -o $@ $(LDFLAGS)
+	@echo "Build complete! Binary is at: $(TARGET)"
 
 install: $(TARGET)
-    install -D $(TARGET) $(DESTDIR)/bin/archium
-    @echo "Archium installed to $(DESTDIR)/bin/archium"
+	install -D $(TARGET) $(DESTDIR)/bin/archium
+	@echo "Archium installed to $(DESTDIR)/bin/archium"
 
 uninstall:
-    rm -f $(DESTDIR)/bin/archium
-    @echo "Archium uninstalled from $(DESTDIR)/bin/archium"
+	rm -f $(DESTDIR)/bin/archium
+	@echo "Archium uninstalled from $(DESTDIR)/bin/archium"
 
 clean:
-    rm -rf $(BUILD_DIR)
-    @echo "Cleaned build directory"
+	rm -rf $(BUILD_DIR)
+	@echo "Cleaned build directory"
 
 debug:
-    @echo "Source files: $(SRC)"
-    @echo "Object files: $(OBJ)"
-    @echo "Target: $(TARGET)"
-    @echo "Build directory: $(BUILD_DIR)"
-    @echo "Install directory: $(DESTDIR)/bin"
+	@echo "Source files: $(SRC)"
+	@echo "Object files: $(OBJ)"
+	@echo "Target: $(TARGET)"
+	@echo "Build directory: $(BUILD_DIR)"
+	@echo "Install directory: $(DESTDIR)/bin"
 
 release: clean all
-    strip $(TARGET)
-    mkdir -p $(BUILD_DIR)/release
-    cp $(TARGET) $(BUILD_DIR)/release/archium
-    tar -czvf $(BUILD_DIR)/$(TARNAME).tar.gz -C $(BUILD_DIR) release
-    @echo "Release archive built: $(BUILD_DIR)/$(TARNAME).tar.gz"
+	strip $(TARGET)
+	mkdir -p $(BUILD_DIR)/release
+	cp $(TARGET) $(BUILD_DIR)/release/archium
+	tar -czvf $(BUILD_DIR)/$(TARNAME).tar.gz -C $(BUILD_DIR) release
+	@echo "Release archive built: $(BUILD_DIR)/$(TARNAME).tar.gz"
 
 format:
-    clang-format -i $(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/*.h)
-    @echo "Codebase formatted with clang-format"
+	clang-format -i $(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/*.h)
+	@echo "Codebase formatted with clang-format"
 
 test: $(TARGET)
-    @echo "Not implemented yet. Please run the binary manually for testing."
+	@echo "Not implemented yet. Please run the binary manually for testing."
