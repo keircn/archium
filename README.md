@@ -1,30 +1,26 @@
-# 🌟 Archium - Fast & Easy Package Management for Arch Linux
-
-## 🚀 Current Version
-
-**Archium v1.5.3**
+# Archium - Fast & Easy Package Management for Arch Linux
 
 Archium is a command-line tool for managing packages on Arch Linux. It provides a simple and intuitive interface for common package management tasks using `yay`, `paru`, or `pacman`.
 
 ---
 
-## ✨ Features
+## Features
 
-- 🔄 **Update the system** or specific packages
-- 📦 **Install packages**
-- ❌ **Remove packages**
-- 🗑️ **Purge packages**
-- 🧹 **Clean cache**
-- 🧩 **Clean orphaned packages**
-- 🔍 **Search for packages**
-- 📋 **List installed packages**
-- ❓ **Display package information**
-- 🌳 **Display package dependency tree**
-- 🔔 **Check for updates**
+- **Update the system** or specific packages
+- **Install packages**
+- **Remove packages**
+- **Purge packages**
+- **Clean cache**
+- **Clean orphaned packages**
+- **Search for packages**
+- **List installed packages**
+- **Display package information**
+- **Display package dependency tree**
+- **Check for updates**
 
 ---
 
-## 🛠️ Installation
+## Installation
 
 ### 1. Clone the Repository
 ```bash
@@ -112,7 +108,7 @@ paru -Syu archium
 
 ---
 
-## 📦 Dependencies
+## Dependencies
 
 - **`gcc`** - GNU Compiler Collection
 - **`yay`** or **`paru`** - AUR helpers for Arch Linux
@@ -122,7 +118,7 @@ paru -Syu archium
 
 ---
 
-## 📝 Notes
+## Notes
 
 - Archium uses `yay` by default. If you only have `paru` installed, it will use `paru`.  
   If you have both and want to use `paru` instead of `yay`, create a file in `$HOME` called `.archium-use-paru`:
@@ -138,22 +134,22 @@ paru -Syu archium
 
 ---
 
-## 📜 License
+## License
 
 This program is licensed under the **GNU General Public License v3.0**.  
 See the [LICENSE](./LICENSE) file for details.
 
 ---
 
-## ❤️ Contributing
+## Contributing
 
 Contributions are welcome! Feel free to fork the repository and submit a pull request.
 
 ---
 
-## 📧 Contact
+## Contact
 
-For any questions or issues, please contact [Keiran](mailto:me@keiran.cc).
+For any questions or issues, please contact [Keiran](mailto:keircn@proton.me).
 
 ---
 
