@@ -40,7 +40,7 @@ sudo make install
 
 ---
 
-## 📖 Usage
+## Usage
 
 When you run `archium`, you will see the following prompt:
 
