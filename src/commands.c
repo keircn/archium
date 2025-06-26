@@ -89,6 +89,8 @@ ArchiumError handle_command(const char *input, const char *package_manager) {
     find_package_owner(file);
   } else if (strcmp(input, "ba") == 0) {
     backup_pacman_config();
+  } else if (strcmp(input, "config") == 0) {
+    configure_preferences();
   }
 
   return ARCHIUM_SUCCESS;
@@ -119,7 +121,16 @@ void update_system(const char *package_manager, const char *package) {
 
 void clear_build_cache() {
   printf("\033[1;34mClearing package build cache...\033[0m\n");
-  execute_command("rm -rf $HOME/.cache/yay", "Cleared package build cache");
+
+  const char *cache_dir = archium_config_get_cache_dir();
+  if (cache_dir) {
+    char command[COMMAND_BUFFER_SIZE];
+    snprintf(command, sizeof(command), "rm -rf %s/*", cache_dir);
+    execute_command(command, "Cleared Archium build cache");
+  }
+
+  execute_command("rm -rf $HOME/.cache/yay", "Cleared yay build cache");
+  execute_command("rm -rf $HOME/.cache/paru", "Cleared paru build cache");
 }
 
 void list_orphans() {
@@ -240,8 +251,15 @@ void perform_self_update(void) {
   char command[COMMAND_BUFFER_SIZE];
   int ret;
 
-  ret = snprintf(clone_dir, sizeof(clone_dir), "/tmp/archium-update-%d",
-                 (int)time(NULL));
+  const char *cache_dir = archium_config_get_cache_dir();
+  if (!cache_dir) {
+    archium_report_error(ARCHIUM_ERROR_SYSTEM_CALL,
+                         "Failed to get cache directory", NULL);
+    return;
+  }
+
+  ret = snprintf(clone_dir, sizeof(clone_dir), "%s/archium-update-%d",
+                 cache_dir, (int)time(NULL));
   if (ret >= (int)sizeof(clone_dir)) {
     archium_report_error(ARCHIUM_ERROR_INVALID_INPUT,
                          "Clone directory path too long", NULL);
@@ -377,5 +395,60 @@ void backup_pacman_config(void) {
   } else {
     archium_report_error(ARCHIUM_ERROR_SYSTEM_CALL,
                          "Failed to backup pacman configuration", NULL);
+  }
+}
+
+void configure_preferences(void) {
+  printf("\033[1;34mArchium Configuration\033[0m\n");
+  printf("Available preferences:\n");
+  printf("1. Package manager preference (yay/paru)\n");
+  printf("2. View current configuration directory\n");
+  printf("3. View log file location\n");
+
+  char choice[MAX_INPUT_LENGTH];
+  get_user_input(choice, "Enter your choice (1-3): ");
+
+  if (strcmp(choice, "1") == 0) {
+    printf("\033[1;33mCurrent preference:\033[0m ");
+    if (archium_config_check_paru_preference()) {
+      printf("paru\n");
+    } else {
+      printf("yay (default)\n");
+    }
+
+    char pref[MAX_INPUT_LENGTH];
+    get_user_input(pref, "Set package manager preference (yay/paru): ");
+
+    if (strcmp(pref, "yay") == 0 || strcmp(pref, "paru") == 0) {
+      if (archium_config_set_preference("package_manager", pref)) {
+        printf("\033[1;32mPackage manager preference set to: %s\033[0m\n",
+               pref);
+        printf(
+            "\033[1;33mNote: Restart Archium for changes to take "
+            "effect.\033[0m\n");
+        log_action("Package manager preference updated");
+      } else {
+        printf("\033[1;31mFailed to set preference.\033[0m\n");
+      }
+    } else {
+      printf(
+          "\033[1;31mInvalid choice. Please enter 'yay' or 'paru'.\033[0m\n");
+    }
+  } else if (strcmp(choice, "2") == 0) {
+    const char *config_dir = archium_config_get_config_dir();
+    if (config_dir) {
+      printf("\033[1;32mConfiguration directory: %s\033[0m\n", config_dir);
+    } else {
+      printf("\033[1;31mFailed to get configuration directory.\033[0m\n");
+    }
+  } else if (strcmp(choice, "3") == 0) {
+    const char *log_file = archium_config_get_log_file();
+    if (log_file) {
+      printf("\033[1;32mLog file location: %s\033[0m\n", log_file);
+    } else {
+      printf("\033[1;31mFailed to get log file location.\033[0m\n");
+    }
+  } else {
+    printf("\033[1;31mInvalid choice.\033[0m\n");
   }
 }

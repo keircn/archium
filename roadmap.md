@@ -4,11 +4,6 @@ This document outlines planned features, improvements, and ongoing work for Arch
 
 ## Upcoming Features
 
-### Configuration System
-
-- Persistent user preferences and settings
-- Config file support for custom behaviors
-
 ### Package History & Rollback
 
 - Track installed, upgraded, and removed packages

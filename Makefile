@@ -5,7 +5,7 @@ LDFLAGS = -lreadline
 BUILD_DIR = build
 SRC_DIR = src
 DESTDIR = /usr/local
-VERSION = $(shell git describe --tags --abbrev=0)
+VERSION = 1.7.0
 TARNAME = archium-$(VERSION)
 
 SRC = $(wildcard $(SRC_DIR)/*.c)

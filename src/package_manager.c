@@ -1,24 +1,6 @@
 #include "archium.h"
 
-int check_archium_file(void) {
-  const char *home = getenv("HOME");
-  if (!home) {
-    fprintf(
-        stderr,
-        "\033[1;31mError: Unable to get HOME environment variable.\033[0m\n");
-    return 0;
-  }
-
-  char path[MAX_INPUT_LENGTH];
-  if (snprintf(path, sizeof(path), "%s/.archium-use-paru", home) >=
-      (int)sizeof(path)) {
-    fprintf(stderr, "\033[1;31mError: Path buffer overflow.\033[0m\n");
-    return 0;
-  }
-
-  struct stat buffer;
-  return (stat(path, &buffer) == 0);
-}
+int check_archium_file(void) { return archium_config_check_paru_preference(); }
 
 int check_command(const char *command) {
   char cmd[COMMAND_BUFFER_SIZE];
@@ -87,13 +69,30 @@ void install_git(void) {
 
 void install_yay(void) {
   printf("\033[1;32mInstalling yay...\033[0m\n");
-  if (system("mkdir -p $HOME/.cache/archium/setup && "
-             "cd $HOME/.cache/archium/setup && "
-             "git clone https://aur.archlinux.org/yay-bin.git && "
-             "cd yay-bin && "
-             "makepkg -scCi && "
-             "cd && "
-             "rm -rf $HOME/.cache/archium/") != 0) {
+
+  const char *cache_dir = archium_config_get_cache_dir();
+  if (!cache_dir) {
+    fprintf(stderr, "\033[1;31mError: Failed to get cache directory.\033[0m\n");
+    exit(EXIT_FAILURE);
+  }
+
+  char command[COMMAND_BUFFER_SIZE];
+  int ret = snprintf(command, sizeof(command),
+                     "mkdir -p %s/setup && "
+                     "cd %s/setup && "
+                     "git clone https://aur.archlinux.org/yay-bin.git && "
+                     "cd yay-bin && "
+                     "makepkg -scCi && "
+                     "cd && "
+                     "rm -rf %s/setup",
+                     cache_dir, cache_dir, cache_dir);
+
+  if (ret >= (int)sizeof(command)) {
+    fprintf(stderr, "\033[1;31mError: Command string too long.\033[0m\n");
+    exit(EXIT_FAILURE);
+  }
+
+  if (system(command) != 0) {
     fprintf(stderr, "\033[1;31mError: Failed to install yay.\033[0m\n");
     exit(EXIT_FAILURE);
   }

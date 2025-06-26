@@ -24,18 +24,7 @@ void handle_error(ArchiumError error_code, const char *context) {
 }
 
 static void write_log(const char *level, const char *message) {
-  if (!config.verbose) {
-    return;
-  }
-
-  time_t now;
-  char timestamp[26];
-
-  time(&now);
-  ctime_r(&now, timestamp);
-  timestamp[24] = '\0';
-
-  fprintf(stderr, "[%s] [%s] %s\n", timestamp, level, message);
+  archium_config_write_log(level, message);
 }
 
 void log_error(const char *error_message, ArchiumError error_code) {

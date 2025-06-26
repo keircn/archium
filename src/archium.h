@@ -18,7 +18,7 @@
 #define COMMAND_BUFFER_SIZE 512
 #define MAX_RETRIES 3
 #define TIMEOUT_SECONDS 30
-#define ARCHIUM_VERSION "1.6.2"
+#define ARCHIUM_VERSION "1.7.0"
 #define ARCHIUM_REPO_URL "https://github.com/keircn/archium.git"
 
 typedef struct {
@@ -87,10 +87,21 @@ void list_recent_installs(void);
 void list_explicit_installs(void);
 void find_package_owner(const char *file);
 void backup_pacman_config(void);
+void configure_preferences(void);
 char **get_pacman_commands(void);
 char *command_generator(const char *text, int state);
 char *get_package_manager_version(const char *package_manager);
 void perform_self_update(void);
+
+int archium_config_init(void);
+void archium_config_migrate_legacy_files(void);
+const char *archium_config_get_config_dir(void);
+const char *archium_config_get_log_file(void);
+const char *archium_config_get_cache_dir(void);
+int archium_config_check_paru_preference(void);
+int archium_config_set_preference(const char *key, const char *value);
+char *archium_config_get_preference(const char *key);
+void archium_config_write_log(const char *level, const char *message);
 
 extern char **cached_commands;
 

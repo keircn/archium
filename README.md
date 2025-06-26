@@ -36,7 +36,7 @@ When you run `archium`, you will see the following prompt:
 
 ```plaintext
 ╔════════════════════════════════════════╗
-║      Welcome to Archium v1.6.2         ║
+║      Welcome to Archium v1.7.0         ║
 ║      Type "h" for help                 ║
 ╚════════════════════════════════════════╝
 Archium $ u
@@ -68,14 +68,50 @@ yay -Syu archium
 paru -Syu archium
 ```
 
+## Configuration
+
+Archium uses a centralized configuration system located at `$HOME/.config/archium/`:
+
+- **Configuration Directory**: `$HOME/.config/archium/`
+- **Log File**: `$HOME/.config/archium/archium.log` (when verbose mode is enabled)
+- **Preferences**: `$HOME/.config/archium/preferences`
+- **Cache Directory**: `$HOME/.config/archium/cache/`
+
+### Setting Package Manager Preference
+
+You can set your preferred package manager using the built-in configuration command:
+
+```bash
+archium
+
+Archium $ config
+Archium Configuration
+Available preferences:
+1. Package manager preference (yay/paru)
+2. View current configuration directory
+3. View log file location
+Enter your choice (1-3): 1
+Current preference: yay (default)
+Set package manager preference (yay/paru): paru
+Package manager preference set to: paru
+Note: Restart Archium for changes to take effect.
+```
+
+Alternatively, for quick command-line usage:
+
+```bash
+archium --exec config
+```
+
+### Legacy Migration
+
+If you have an existing `.archium-use-paru` file in your home directory, Archium will automatically migrate it to the new configuration system and remove the old file.
+
 ## Notes
 
-- Archium uses `yay` by default. If you only have `paru` installed, it will use `paru`.  
-  If you have both and want to use `paru` instead of `yay`, create a file in `$HOME` called `.archium-use-paru`:
-
-  ```bash
-  touch $HOME/.archium-use-paru
-  ```
+- Archium uses `yay` by default. If you only have `paru` installed, it will use `paru`.
+- Use the `config` command within Archium to manage preferences and view configuration paths.
+- Enable verbose logging with `--verbose` or `-V` to create detailed logs at `$HOME/.config/archium/archium.log`.
 
 - If Archium fails to upgrade to a newer version, try cleaning the cache using your preferred AUR helper and reinstalling:
   ```bash

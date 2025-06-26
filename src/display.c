@@ -122,13 +122,7 @@ void display_help(void) {
   printf("\033[1;32mex\033[0m          - List explicitly installed packages\n");
   printf("\033[1;32mow\033[0m          - Find which package owns a file\n");
   printf("\033[1;32mba\033[0m          - Backup pacman configuration\n");
-  printf("\033[1;32mdt\033[0m          - Display package dependency tree\n");
-  printf("\033[1;32mcu\033[0m          - Check for updates\n");
-  printf("\033[1;32msi\033[0m          - List installed packages by size\n");
-  printf("\033[1;32mre\033[0m          - Show recently installed packages\n");
-  printf("\033[1;32mex\033[0m          - List explicitly installed packages\n");
-  printf("\033[1;32mow\033[0m          - Find which package owns a file\n");
-  printf("\033[1;32mba\033[0m          - Backup pacman configuration\n");
+  printf("\033[1;32mconfig\033[0m      - Configure Archium preferences\n");
   printf("\033[1;32mh\033[0m           - Help\n");
   printf("\033[1;32mq\033[0m           - Quit\n");
 }

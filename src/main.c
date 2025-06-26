@@ -8,6 +8,14 @@ int main(int argc, char *argv[]) {
     return status;
   }
 
+  if (!archium_config_init()) {
+    archium_report_error(ARCHIUM_ERROR_SYSTEM_CALL,
+                         "Failed to initialize configuration system", NULL);
+    return ARCHIUM_ERROR_SYSTEM_CALL;
+  }
+
+  archium_config_migrate_legacy_files();
+
   signal(SIGINT, handle_signal);
   signal(SIGTERM, handle_signal);
   signal(SIGABRT, handle_signal);
