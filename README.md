@@ -4,21 +4,13 @@ Archium is a command-line tool for managing packages on Arch Linux. It provides 
 
 ---
 
-## Features
+## Dependencies
 
-- **Update the system** or specific packages
-- **Install packages**
-- **Remove packages**
-- **Purge packages**
-- **Clean cache**
-- **Clean orphaned packages**
-- **Search for packages**
-- **List installed packages**
-- **Display package information**
-- **Display package dependency tree**
-- **Check for updates**
-
----
+- **`gcc`** - GNU Compiler Collection
+- **`yay`** or **`paru`** - AUR helpers for Arch Linux
+- **`git`** - For installing `yay` if it is not already installed
+- **`readline`** - A library for command-line input (likely preinstalled)
+- **`ncurses`** - A library for text-based user interfaces (likely preinstalled)
 
 ## Installation
 
@@ -75,8 +67,6 @@ $ i
 Enter package name to install:
 ```
 
----
-
 ### Command-Line Arguments
 
 | Argument            | Description                                      |
@@ -106,18 +96,6 @@ yay -Syu archium
 paru -Syu archium
 ```
 
----
-
-## Dependencies
-
-- **`gcc`** - GNU Compiler Collection
-- **`yay`** or **`paru`** - AUR helpers for Arch Linux
-- **`git`** - For installing `yay` if it is not already installed
-- **`readline`** - A library for command-line input (likely preinstalled)
-- **`ncurses`** - A library for text-based user interfaces (likely preinstalled)
-
----
-
 ## Notes
 
 - Archium uses `yay` by default. If you only have `paru` installed, it will use `paru`.  
@@ -139,13 +117,9 @@ paru -Syu archium
 This program is licensed under the **GNU General Public License v3.0**.  
 See the [LICENSE](./LICENSE) file for details.
 
----
-
 ## Contributing
 
 Contributions are welcome! Feel free to fork the repository and submit a pull request.
-
----
 
 ## Contact
 
