@@ -10,22 +10,24 @@ Archium is a command-line tool for managing packages on Arch Linux. It provides 
 - **`yay`** or **`paru`** - AUR helpers for Arch Linux
 - **`git`** - For installing `yay` if it is not already installed
 - **`readline`** - A library for command-line input (likely preinstalled)
-- **`ncurses`** - A library for text-based user interfaces (likely preinstalled)
 
 ## Installation
 
 ### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/keircn/archium.git
 cd archium
 ```
 
 ### 2. Compile the Program
+
 ```bash
 make
 ```
 
 ### 3. Install the Binary (Requires Root Permissions)
+
 ```bash
 sudo make install
 ```
@@ -42,13 +44,14 @@ Archium $
 ```
 
 ### Interactive Shell Commands
-| Command | Description                              |
-|---------|------------------------------------------|
-| `u`     | Update the system or a specific package  |
-| `i`     | Install packages                         |
-| `r`     | Remove packages                          |
-| `p`     | Purge packages                           |
-| `c`     | Clean cache                              |
+
+| Command | Description                             |
+| ------- | --------------------------------------- |
+| `u`     | Update the system or a specific package |
+| `i`     | Install packages                        |
+| `r`     | Remove packages                         |
+| `p`     | Purge packages                          |
+| `c`     | Clean cache                             |
 | `cc`    | Clear package build cache               |
 | `o`     | Clean orphaned packages                 |
 | `lo`    | List orphaned packages                  |
@@ -61,7 +64,9 @@ Archium $
 | `q`     | Quit the application                    |
 
 ### Example
+
 To install a package, type `i` and follow the prompt:
+
 ```plaintext
 $ i
 Enter package name to install:
@@ -69,27 +74,31 @@ Enter package name to install:
 
 ### Command-Line Arguments
 
-| Argument            | Description                                      |
-|----------------------|--------------------------------------------------|
-| `--exec <command>`   | Execute a specific command directly              |
-| `--version`, `-v`    | Display version information                      |
-| `--verbose`, `-V`    | Enable verbose logging                           |
-| `--help`, `-h`       | Display help for command-line arguments          |
-| `--self-update`      | Update Archium to the latest version            |
+| Argument           | Description                             |
+| ------------------ | --------------------------------------- |
+| `--exec <command>` | Execute a specific command directly     |
+| `--version`, `-v`  | Display version information             |
+| `--verbose`, `-V`  | Enable verbose logging                  |
+| `--help`, `-h`     | Display help for command-line arguments |
+| `--self-update`    | Update Archium to the latest version    |
 
 ### Example
+
 To update the system directly from the command line:
+
 ```bash
 archium --exec u
 ```
 
 To update Archium itself (only for manual installations):
+
 ```bash
 archium --self-update
 ```
 
-**Note**: The `--self-update` option only works if you installed Archium manually. 
+**Note**: The `--self-update` option only works if you installed Archium manually.
 If you installed Archium from the AUR, please use your AUR helper to update:
+
 ```bash
 yay -Syu archium
 # or
@@ -100,6 +109,7 @@ paru -Syu archium
 
 - Archium uses `yay` by default. If you only have `paru` installed, it will use `paru`.  
   If you have both and want to use `paru` instead of `yay`, create a file in `$HOME` called `.archium-use-paru`:
+
   ```bash
   touch $HOME/.archium-use-paru
   ```

@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -O2 -g
-LDFLAGS = -lreadline -lncurses
+LDFLAGS = -lreadline
 
 BUILD_DIR = build
 SRC_DIR = src
