@@ -18,7 +18,7 @@
 #define COMMAND_BUFFER_SIZE 512
 #define MAX_RETRIES 3
 #define TIMEOUT_SECONDS 30
-#define ARCHIUM_VERSION "1.6.0"
+#define ARCHIUM_VERSION "1.6.1"
 #define ARCHIUM_REPO_URL "https://github.com/q4ow/archium.git"
 
 typedef struct {
