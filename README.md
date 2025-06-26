@@ -39,6 +39,8 @@ When you run `archium`, you will see the following prompt:
 ║      Welcome to Archium v1.6.2         ║
 ║      Type "h" for help                 ║
 ╚════════════════════════════════════════╝
+Archium $ u
+Upgrading system...
 ```
 
 ### Command-Line Arguments
