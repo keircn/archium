@@ -75,10 +75,8 @@ int main(int argc, char *argv[]) {
     if (*input_line) {
       add_history(input_line);
       status = handle_command(input_line, package_manager);
-
       if (status != ARCHIUM_SUCCESS) {
-        handle_error(status, "Command execution failed");
-        log_error(input_line, status);
+        archium_report_error(status, "Command execution failed", input_line);
       }
     }
   }

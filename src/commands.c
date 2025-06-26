@@ -23,7 +23,6 @@ ArchiumError handle_command(const char *input, const char *package_manager) {
   log_action(input);
 
   if (!is_valid_command(input)) {
-    fprintf(stderr, "Error: Invalid command. Type 'h' for help.\n");
     return ARCHIUM_ERROR_INVALID_INPUT;
   }
 

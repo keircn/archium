@@ -89,3 +89,24 @@ ArchiumError parse_arguments(int argc, char *argv[]) {
 
   return ARCHIUM_SUCCESS;
 }
+
+void archium_report_error(ArchiumError error_code, const char *context,
+                          const char *input) {
+  if (error_code == ARCHIUM_SUCCESS) return;
+  if (config.verbose) {
+    if (input && strlen(input) > 0) {
+      fprintf(stderr,
+              "\033[1;31m[Archium Error]\033[0m %s: '%s' (code: %d - %s)\n",
+              context, input, error_code, get_error_string(error_code));
+    } else {
+      fprintf(stderr, "\033[1;31m[Archium Error]\033[0m %s (code: %d - %s)\n",
+              context, error_code, get_error_string(error_code));
+    }
+  } else {
+    if (error_code == ARCHIUM_ERROR_INVALID_INPUT) {
+      printf("\033[1;31mInvalid command. Type 'h' for help.\033[0m\n");
+    } else {
+      printf("\033[1;31m%s\033[0m\n", get_error_string(error_code));
+    }
+  }
+}

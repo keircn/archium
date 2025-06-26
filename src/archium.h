@@ -91,6 +91,8 @@ char **get_pacman_commands(void);
 char *command_generator(const char *text, int state);
 char *get_package_manager_version(const char *package_manager);
 void perform_self_update(void);
+void archium_report_error(ArchiumError error_code, const char *context,
+                          const char *input);
 
 extern char **cached_commands;
 
