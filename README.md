@@ -2,8 +2,6 @@
 
 Archium is a command-line tool for managing packages on Arch Linux. It provides a simple and intuitive interface for common package management tasks using `yay`, `paru`, or `pacman`.
 
----
-
 ## Dependencies
 
 - **`gcc`** - GNU Compiler Collection
@@ -31,8 +29,6 @@ make
 ```bash
 sudo make install
 ```
-
----
 
 ## Usage
 
@@ -120,8 +116,6 @@ paru -Syu archium
   paru -Scc --noconfirm && paru -S archium --noconfirm
   ```
 
----
-
 ## License
 
 This program is licensed under the **GNU General Public License v3.0**.  
@@ -134,7 +128,5 @@ Contributions are welcome! Feel free to fork the repository and submit a pull re
 ## Contact
 
 For any questions or issues, please contact [Keiran](mailto:keircn@proton.me).
-
----
 
 > **Disclaimer**: Archium is not affiliated with Arch Linux or its official package managers.
