@@ -1,12 +1,12 @@
 # Archium - Fast & Easy Package Management for Arch Linux
 
-Archium is a command-line tool for managing packages on Arch Linux. It provides a simple and intuitive interface for common package management tasks using `yay`, `paru`, or `pacman`.
+Archium is a command-line tool for managing packages on Arch Linux. It provides a simple and intuitive interface for common package management tasks using `yay`, `paru`, or `pacman`. Archium is a faithful fork of [Archie](https://github.com/TuxForge/archie) by [Gurov](https://github.com/Gur0v).
 
 ## Dependencies
 
-- **`gcc`** - GNU Compiler Collection
-- **`yay`** or **`paru`** - AUR helpers for Arch Linux
-- **`git`** - For installing `yay` if it is not already installed
+- **`gcc`** - It's written in C, what do you expect?
+- **`yay`** or **`paru`** - AUR helpers for Arch Linux [OPTIONAL]
+- **`git`** - For installing `yay` if it is not already installed [OPTIONAL]
 - **`readline`** - A library for command-line input (likely preinstalled)
 
 ## Installation
@@ -35,37 +35,10 @@ sudo make install
 When you run `archium`, you will see the following prompt:
 
 ```plaintext
-Welcome to Archium, type "h" for help
-Archium $
-```
-
-### Interactive Shell Commands
-
-| Command | Description                             |
-| ------- | --------------------------------------- |
-| `u`     | Update the system or a specific package |
-| `i`     | Install packages                        |
-| `r`     | Remove packages                         |
-| `p`     | Purge packages                          |
-| `c`     | Clean cache                             |
-| `cc`    | Clear package build cache               |
-| `o`     | Clean orphaned packages                 |
-| `lo`    | List orphaned packages                  |
-| `s`     | Search for packages                     |
-| `l`     | List installed packages                 |
-| `?`     | Display package information             |
-| `dt`    | Display package dependency tree         |
-| `cu`    | Check for updates                       |
-| `h`     | Display help                            |
-| `q`     | Quit the application                    |
-
-### Example
-
-To install a package, type `i` and follow the prompt:
-
-```plaintext
-$ i
-Enter package name to install:
+╔════════════════════════════════════════╗
+║      Welcome to Archium v1.6.2         ║
+║      Type "h" for help                 ║
+╚════════════════════════════════════════╝
 ```
 
 ### Command-Line Arguments
@@ -77,14 +50,6 @@ Enter package name to install:
 | `--verbose`, `-V`  | Enable verbose logging                  |
 | `--help`, `-h`     | Display help for command-line arguments |
 | `--self-update`    | Update Archium to the latest version    |
-
-### Example
-
-To update the system directly from the command line:
-
-```bash
-archium --exec u
-```
 
 To update Archium itself (only for manual installations):
 
@@ -121,12 +86,8 @@ paru -Syu archium
 This program is licensed under the **GNU General Public License v3.0**.  
 See the [LICENSE](./LICENSE) file for details.
 
-## Contributing
-
-Contributions are welcome! Feel free to fork the repository and submit a pull request.
-
 ## Contact
 
-For any questions or issues, please contact [Keiran](mailto:keircn@proton.me).
+For any questions or issues, please contact [Keiran](mailto:keiran0@proton.me).
 
 > **Disclaimer**: Archium is not affiliated with Arch Linux or its official package managers.
