@@ -38,7 +38,8 @@ typedef enum {
 } ArchiumError;
 
 const char *get_error_string(ArchiumError error_code);
-void handle_error(ArchiumError error_code, const char *context);
+void archium_report_error(ArchiumError error_code, const char *context,
+                          const char *input);
 
 extern ArchiumConfig config;
 ArchiumError parse_arguments(int argc, char *argv[]);
@@ -56,7 +57,6 @@ char *command_generator(const char *text, int state);
 void cache_pacman_commands(void);
 
 void log_action(const char *action);
-void log_error(const char *error_message, ArchiumError error_code);
 void log_debug(const char *debug_message);
 void log_info(const char *info_message);
 
@@ -91,8 +91,6 @@ char **get_pacman_commands(void);
 char *command_generator(const char *text, int state);
 char *get_package_manager_version(const char *package_manager);
 void perform_self_update(void);
-void archium_report_error(ArchiumError error_code, const char *context,
-                          const char *input);
 
 extern char **cached_commands;
 

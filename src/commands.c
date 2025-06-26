@@ -219,7 +219,8 @@ void display_dependency_tree(const char *package_manager, const char *package) {
 void perform_self_update(void) {
   FILE *fp = popen("pacman -Qm | grep '^archium '", "r");
   if (!fp) {
-    log_error("Failed to check installation source", ARCHIUM_ERROR_SYSTEM_CALL);
+    archium_report_error(ARCHIUM_ERROR_SYSTEM_CALL,
+                         "Failed to check installation source", NULL);
     return;
   }
 
@@ -242,7 +243,8 @@ void perform_self_update(void) {
   ret = snprintf(clone_dir, sizeof(clone_dir), "/tmp/archium-update-%d",
                  (int)time(NULL));
   if (ret >= (int)sizeof(clone_dir)) {
-    log_error("Clone directory path too long", ARCHIUM_ERROR_INVALID_INPUT);
+    archium_report_error(ARCHIUM_ERROR_INVALID_INPUT,
+                         "Clone directory path too long", NULL);
     return;
   }
 
@@ -250,27 +252,30 @@ void perform_self_update(void) {
   log_info("Starting self-update process");
 
   if (mkdir(clone_dir, 0755) != 0) {
-    log_error("Failed to create temporary directory",
-              ARCHIUM_ERROR_SYSTEM_CALL);
+    archium_report_error(ARCHIUM_ERROR_SYSTEM_CALL,
+                         "Failed to create temporary directory", NULL);
     return;
   }
 
   ret = snprintf(command, sizeof(command), "git clone %.256s %.256s",
                  ARCHIUM_REPO_URL, clone_dir);
   if (ret >= (int)sizeof(command)) {
-    log_error("Command string too long", ARCHIUM_ERROR_INVALID_INPUT);
+    archium_report_error(ARCHIUM_ERROR_INVALID_INPUT, "Command string too long",
+                         NULL);
     rmdir(clone_dir);
     return;
   }
 
   if (system(command) != 0) {
-    log_error("Failed to clone repository", ARCHIUM_ERROR_SYSTEM_CALL);
+    archium_report_error(ARCHIUM_ERROR_SYSTEM_CALL,
+                         "Failed to clone repository", NULL);
     rmdir(clone_dir);
     return;
   }
 
   if (chdir(clone_dir) != 0) {
-    log_error("Failed to change to clone directory", ARCHIUM_ERROR_SYSTEM_CALL);
+    archium_report_error(ARCHIUM_ERROR_SYSTEM_CALL,
+                         "Failed to change to clone directory", NULL);
     ret = snprintf(command, sizeof(command), "rm -rf %.256s", clone_dir);
     if (ret < (int)sizeof(command)) {
       system(command);
@@ -279,7 +284,8 @@ void perform_self_update(void) {
   }
 
   if (system("make") != 0) {
-    log_error("Failed to build project", ARCHIUM_ERROR_SYSTEM_CALL);
+    archium_report_error(ARCHIUM_ERROR_SYSTEM_CALL, "Failed to build project",
+                         NULL);
     ret = snprintf(command, sizeof(command), "rm -rf %.256s", clone_dir);
     if (ret < (int)sizeof(command)) {
       system(command);
@@ -291,7 +297,8 @@ void perform_self_update(void) {
       "\033[1;33mRequesting elevated privileges to install "
       "updates...\033[0m\n");
   if (system("sudo make install") != 0) {
-    log_error("Failed to install updates", ARCHIUM_ERROR_SYSTEM_CALL);
+    archium_report_error(ARCHIUM_ERROR_SYSTEM_CALL, "Failed to install updates",
+                         NULL);
     ret = snprintf(command, sizeof(command), "rm -rf %.256s", clone_dir);
     if (ret < (int)sizeof(command)) {
       system(command);
@@ -368,7 +375,7 @@ void backup_pacman_config(void) {
            timestamp);
     log_info("Pacman configuration backed up");
   } else {
-    log_error("Failed to backup pacman configuration",
-              ARCHIUM_ERROR_SYSTEM_CALL);
+    archium_report_error(ARCHIUM_ERROR_SYSTEM_CALL,
+                         "Failed to backup pacman configuration", NULL);
   }
 }

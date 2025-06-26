@@ -20,8 +20,7 @@ const char *get_error_string(ArchiumError error_code) {
 }
 
 void handle_error(ArchiumError error_code, const char *context) {
-  const char *error_str = get_error_string(error_code);
-  fprintf(stderr, "\033[1;31mError: %s - %s\033[0m\n", context, error_str);
+  archium_report_error(error_code, context, NULL);
 }
 
 static void write_log(const char *level, const char *message) {
@@ -40,14 +39,7 @@ static void write_log(const char *level, const char *message) {
 }
 
 void log_error(const char *error_message, ArchiumError error_code) {
-  char full_message[COMMAND_BUFFER_SIZE];
-  snprintf(full_message, sizeof(full_message), "%s (Error code: %d - %s)",
-           error_message, error_code, get_error_string(error_code));
-  fprintf(stderr, "\033[1;31m%s\033[0m\n", full_message);
-
-  if (config.verbose) {
-    write_log("ERROR", full_message);
-  }
+  archium_report_error(error_code, error_message, NULL);
 }
 
 void log_debug(const char *debug_message) { write_log("DEBUG", debug_message); }

@@ -20,11 +20,8 @@ int main(int argc, char *argv[]) {
   }
 
   if (geteuid() != 0 && access("/usr/bin/sudo", X_OK) != 0) {
-    log_error("Insufficient privileges and sudo not available",
-              ARCHIUM_ERROR_PERMISSION);
-    fprintf(stderr,
-            "\033[1;31mError: This operation requires root "
-            "privileges.\033[0m\n");
+    archium_report_error(ARCHIUM_ERROR_PERMISSION,
+                         "This operation requires root privileges.", NULL);
     return ARCHIUM_ERROR_PERMISSION;
   }
 
@@ -45,8 +42,8 @@ int main(int argc, char *argv[]) {
       log_info("Using package manager: pacman");
       break;
     default:
-      log_error("No supported package manager found",
-                ARCHIUM_ERROR_PACKAGE_MANAGER);
+      archium_report_error(ARCHIUM_ERROR_PACKAGE_MANAGER,
+                           "No supported package manager found", NULL);
       prompt_install_yay();
       return ARCHIUM_ERROR_PACKAGE_MANAGER;
   }
