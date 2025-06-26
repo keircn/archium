@@ -16,7 +16,7 @@ Archium is a command-line tool for managing packages on Arch Linux. It provides 
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/q4ow/archium.git
+git clone https://github.com/keircn/archium.git
 cd archium
 ```
 
