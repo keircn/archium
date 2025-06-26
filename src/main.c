@@ -66,6 +66,8 @@ int main(int argc, char *argv[]) {
   printf("\033[1;36m║      Type \"h\" for help                 ║\033[0m\n");
   printf("\033[1;36m╚════════════════════════════════════════╝\033[0m\n");
 
+  display_random_tip();
+
   while (1) {
     char input_line[MAX_INPUT_LENGTH];
     get_input(input_line, "\033[1;32mArchium $ \033[0m");

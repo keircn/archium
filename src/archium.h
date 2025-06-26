@@ -49,6 +49,7 @@ void prompt_install_yay(void);
 void display_version(void);
 void display_cli_help(void);
 void display_help(void);
+void display_random_tip(void);
 
 char **command_completion(const char *text, int start, int end);
 char *command_generator(const char *text, int state);

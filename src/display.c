@@ -1,4 +1,25 @@
+#include <time.h>
+
 #include "archium.h"
+
+static const char *archium_tips[] = {
+    "Use 'h' or 'help' to see all available commands.",
+    "You can update a specific package with 'u <package>'.",
+    "Use 's' to search for packages by name.",
+    "'cc' clears the AUR helper build cache.",
+    "'lo' lists orphaned packages you can remove.",
+    "'dt' shows the dependency tree for a package.",
+    "'ba' backs up your pacman.conf safely.",
+    "Use tab completion for faster command entry.",
+    "'ow' finds which package owns a file.",
+    "'si' lists installed packages by size."};
+#define NUM_TIPS (sizeof(archium_tips) / sizeof(archium_tips[0]))
+
+void display_random_tip(void) {
+  srand((unsigned int)time(NULL) ^ getpid());
+  int idx = rand() % NUM_TIPS;
+  printf("\033[1;35mTip:\033[0m %s\n", archium_tips[idx]);
+}
 
 void display_version(void) {
   int pm_check = check_package_manager();
