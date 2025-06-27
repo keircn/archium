@@ -16,6 +16,10 @@ int main(int argc, char *argv[]) {
 
   archium_config_migrate_legacy_files();
 
+  if (!archium_plugin_init()) {
+    log_debug("Failed to initialize plugin system");
+  }
+
   signal(SIGINT, handle_signal);
   signal(SIGTERM, handle_signal);
   signal(SIGABRT, handle_signal);

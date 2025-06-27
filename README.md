@@ -107,6 +107,66 @@ archium --exec config
 
 If you have an existing `.archium-use-paru` file in your home directory, Archium will automatically migrate it to the new configuration system and remove the old file.
 
+## Plugin System
+
+Archium features an extensible plugin system that allows you to add custom commands and functionality through shared libraries (.so files).
+
+### Plugin Directory
+
+Plugins are stored in: `$HOME/.config/archium/plugins/`
+
+### Managing Plugins
+
+Use the built-in plugin management system:
+
+```bash
+# Run Archium and use the plugin command
+archium
+# Then type: plugin
+```
+
+Available plugin management options:
+
+1. **List loaded plugins** - See all currently loaded plugins
+2. **View plugin directory** - Get the path to the plugin directory
+3. **Create example plugin** - Generate example plugin source code and Makefile
+
+### Creating Plugins
+
+Plugins are C shared libraries that implement a specific API. To create a plugin:
+
+1. **Generate example**: Use `plugin` command → option 3 to create `example.c` and `Makefile`
+2. **Customize**: Modify the generated code to implement your functionality
+3. **Build**: Run `make` in the plugin directory to create the `.so` file
+4. **Load**: Restart Archium to automatically load the new plugin
+
+### Plugin API
+
+Each plugin must implement these functions:
+
+```c
+char *archium_plugin_get_name(void);           // Plugin display name
+char *archium_plugin_get_command(void);        // Command name
+char *archium_plugin_get_description(void);    // Command description
+ArchiumError archium_plugin_execute(const char *args, const char *package_manager);
+void archium_plugin_cleanup(void);             // Optional cleanup
+```
+
+### Plugin Example
+
+```c
+char *archium_plugin_get_command(void) {
+  return "hello";
+}
+
+ArchiumError archium_plugin_execute(const char *args, const char *package_manager) {
+  printf("Hello from plugin! Package manager: %s\n", package_manager);
+  return ARCHIUM_SUCCESS;
+}
+```
+
+Build with: `gcc -fPIC -shared -o hello.so hello.c`
+
 ## Notes
 
 - Archium uses `yay` by default. If you only have `paru` installed, it will use `paru`.

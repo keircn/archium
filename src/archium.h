@@ -88,6 +88,7 @@ void list_explicit_installs(void);
 void find_package_owner(const char *file);
 void backup_pacman_config(void);
 void configure_preferences(void);
+void manage_plugins(void);
 char **get_pacman_commands(void);
 char *command_generator(const char *text, int state);
 char *get_package_manager_version(const char *package_manager);
@@ -98,10 +99,21 @@ void archium_config_migrate_legacy_files(void);
 const char *archium_config_get_config_dir(void);
 const char *archium_config_get_log_file(void);
 const char *archium_config_get_cache_dir(void);
+const char *archium_config_get_plugin_dir(void);
 int archium_config_check_paru_preference(void);
 int archium_config_set_preference(const char *key, const char *value);
 char *archium_config_get_preference(const char *key);
 void archium_config_write_log(const char *level, const char *message);
+
+int archium_plugin_init(void);
+void archium_plugin_cleanup(void);
+int archium_plugin_find_by_command(const char *command);
+ArchiumError archium_plugin_execute(const char *command, const char *args,
+                                    const char *package_manager);
+int archium_plugin_is_plugin_command(const char *command);
+void archium_plugin_list_loaded(void);
+void archium_plugin_display_help(void);
+int archium_plugin_create_example(void);
 
 extern char **cached_commands;
 

@@ -6,6 +6,7 @@ static char config_dir_path[CONFIG_BUFFER_SIZE];
 static char log_file_path[CONFIG_BUFFER_SIZE];
 static char preference_file_path[CONFIG_BUFFER_SIZE];
 static char cache_dir_path[CONFIG_BUFFER_SIZE];
+static char plugin_dir_path[CONFIG_BUFFER_SIZE];
 
 static int config_initialized = 0;
 
@@ -58,6 +59,13 @@ static int init_config_paths(void) {
     return 0;
   }
 
+  if (snprintf(plugin_dir_path, sizeof(plugin_dir_path), "%s/plugins",
+               config_dir_path) >= (int)sizeof(plugin_dir_path)) {
+    archium_report_error(ARCHIUM_ERROR_SYSTEM_CALL,
+                         "Plugin directory path too long", NULL);
+    return 0;
+  }
+
   return 1;
 }
 
@@ -94,6 +102,12 @@ int archium_config_init(void) {
   if (!ensure_directory_exists(cache_dir_path)) {
     archium_report_error(ARCHIUM_ERROR_SYSTEM_CALL,
                          "Failed to create Archium cache directory", NULL);
+    return 0;
+  }
+
+  if (!ensure_directory_exists(plugin_dir_path)) {
+    archium_report_error(ARCHIUM_ERROR_SYSTEM_CALL,
+                         "Failed to create Archium plugin directory", NULL);
     return 0;
   }
 
@@ -145,6 +159,13 @@ const char *archium_config_get_cache_dir(void) {
     return NULL;
   }
   return cache_dir_path;
+}
+
+const char *archium_config_get_plugin_dir(void) {
+  if (!archium_config_init()) {
+    return NULL;
+  }
+  return plugin_dir_path;
 }
 
 int archium_config_check_paru_preference(void) {

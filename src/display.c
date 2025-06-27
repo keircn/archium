@@ -123,6 +123,9 @@ void display_help(void) {
   printf("\033[1;32mow\033[0m          - Find which package owns a file\n");
   printf("\033[1;32mba\033[0m          - Backup pacman configuration\n");
   printf("\033[1;32mconfig\033[0m      - Configure Archium preferences\n");
+  printf("\033[1;32mplugin\033[0m      - Plugin management\n");
   printf("\033[1;32mh\033[0m           - Help\n");
   printf("\033[1;32mq\033[0m           - Quit\n");
+
+  archium_plugin_display_help();
 }
