@@ -60,16 +60,18 @@ char *get_package_manager_version(const char *package_manager) {
 int check_git(void) { return check_command("git"); }
 
 void install_git(void) {
-  printf("\033[1;32mInstalling git...\033[0m\n");
-  if (system("sudo pacman -S --noconfirm git") != 0) {
+  char output_buffer[2048];
+  int result = execute_command_with_output_capture(
+      "sudo pacman -S --noconfirm git", "Installing git", output_buffer,
+      sizeof(output_buffer));
+  if (result != 0) {
     fprintf(stderr, "\033[1;31mError: Failed to install git.\033[0m\n");
     exit(EXIT_FAILURE);
   }
+  parse_and_show_install_result(output_buffer, result, "git");
 }
 
 void install_yay(void) {
-  printf("\033[1;32mInstalling yay...\033[0m\n");
-
   const char *cache_dir = archium_config_get_cache_dir();
   if (!cache_dir) {
     fprintf(stderr, "\033[1;31mError: Failed to get cache directory.\033[0m\n");
@@ -77,6 +79,7 @@ void install_yay(void) {
   }
 
   char command[COMMAND_BUFFER_SIZE];
+  char output_buffer[4096];
   int ret = snprintf(command, sizeof(command),
                      "mkdir -p %s/setup && "
                      "cd %s/setup && "
@@ -92,10 +95,13 @@ void install_yay(void) {
     exit(EXIT_FAILURE);
   }
 
-  if (system(command) != 0) {
+  int result = execute_command_with_output_capture(
+      command, "Installing yay", output_buffer, sizeof(output_buffer));
+  if (result != 0) {
     fprintf(stderr, "\033[1;31mError: Failed to install yay.\033[0m\n");
     exit(EXIT_FAILURE);
   }
+  parse_and_show_install_result(output_buffer, result, "yay");
   printf(
       "\033[1;32mInstallation of yay is complete. Please restart your shell "
       "and relaunch Archium.\033[0m\n");

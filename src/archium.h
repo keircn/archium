@@ -65,6 +65,20 @@ void log_debug(const char *debug_message);
 void log_info(const char *info_message);
 
 void handle_signal(int signal);
+void show_progress_bar(int current, int total, const char *prefix);
+void show_spinner(int position, const char *message);
+int execute_command_with_spinner(const char *command, const char *message);
+int execute_command_with_output_capture(const char *command,
+                                        const char *message,
+                                        char *output_buffer,
+                                        size_t buffer_size);
+void parse_and_show_upgrade_result(const char *output, int exit_code);
+void parse_and_show_install_result(const char *output, int exit_code,
+                                   const char *package);
+void parse_and_show_remove_result(const char *output, int exit_code,
+                                  const char *package);
+void parse_and_show_generic_result(const char *output, int exit_code,
+                                   const char *operation);
 int check_archium_file(void);
 void install_git(void);
 void install_yay(void);

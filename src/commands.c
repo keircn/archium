@@ -133,28 +133,44 @@ ArchiumError handle_exec_command(const char *command,
 
 void update_system(const char *package_manager, const char *package) {
   char command[COMMAND_BUFFER_SIZE];
+  char output_buffer[4096];
+
   if (package) {
     snprintf(command, sizeof(command), "%s -S %s", package_manager, package);
-    printf("\033[1;34mUpgrading package: %s\033[0m\n", package);
+    int result = execute_command_with_output_capture(
+        command, "Upgrading package", output_buffer, sizeof(output_buffer));
+    parse_and_show_install_result(output_buffer, result, package);
   } else {
     snprintf(command, sizeof(command), "%s -Syu --noconfirm", package_manager);
-    printf("\033[1;34mUpgrading system...\033[0m\n");
+    int result = execute_command_with_output_capture(
+        command, "Upgrading system", output_buffer, sizeof(output_buffer));
+    parse_and_show_upgrade_result(output_buffer, result);
   }
-  execute_command(command, "System updated");
 }
 
 void clear_build_cache() {
-  printf("\033[1;34mClearing package build cache...\033[0m\n");
-
   const char *cache_dir = archium_config_get_cache_dir();
+  char output_buffer[1024];
+
   if (cache_dir) {
     char command[COMMAND_BUFFER_SIZE];
     snprintf(command, sizeof(command), "rm -rf %s/*", cache_dir);
-    execute_command(command, "Cleared Archium build cache");
+    int result = execute_command_with_output_capture(
+        command, "Clearing Archium cache", output_buffer,
+        sizeof(output_buffer));
+    parse_and_show_generic_result(output_buffer, result,
+                                  "Clearing Archium cache");
   }
 
-  execute_command("rm -rf $HOME/.cache/yay", "Cleared yay build cache");
-  execute_command("rm -rf $HOME/.cache/paru", "Cleared paru build cache");
+  int result1 = execute_command_with_output_capture(
+      "rm -rf $HOME/.cache/yay", "Clearing yay cache", output_buffer,
+      sizeof(output_buffer));
+  parse_and_show_generic_result(output_buffer, result1, "Clearing yay cache");
+
+  int result2 = execute_command_with_output_capture(
+      "rm -rf $HOME/.cache/paru", "Clearing paru cache", output_buffer,
+      sizeof(output_buffer));
+  parse_and_show_generic_result(output_buffer, result2, "Clearing paru cache");
 }
 
 void list_orphans() {
@@ -164,30 +180,39 @@ void list_orphans() {
 
 void install_package(const char *package_manager, const char *packages) {
   char command[COMMAND_BUFFER_SIZE];
+  char output_buffer[4096];
   snprintf(command, sizeof(command), "%s -S %s", package_manager, packages);
-  printf("\033[1;34mInstalling packages: %s\033[0m\n", packages);
-  execute_command(command, "Installed packages");
+  int result = execute_command_with_output_capture(
+      command, "Installing packages", output_buffer, sizeof(output_buffer));
+  parse_and_show_install_result(output_buffer, result, packages);
 }
 
 void remove_package(const char *package_manager, const char *packages) {
   char command[COMMAND_BUFFER_SIZE];
+  char output_buffer[4096];
   snprintf(command, sizeof(command), "%s -R %s", package_manager, packages);
-  printf("\033[1;34mRemoving packages: %s\033[0m\n", packages);
-  execute_command(command, "Removed packages");
+  int result = execute_command_with_output_capture(
+      command, "Removing packages", output_buffer, sizeof(output_buffer));
+  parse_and_show_remove_result(output_buffer, result, packages);
 }
 
 void purge_package(const char *package_manager, const char *packages) {
   char command[COMMAND_BUFFER_SIZE];
+  char output_buffer[4096];
   snprintf(command, sizeof(command), "%s -Rns %s", package_manager, packages);
-  printf("\033[1;34mPurging packages: %s\033[0m\n", packages);
-  execute_command(command, "Purged packages");
+  int result = execute_command_with_output_capture(
+      command, "Purging packages", output_buffer, sizeof(output_buffer));
+  parse_and_show_remove_result(output_buffer, result, packages);
 }
 
 void clean_cache(const char *package_manager) {
   char command[COMMAND_BUFFER_SIZE];
+  char output_buffer[2048];
   snprintf(command, sizeof(command), "%s -Sc --noconfirm", package_manager);
-  printf("\033[1;34mCleaning package cache...\033[0m\n");
-  execute_command(command, "Cache cleaned");
+  int result = execute_command_with_output_capture(
+      command, "Cleaning package cache", output_buffer, sizeof(output_buffer));
+  parse_and_show_generic_result(output_buffer, result,
+                                "Cleaning package cache");
 }
 
 void clean_orphans(const char *package_manager) {
@@ -212,10 +237,14 @@ void clean_orphans(const char *package_manager) {
   orphaned_packages[strcspn(orphaned_packages, "\n")] = '\0';
 
   char command[COMMAND_BUFFER_SIZE];
+  char output_buffer[2048];
   snprintf(command, sizeof(command), "%s -Rns %s", package_manager,
            orphaned_packages);
-  printf("\033[1;34mCleaning orphaned packages...\033[0m\n");
-  execute_command(command, "Orphaned packages cleaned");
+  int result =
+      execute_command_with_output_capture(command, "Cleaning orphaned packages",
+                                          output_buffer, sizeof(output_buffer));
+  parse_and_show_generic_result(output_buffer, result,
+                                "Cleaning orphaned packages");
 }
 
 void search_package(const char *package_manager, const char *package) {
@@ -290,7 +319,6 @@ void perform_self_update(void) {
     return;
   }
 
-  printf("\033[1;34mUpdating Archium...\033[0m\n");
   log_info("Starting self-update process");
 
   if (mkdir(clone_dir, 0755) != 0) {
@@ -308,12 +336,18 @@ void perform_self_update(void) {
     return;
   }
 
-  if (system(command) != 0) {
+  char output_buffer[2048];
+  int result1 =
+      execute_command_with_output_capture(command, "Cloning Archium repository",
+                                          output_buffer, sizeof(output_buffer));
+  if (result1 != 0) {
     archium_report_error(ARCHIUM_ERROR_SYSTEM_CALL,
                          "Failed to clone repository", NULL);
     rmdir(clone_dir);
     return;
   }
+  parse_and_show_generic_result(output_buffer, result1,
+                                "Cloning Archium repository");
 
   if (chdir(clone_dir) != 0) {
     archium_report_error(ARCHIUM_ERROR_SYSTEM_CALL,
@@ -325,7 +359,9 @@ void perform_self_update(void) {
     return;
   }
 
-  if (system("make") != 0) {
+  int result2 = execute_command_with_output_capture(
+      "make", "Building Archium", output_buffer, sizeof(output_buffer));
+  if (result2 != 0) {
     archium_report_error(ARCHIUM_ERROR_SYSTEM_CALL, "Failed to build project",
                          NULL);
     ret = snprintf(command, sizeof(command), "rm -rf %.256s", clone_dir);
@@ -334,11 +370,12 @@ void perform_self_update(void) {
     }
     return;
   }
+  parse_and_show_generic_result(output_buffer, result2, "Building Archium");
 
-  printf(
-      "\033[1;33mRequesting elevated privileges to install "
-      "updates...\033[0m\n");
-  if (system("sudo make install") != 0) {
+  int result3 = execute_command_with_output_capture(
+      "sudo make install", "Installing updates", output_buffer,
+      sizeof(output_buffer));
+  if (result3 != 0) {
     archium_report_error(ARCHIUM_ERROR_SYSTEM_CALL, "Failed to install updates",
                          NULL);
     ret = snprintf(command, sizeof(command), "rm -rf %.256s", clone_dir);
@@ -347,6 +384,7 @@ void perform_self_update(void) {
     }
     return;
   }
+  parse_and_show_generic_result(output_buffer, result3, "Installing updates");
 
   ret = snprintf(command, sizeof(command), "rm -rf %.256s", clone_dir);
   if (ret < (int)sizeof(command)) {
