@@ -9,3 +9,5 @@ Thumbs.db
 
 .github
 build
+*.md
+!READNE.md

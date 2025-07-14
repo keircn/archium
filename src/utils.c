@@ -38,11 +38,15 @@ int is_valid_command(const char *command) {
       "q",  "l",  "?",  "cu", "dt",     "cc",   "lo",     "si",
       "re", "ex", "ow", "ba", "config", "help", "plugin", "plugins"};
   int num_commands = sizeof(valid_commands) / sizeof(valid_commands[0]);
+
   for (int i = 0; i < num_commands; i++) {
-    if (strcmp(command, valid_commands[i]) == 0 ||
-        strncmp(command, "u ", 2) == 0) {
+    if (strcmp(command, valid_commands[i]) == 0) {
       return 1;
     }
+  }
+
+  if (strncmp(command, "u ", 2) == 0 || strncmp(command, "h ", 2) == 0) {
+    return 1;
   }
 
   if (archium_plugin_is_plugin_command(command)) {

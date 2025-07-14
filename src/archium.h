@@ -50,6 +50,9 @@ void prompt_install_yay(void);
 void display_version(void);
 void display_cli_help(void);
 void display_help(void);
+void display_help_category(const char *category);
+void display_help_quick(void);
+void display_help_command(const char *command);
 void display_random_tip(void);
 
 char **command_completion(const char *text, int start, int end);

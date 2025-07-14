@@ -102,30 +102,116 @@ void display_cli_help(void) {
 }
 
 void display_help(void) {
-  printf("\n");
-  printf("\033[1;33mAvailable commands:\033[0m\n");
-  printf("\033[1;32mu\033[0m [package] - Update system or specific package\n");
-  printf("\033[1;32mi\033[0m           - Install packages\n");
-  printf("\033[1;32mr\033[0m           - Remove packages\n");
-  printf("\033[1;32mp\033[0m           - Purge packages\n");
-  printf("\033[1;32mc\033[0m           - Clean cache\n");
-  printf("\033[1;32mo\033[0m           - Clean orphaned packages\n");
-  printf("\033[1;32ms\033[0m           - Search for packages\n");
-  printf("\033[1;32ml\033[0m           - List installed packages\n");
-  printf("\033[1;32m?\033[0m           - Show package information\n");
-  printf("\033[1;32mcc\033[0m          - Clear package build cache\n");
-  printf("\033[1;32mlo\033[0m          - List orphaned packages\n");
-  printf("\033[1;32mdt\033[0m          - Display package dependency tree\n");
-  printf("\033[1;32mcu\033[0m          - Check for updates\n");
-  printf("\033[1;32msi\033[0m          - List installed packages by size\n");
-  printf("\033[1;32mre\033[0m          - Show recently installed packages\n");
-  printf("\033[1;32mex\033[0m          - List explicitly installed packages\n");
-  printf("\033[1;32mow\033[0m          - Find which package owns a file\n");
-  printf("\033[1;32mba\033[0m          - Backup pacman configuration\n");
-  printf("\033[1;32mconfig\033[0m      - Configure Archium preferences\n");
-  printf("\033[1;32mplugin\033[0m      - Plugin management\n");
-  printf("\033[1;32mh\033[0m           - Help\n");
-  printf("\033[1;32mq\033[0m           - Quit\n");
+  printf("\n\033[1;33mArchium Help\033[0m\n");
+  printf("Use \033[1;32mh <category>\033[0m for specific help, or:\n\n");
+  printf("\033[1;36mCategories:\033[0m\n");
+  printf(
+      "  \033[1;32mpackages\033[0m  - Package operations (install, remove, "
+      "search)\n");
+  printf(
+      "  \033[1;32msystem\033[0m    - System maintenance (update, clean, "
+      "orphans)\n");
+  printf(
+      "  \033[1;32minfo\033[0m      - Information commands (list, show, "
+      "dependencies)\n");
+  printf("  \033[1;32mconfig\033[0m    - Configuration and plugins\n\n");
+  printf("\033[1;36mQuick Help:\033[0m\n");
+  printf("  \033[1;32mh quick\033[0m   - Show abbreviated command list\n");
+  printf("  \033[1;32mh tips\033[0m    - Show helpful tips\n");
+  printf(
+      "  \033[1;32mh <cmd>\033[0m   - Detailed help for specific command\n\n");
+  printf("  \033[1;32mq\033[0m         - Quit Archium\n");
+}
 
-  archium_plugin_display_help();
+void display_help_category(const char *category) {
+  if (strcmp(category, "packages") == 0) {
+    printf("\n\033[1;33mPackage Operations:\033[0m\n");
+    printf("\033[1;32mi\033[0m           - Install packages\n");
+    printf("\033[1;32mr\033[0m           - Remove packages\n");
+    printf(
+        "\033[1;32mp\033[0m           - Purge packages (remove with "
+        "dependencies)\n");
+    printf("\033[1;32ms\033[0m           - Search for packages\n");
+    printf(
+        "\033[1;32mu\033[0m [package] - Update system or specific package\n");
+  } else if (strcmp(category, "system") == 0) {
+    printf("\n\033[1;33mSystem Maintenance:\033[0m\n");
+    printf("\033[1;32mc\033[0m           - Clean package cache\n");
+    printf("\033[1;32mcc\033[0m          - Clear build cache\n");
+    printf("\033[1;32mo\033[0m           - Clean orphaned packages\n");
+    printf("\033[1;32mlo\033[0m          - List orphaned packages\n");
+    printf("\033[1;32mcu\033[0m          - Check for package updates\n");
+    printf("\033[1;32mba\033[0m          - Backup pacman configuration\n");
+  } else if (strcmp(category, "info") == 0) {
+    printf("\n\033[1;33mInformation Commands:\033[0m\n");
+    printf("\033[1;32ml\033[0m           - List all installed packages\n");
+    printf("\033[1;32m?\033[0m           - Show package information\n");
+    printf("\033[1;32mdt\033[0m          - Display package dependency tree\n");
+    printf("\033[1;32msi\033[0m          - List packages by size\n");
+    printf("\033[1;32mre\033[0m          - Show recently installed packages\n");
+    printf(
+        "\033[1;32mex\033[0m          - List explicitly installed packages\n");
+    printf("\033[1;32mow\033[0m          - Find which package owns a file\n");
+  } else if (strcmp(category, "config") == 0) {
+    printf("\n\033[1;33mConfiguration & Plugins:\033[0m\n");
+    printf("\033[1;32mconfig\033[0m      - Configure Archium preferences\n");
+    printf("\033[1;32mplugin\033[0m      - Plugin management\n");
+    archium_plugin_display_help();
+  } else {
+    printf("\n\033[1;31mUnknown category: %s\033[0m\n", category);
+    printf(
+        "Available categories: \033[1;32mpackages\033[0m, "
+        "\033[1;32msystem\033[0m, \033[1;32minfo\033[0m, "
+        "\033[1;32mconfig\033[0m\n");
+  }
+}
+
+void display_help_quick(void) {
+  printf("\n\033[1;33mQuick Reference:\033[0m\n");
+  printf(
+      "\033[1;32mi\033[0m install  \033[1;32mr\033[0m remove   "
+      "\033[1;32ms\033[0m search   \033[1;32mu\033[0m update\n");
+  printf(
+      "\033[1;32ml\033[0m list     \033[1;32mc\033[0m clean    "
+      "\033[1;32mo\033[0m orphans  \033[1;32m?\033[0m info\n");
+  printf(
+      "\033[1;32mq\033[0m quit     \033[1;32mh\033[0m help     "
+      "\033[1;32mconfig\033[0m       \033[1;32mplugin\033[0m\n");
+}
+
+void display_help_command(const char *command) {
+  printf("\n");
+  if (strcmp(command, "i") == 0) {
+    printf("\033[1;33mInstall Command:\033[0m \033[1;32mi\033[0m\n");
+    printf("Install one or more packages from repositories or AUR.\n");
+    printf("\033[1;36mExample:\033[0m Install firefox and git\n");
+    printf("  Archium $ i\n");
+    printf("  Enter package names to install: firefox git\n");
+  } else if (strcmp(command, "r") == 0) {
+    printf("\033[1;33mRemove Command:\033[0m \033[1;32mr\033[0m\n");
+    printf("Remove installed packages while keeping dependencies.\n");
+    printf("\033[1;36mExample:\033[0m Remove firefox\n");
+    printf("  Archium $ r\n");
+    printf("  Enter package names to remove: firefox\n");
+  } else if (strcmp(command, "u") == 0) {
+    printf("\033[1;33mUpdate Command:\033[0m \033[1;32mu\033[0m [package]\n");
+    printf("Update entire system or specific package.\n");
+    printf("\033[1;36mExamples:\033[0m\n");
+    printf("  u           - Update entire system\n");
+    printf("  u firefox   - Update only firefox\n");
+  } else if (strcmp(command, "s") == 0) {
+    printf("\033[1;33mSearch Command:\033[0m \033[1;32ms\033[0m\n");
+    printf("Search for packages in repositories and AUR.\n");
+    printf("\033[1;36mExample:\033[0m Search for text editors\n");
+    printf("  Archium $ s\n");
+    printf("  Enter package name to search: editor\n");
+  } else if (strcmp(command, "tips") == 0) {
+    printf("\033[1;33mHelpful Tips:\033[0m\n");
+    for (size_t i = 0; i < NUM_TIPS; i++) {
+      printf("• %s\n", archium_tips[i]);
+    }
+  } else {
+    printf("\033[1;31mNo detailed help available for: %s\033[0m\n", command);
+    printf("Try \033[1;32mh quick\033[0m for a command overview.\n");
+  }
 }

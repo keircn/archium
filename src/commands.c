@@ -31,6 +31,21 @@ ArchiumError handle_command(const char *input, const char *package_manager) {
     return ARCHIUM_SUCCESS;
   }
 
+  if (strncmp(input, "h ", 2) == 0) {
+    const char *help_arg = input + 2;
+    if (strcmp(help_arg, "quick") == 0) {
+      display_help_quick();
+    } else if (strcmp(help_arg, "packages") == 0 ||
+               strcmp(help_arg, "system") == 0 ||
+               strcmp(help_arg, "info") == 0 ||
+               strcmp(help_arg, "config") == 0) {
+      display_help_category(help_arg);
+    } else {
+      display_help_command(help_arg);
+    }
+    return ARCHIUM_SUCCESS;
+  }
+
   if (strcmp(input, "q") == 0 || strcmp(input, "quit") == 0 ||
       strcmp(input, "exit") == 0) {
     printf("Exiting Archium.\n");
