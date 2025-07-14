@@ -5,26 +5,33 @@ LDFLAGS = -lreadline -ldl -ldl
 BUILD_DIR = build
 SRC_DIR = src
 DESTDIR = /usr/local
-VERSION = 1.7.0
+VERSION = $(shell cat VERSION)
 TARNAME = archium-$(VERSION)
 
 SRC = $(wildcard $(SRC_DIR)/*.c)
 OBJ = $(SRC:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
 TARGET = $(BUILD_DIR)/archium
+VERSION_HEADER = $(SRC_DIR)/version.h
 
-.PHONY: all clean install uninstall test debug release format
+.PHONY: all clean install uninstall test debug release format version-header
 
-all: $(BUILD_DIR) $(TARGET)
+all: $(BUILD_DIR) version-header $(TARGET)
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
+
+version-header:
+	@echo "#ifndef VERSION_H" > $(VERSION_HEADER)
+	@echo "#define VERSION_H" >> $(VERSION_HEADER)
+	@echo "#define ARCHIUM_VERSION \"$(VERSION)\"" >> $(VERSION_HEADER)
+	@echo "#endif" >> $(VERSION_HEADER)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(TARGET): $(OBJ)
 	$(CC) $(OBJ) -o $@ $(LDFLAGS)
-	@echo "Build complete! Binary is at: $(TARGET)"
+	@echo "Build complete at $(TARGET)"
 
 install: $(TARGET)
 	install -D $(TARGET) $(DESTDIR)/bin/archium
@@ -36,7 +43,7 @@ uninstall:
 
 clean:
 	rm -rf $(BUILD_DIR)
-	@echo "Cleaned build directory"
+	rm -f $(VERSION_HEADER)
 
 debug:
 	@echo "Source files: $(SRC)"
@@ -50,11 +57,9 @@ release: clean all
 	mkdir -p $(BUILD_DIR)/release
 	cp $(TARGET) $(BUILD_DIR)/release/archium
 	tar -czvf $(BUILD_DIR)/$(TARNAME).tar.gz -C $(BUILD_DIR) release
-	@echo "Release archive built: $(BUILD_DIR)/$(TARNAME).tar.gz"
 
 format:
 	clang-format -i $(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/*.h)
-	@echo "Codebase formatted with clang-format"
 
 test: $(TARGET)
-	@echo "Not implemented yet. Please run the binary manually for testing."
+	@echo "Not implemented yet."
