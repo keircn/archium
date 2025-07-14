@@ -4,9 +4,13 @@ static void execute_command(const char *command, const char *log_message) {
   int ret = system(command);
   if (ret != 0) {
     fprintf(stderr, "\033[1;31mError: Command failed: %s\033[0m\n", command);
-    printf("\033[1;31m[Status]\033[0m Command failed (exit code: %d)\n", ret);
+    if (config.verbose) {
+      printf("\033[1;31m[Status]\033[0m Command failed (exit code: %d)\n", ret);
+    }
   } else {
-    printf("\033[1;32m[Status]\033[0m Command succeeded\n");
+    if (config.verbose) {
+      printf("\033[1;32m[Status]\033[0m Command succeeded\n");
+    }
   }
   if (log_message) {
     log_action(log_message);
