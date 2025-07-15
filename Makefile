@@ -13,7 +13,7 @@ OBJ = $(SRC:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
 TARGET = $(BUILD_DIR)/archium
 VERSION_HEADER = $(SRC_DIR)/version.h
 
-.PHONY: all clean install uninstall test debug release format version-header
+.PHONY: all clean install uninstall install-completions test debug release format version-header
 
 all: $(BUILD_DIR) version-header $(TARGET)
 
@@ -36,6 +36,9 @@ $(TARGET): $(OBJ)
 install: $(TARGET)
 	install -D $(TARGET) $(DESTDIR)/bin/archium
 	@echo "Archium installed to $(DESTDIR)/bin/archium"
+
+install-completions:
+	./install-completions.sh --all
 
 uninstall:
 	rm -f $(DESTDIR)/bin/archium
