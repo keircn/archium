@@ -1,4 +1,6 @@
-# Archium - Fast & Easy Package Management for Arch Linux
+# Archium
+
+*Fast & Easy Package Management for Arch Linux*
 
 Archium is a command-line tool for managing packages on Arch Linux. It provides a simple and intuitive interface for common package management tasks using `yay`, `paru`, or `pacman`. Archium is a faithful fork of [Archie](https://github.com/TuxForge/archie) by [Gurov](https://github.com/Gur0v).
 
