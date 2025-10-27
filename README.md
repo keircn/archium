@@ -188,6 +188,6 @@ See the [LICENSE](./LICENSE) file for details.
 
 ## Contact
 
-For any questions or issues, please contact [Keiran](mailto:keiran0@proton.me).
+For any questions or issues, please contact me at [keircn@proton.me](mailto:keircn@proton.me) or via [Discord](https://keircn.com/discord).
 
 > **Disclaimer**: Archium is not affiliated with Arch Linux or its official package managers.
