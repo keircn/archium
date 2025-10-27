@@ -1,12 +1,6 @@
 #!/bin/bash
 
-# Archium Version Bump Script
 # Usage: ./bump-version.sh [major|minor|patch] [version]
-# Examples:
-#   ./bump-version.sh patch         # 1.7.0 -> 1.7.1
-#   ./bump-version.sh minor         # 1.7.0 -> 1.8.0
-#   ./bump-version.sh major         # 1.7.0 -> 2.0.0
-#   ./bump-version.sh custom 2.0.0  # Set specific version
 
 set -e
 
@@ -42,12 +36,12 @@ if ! git diff-index --quiet HEAD --; then
     exit 1
 fi
 
-if [ ! -f "VERSION" ]; then
+if [ ! -f ".VERSION" ]; then
     print_error "VERSION file not found"
     exit 1
 fi
 
-CURRENT_VERSION=$(cat VERSION)
+CURRENT_VERSION=$(cat .VERSION)
 print_status "Current version: $CURRENT_VERSION"
 
 IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"
