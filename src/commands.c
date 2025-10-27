@@ -53,6 +53,7 @@ ArchiumError handle_command(const char *input, const char *package_manager) {
   if (strcmp(input, "q") == 0 || strcmp(input, "quit") == 0 ||
       strcmp(input, "exit") == 0) {
     printf("Exiting Archium.\n");
+    cleanup_cached_commands();
     archium_plugin_cleanup();
     exit(0);
   }

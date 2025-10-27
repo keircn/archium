@@ -10,8 +10,9 @@ typedef struct {
 } spinner_data_t;
 
 void handle_signal(int signal) {
-  if (signal == SIGINT) {
-    printf("\nInterrupt received. Exiting gracefully.\n");
+  if (signal == SIGINT || signal == SIGTERM || signal == SIGABRT) {
+    printf("\nSignal %d received. Exiting gracefully.\n", signal);
+    cleanup_cached_commands();
     archium_plugin_cleanup();
     exit(EXIT_SUCCESS);
   }

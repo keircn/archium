@@ -24,6 +24,8 @@ int main(int argc, char *argv[]) {
   signal(SIGTERM, handle_signal);
   signal(SIGABRT, handle_signal);
 
+  atexit(cleanup_cached_commands);
+
   log_info("Archium started");
 
   if (config.version) {
@@ -66,6 +68,8 @@ int main(int argc, char *argv[]) {
   if (config.exec_mode) {
     status = handle_exec_command(config.exec_command, package_manager);
     log_info("Executed command in exec mode");
+    cleanup_cached_commands();
+    archium_plugin_cleanup();
     return status;
   }
 

@@ -67,3 +67,13 @@ char **command_completion(const char *text, int start, int end) {
   rl_attempted_completion_over = 1;
   return rl_completion_matches(text, command_generator);
 }
+
+void cleanup_cached_commands(void) {
+  if (cached_commands) {
+    for (int i = 0; cached_commands[i] != NULL; i++) {
+      free(cached_commands[i]);
+    }
+    free(cached_commands);
+    cached_commands = NULL;
+  }
+}

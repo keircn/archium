@@ -59,6 +59,7 @@ void display_random_tip(void);
 char **command_completion(const char *text, int start, int end);
 char *command_generator(const char *text, int state);
 void cache_pacman_commands(void);
+void cleanup_cached_commands(void);
 
 void log_action(const char *action);
 void log_debug(const char *debug_message);
