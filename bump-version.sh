@@ -100,8 +100,8 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     exit 0
 fi
 
-echo "$NEW_VERSION" > VERSION
-print_success "Updated VERSION file"
+echo "$NEW_VERSION" > .VERSION
+print_success "Updated .VERSION file"
 
 if grep -q "v$CURRENT_VERSION" README.md; then
     sed -i "s/v$CURRENT_VERSION/v$NEW_VERSION/g" README.md
@@ -114,14 +114,14 @@ if make all > /dev/null 2>&1; then
     print_success "Build successful"
 else
     print_error "Build failed! Rolling back changes..."
-    echo "$CURRENT_VERSION" > VERSION
+    echo "$CURRENT_VERSION" > .VERSION
     git checkout README.md 2>/dev/null || true
     exit 1
 fi
 
 print_status "Creating git commit and tag..."
 
-git add VERSION README.md
+git add .VERSION README.md
 
 git commit -m "Bump version to $NEW_VERSION
 

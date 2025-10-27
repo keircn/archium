@@ -5,7 +5,7 @@ LDFLAGS = -lreadline -ldl -ldl -lpthread
 BUILD_DIR = build
 SRC_DIR = src
 DESTDIR = /usr/local
-VERSION = $(shell cat VERSION)
+VERSION = $(shell cat .VERSION)
 TARNAME = archium-$(VERSION)
 
 SRC = $(wildcard $(SRC_DIR)/*.c)
