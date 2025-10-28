@@ -3,7 +3,8 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-COMPLETIONS_DIR="$SCRIPT_DIR/completions"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+COMPLETIONS_DIR="$PROJECT_ROOT/completions"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
