@@ -42,7 +42,8 @@ ArchiumError handle_command(const char *input, const char *package_manager) {
     } else if (strcmp(help_arg, "packages") == 0 ||
                strcmp(help_arg, "system") == 0 ||
                strcmp(help_arg, "info") == 0 ||
-               strcmp(help_arg, "config") == 0) {
+               strcmp(help_arg, "config") == 0 ||
+               strcmp(help_arg, "plugin") == 0) {
       display_help_category(help_arg);
     } else {
       display_help_command(help_arg);

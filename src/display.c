@@ -114,7 +114,8 @@ void display_help(void) {
   printf(
       "  \033[1;32minfo\033[0m      - Information commands (list, show, "
       "dependencies)\n");
-  printf("  \033[1;32mconfig\033[0m    - Configuration and plugins\n\n");
+  printf("  \033[1;32mconfig\033[0m    - Configuration and plugins\n");
+  printf("  \033[1;32mplugin\033[0m    - Plugin management commands\n\n");
   printf("\033[1;36mQuick Help:\033[0m\n");
   printf("  \033[1;32mh quick\033[0m   - Show abbreviated command list\n");
   printf("  \033[1;32mh tips\033[0m    - Show helpful tips\n");
@@ -159,12 +160,18 @@ void display_help_category(const char *category) {
     printf("\033[1;32mpd\033[0m          - View plugin directory\n");
     printf("\033[1;32mpe\033[0m          - Create example plugin\n");
     archium_plugin_display_help();
+  } else if (strcmp(category, "plugin") == 0) {
+    printf("\n\033[1;33mPlugin Management Commands:\033[0m\n");
+    printf("\033[1;32mpl\033[0m          - List loaded plugins\n");
+    printf("\033[1;32mpd\033[0m          - View plugin directory\n");
+    printf("\033[1;32mpe\033[0m          - Create example plugin\n");
+    archium_plugin_display_help();
   } else {
     printf("\n\033[1;31mUnknown category: %s\033[0m\n", category);
     printf(
         "Available categories: \033[1;32mpackages\033[0m, "
         "\033[1;32msystem\033[0m, \033[1;32minfo\033[0m, "
-        "\033[1;32mconfig\033[0m\n");
+        "\033[1;32mconfig\033[0m, \033[1;32mplugin\033[0m\n");
   }
 }
 
