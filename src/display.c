@@ -155,7 +155,9 @@ void display_help_category(const char *category) {
   } else if (strcmp(category, "config") == 0) {
     printf("\n\033[1;33mConfiguration & Plugins:\033[0m\n");
     printf("\033[1;32mconfig\033[0m      - Configure Archium preferences\n");
-    printf("\033[1;32mplugin\033[0m      - Plugin management\n");
+    printf("\033[1;32mpl\033[0m          - List loaded plugins\n");
+    printf("\033[1;32mpd\033[0m          - View plugin directory\n");
+    printf("\033[1;32mpe\033[0m          - Create example plugin\n");
     archium_plugin_display_help();
   } else {
     printf("\n\033[1;31mUnknown category: %s\033[0m\n", category);
@@ -176,7 +178,7 @@ void display_help_quick(void) {
       "\033[1;32mo\033[0m orphans  \033[1;32m?\033[0m info\n");
   printf(
       "\033[1;32mq\033[0m quit     \033[1;32mh\033[0m help     "
-      "\033[1;32mconfig\033[0m       \033[1;32mplugin\033[0m\n");
+      "\033[1;32mconfig\033[0m       \033[1;32mpl\033[0m list\n");
 }
 
 void display_help_command(const char *command) {
@@ -210,6 +212,25 @@ void display_help_command(const char *command) {
     for (size_t i = 0; i < NUM_TIPS; i++) {
       printf("• %s\n", archium_tips[i]);
     }
+  } else if (strcmp(command, "pl") == 0) {
+    printf("\033[1;33mPlugin List Command:\033[0m \033[1;32mpl\033[0m\n");
+    printf(
+        "List all currently loaded plugins with their commands and "
+        "descriptions.\n");
+    printf("\033[1;36mExample:\033[0m\n");
+    printf("  Archium $ pl\n");
+  } else if (strcmp(command, "pd") == 0) {
+    printf("\033[1;33mPlugin Directory Command:\033[0m \033[1;32mpd\033[0m\n");
+    printf(
+        "Display the plugin directory path where .so files should be "
+        "placed.\n");
+    printf("\033[1;36mExample:\033[0m\n");
+    printf("  Archium $ pd\n");
+  } else if (strcmp(command, "pe") == 0) {
+    printf("\033[1;33mPlugin Example Command:\033[0m \033[1;32mpe\033[0m\n");
+    printf("Create an example plugin with template code and Makefile.\n");
+    printf("\033[1;36mExample:\033[0m\n");
+    printf("  Archium $ pe\n");
   } else {
     printf("\033[1;31mNo detailed help available for: %s\033[0m\n", command);
     printf("Try \033[1;32mh quick\033[0m for a command overview.\n");

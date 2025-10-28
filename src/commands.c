@@ -112,8 +112,31 @@ ArchiumError handle_command(const char *input, const char *package_manager) {
     backup_pacman_config();
   } else if (strcmp(input, "config") == 0) {
     configure_preferences();
-  } else if (strcmp(input, "plugin") == 0 || strcmp(input, "plugins") == 0) {
-    manage_plugins();
+  } else if (strcmp(input, "pl") == 0) {
+    archium_plugin_list_loaded();
+  } else if (strcmp(input, "pd") == 0) {
+    const char *plugin_dir = archium_config_get_plugin_dir();
+    if (plugin_dir) {
+      printf("\033[1;32mPlugin directory: %s\033[0m\n", plugin_dir);
+      printf(
+          "\033[1;33mPlace .so files in this directory to load them as "
+          "plugins.\033[0m\n");
+    } else {
+      printf("\033[1;31mFailed to get plugin directory.\033[0m\n");
+    }
+  } else if (strcmp(input, "pe") == 0) {
+    if (archium_plugin_create_example()) {
+      const char *plugin_dir = archium_config_get_plugin_dir();
+      printf("\033[1;32mExample plugin created successfully!\033[0m\n");
+      printf("\033[1;33mLocation: %s/example.c\033[0m\n",
+             plugin_dir ? plugin_dir : "unknown");
+      printf("\033[1;33mTo build: cd %s && make\033[0m\n",
+             plugin_dir ? plugin_dir : "unknown");
+      printf("\033[1;33mRestart Archium to load the plugin.\033[0m\n");
+      log_action("Example plugin created");
+    } else {
+      printf("\033[1;31mFailed to create example plugin.\033[0m\n");
+    }
   } else if (archium_plugin_is_plugin_command(input)) {
     return archium_plugin_execute(input, "", package_manager);
   }
@@ -510,46 +533,6 @@ void configure_preferences(void) {
       printf("\033[1;32mLog file location: %s\033[0m\n", log_file);
     } else {
       printf("\033[1;31mFailed to get log file location.\033[0m\n");
-    }
-  } else {
-    printf("\033[1;31mInvalid choice.\033[0m\n");
-  }
-}
-
-void manage_plugins(void) {
-  printf("\033[1;34mArchium Plugin Management\033[0m\n");
-  printf("Available options:\n");
-  printf("1. List loaded plugins\n");
-  printf("2. View plugin directory\n");
-  printf("3. Create example plugin\n");
-
-  char choice[MAX_INPUT_LENGTH];
-  get_user_input(choice, "Enter your choice (1-3): ");
-
-  if (strcmp(choice, "1") == 0) {
-    archium_plugin_list_loaded();
-  } else if (strcmp(choice, "2") == 0) {
-    const char *plugin_dir = archium_config_get_plugin_dir();
-    if (plugin_dir) {
-      printf("\033[1;32mPlugin directory: %s\033[0m\n", plugin_dir);
-      printf(
-          "\033[1;33mPlace .so files in this directory to load them as "
-          "plugins.\033[0m\n");
-    } else {
-      printf("\033[1;31mFailed to get plugin directory.\033[0m\n");
-    }
-  } else if (strcmp(choice, "3") == 0) {
-    if (archium_plugin_create_example()) {
-      const char *plugin_dir = archium_config_get_plugin_dir();
-      printf("\033[1;32mExample plugin created successfully!\033[0m\n");
-      printf("\033[1;33mLocation: %s/example.c\033[0m\n",
-             plugin_dir ? plugin_dir : "unknown");
-      printf("\033[1;33mTo build: cd %s && make\033[0m\n",
-             plugin_dir ? plugin_dir : "unknown");
-      printf("\033[1;33mRestart Archium to load the plugin.\033[0m\n");
-      log_action("Example plugin created");
-    } else {
-      printf("\033[1;31mFailed to create example plugin.\033[0m\n");
     }
   } else {
     printf("\033[1;31mInvalid choice.\033[0m\n");

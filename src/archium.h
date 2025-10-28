@@ -173,7 +173,6 @@ void list_explicit_installs(void);
 void find_package_owner(const char *file);
 void backup_pacman_config(void);
 void configure_preferences(void);
-void manage_plugins(void);
 char **get_pacman_commands(void);
 char *command_generator(const char *text, int state);
 char *get_package_manager_version(const char *package_manager);
