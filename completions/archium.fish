@@ -25,3 +25,6 @@ complete -c archium -n '__fish_seen_subcommand_from --exec' -a ow -d 'Find packa
 complete -c archium -n '__fish_seen_subcommand_from --exec' -a ba -d 'Backup pacman config'
 complete -c archium -n '__fish_seen_subcommand_from --exec' -a config -d 'Configure preferences'
 complete -c archium -n '__fish_seen_subcommand_from --exec' -a 'plugin plugins' -d 'Manage plugins'
+complete -c archium -n '__fish_seen_subcommand_from --exec' -a pl -d 'List loaded plugins'
+complete -c archium -n '__fish_seen_subcommand_from --exec' -a pd -d 'View plugin directory'
+complete -c archium -n '__fish_seen_subcommand_from --exec' -a pe -d 'Create example plugin'

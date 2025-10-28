@@ -38,6 +38,9 @@ _archium() {
         'config:Configure preferences'
         'plugin:Manage plugins'
         'plugins:Manage plugins'
+        'pl:List loaded plugins'
+        'pd:View plugin directory'
+        'pe:Create example plugin'
     )
 
     if (( CURRENT == 1 )); then

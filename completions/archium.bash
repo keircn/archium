@@ -5,7 +5,7 @@ _archium() {
     _init_completion || return
 
     local flags="--help -h --version -v --verbose -V --exec --self-update"
-    local exec_commands="h help u i r p c cc o lo s l ? cu dt si re ex ow ba config plugin plugins"
+    local exec_commands="h help u i r p c cc o lo s l ? cu dt si re ex ow ba config plugin plugins pl pd pe"
 
     case $COMP_CWORD in
         1)
