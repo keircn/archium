@@ -9,6 +9,6 @@ Thumbs.db
 .github
 build
 *.md
+!README.md
 
-# Automatically generated
 src/version.h
