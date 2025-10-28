@@ -183,7 +183,7 @@ Build with: `gcc -fPIC -shared -o hello.so hello.c`
 
 ## License
 
-This program is licensed under the **GNU General Public License v3.0**.  
+This program is licensed under the **MIT License**.  
 See the [LICENSE](./LICENSE) file for details.
 
 ## Contact
