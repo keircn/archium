@@ -119,25 +119,19 @@ Plugins are stored in: `$HOME/.config/archium/plugins/`
 
 ### Managing Plugins
 
-Use the built-in plugin management system:
+Use the built-in plugin management commands:
 
-```bash
-# Run Archium and use the plugin command
-archium
-# Then type: plugin
-```
+Available plugin management commands:
 
-Available plugin management options:
-
-1. **List loaded plugins** - See all currently loaded plugins
-2. **View plugin directory** - Get the path to the plugin directory
-3. **Create example plugin** - Generate example plugin source code and Makefile
+- **`pl`** - List all currently loaded plugins with their commands and descriptions
+- **`pd`** - Display the plugin directory path where .so files should be placed
+- **`pe`** - Create an example plugin with template code and Makefile
 
 ### Creating Plugins
 
 Plugins are C shared libraries that implement a specific API. To create a plugin:
 
-1. **Generate example**: Use `plugin` command → option 3 to create `example.c` and `Makefile`
+1. **Generate example**: Use the `pe` command to create `example.c` and `Makefile`
 2. **Customize**: Modify the generated code to implement your functionality
 3. **Build**: Run `make` in the plugin directory to create the `.so` file
 4. **Load**: Restart Archium to automatically load the new plugin
