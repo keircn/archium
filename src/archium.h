@@ -89,6 +89,8 @@ typedef struct {
 } ArchiumErrorContext;
 
 const char *get_error_string(ArchiumError error_code);
+void handle_error(ArchiumError error_code, const char *context);
+void log_error(const char *error_message, ArchiumError error_code);
 void archium_report_error(ArchiumError error_code, const char *context,
                           const char *input);
 
@@ -112,6 +114,8 @@ extern ArchiumConfig config;
 ArchiumError parse_arguments(int argc, char *argv[]);
 
 int check_package_manager(void);
+int check_command(const char *command);
+int check_git(void);
 void prompt_install_yay(void);
 
 void display_version(void);
