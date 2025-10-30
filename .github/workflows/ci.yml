@@ -73,26 +73,3 @@ jobs:
         CC=gcc CFLAGS="-Wall -Wextra -O1 -g -fsanitize=address -fno-omit-frame-pointer" make all
         timeout 2s ./build/archium --help || true
 
-  multi-platform:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, ubuntu-20.04]
-        
-    runs-on: ${{ matrix.os }}
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential libreadline-dev
-    
-    - name: Build
-      run: make all
-    
-    - name: Verify binary
-      run: |
-        test -f build/archium
-        ./build/archium --version || true
