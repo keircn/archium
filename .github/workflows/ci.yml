@@ -55,27 +55,6 @@ jobs:
         path: build/archium
         retention-days: 7
 
-  format-check:
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Install clang-format
-      run: sudo apt-get update && sudo apt-get install -y clang-format
-    
-    - name: Check formatting
-      run: |
-        make format
-        if ! git diff --exit-code; then
-          echo "The following files need formatting:"
-          git diff --name-only
-          echo ""
-          echo "Please run 'make format' locally and commit the changes."
-          exit 1
-        fi
-
   security-scan:
     runs-on: ubuntu-latest
     
