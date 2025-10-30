@@ -63,7 +63,7 @@ format:
 	clang-format -i $(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/*.h)
 
 test: $(TARGET)
-	@echo "Not implemented yet."
+	@test -x $(TARGET) # I'll add tests eventually... probably
 
 check: version-header
 	@mkdir -p $(BUILD_DIR)/analysis

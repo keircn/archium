@@ -6,7 +6,6 @@
 ehthumbs.db
 Thumbs.db
 
-.github
 build
 *.md
 !README.md

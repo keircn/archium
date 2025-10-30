@@ -1,0 +1,135 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        cc: [gcc, clang]
+        os: [ubuntu-latest]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential libreadline-dev clang-format clang-tidy
+    
+    - name: Check code formatting
+      run: |
+        make format
+        if ! git diff --exit-code; then
+          echo "Code formatting issues found. Please run 'make format' and commit the changes."
+          exit 1
+        fi
+    
+    - name: Static analysis
+      run: make check
+    
+    - name: Build with ${{ matrix.cc }}
+      env:
+        CC: ${{ matrix.cc }}
+      run: |
+        make clean
+        make all
+    
+    - name: Run clang-tidy analysis
+      if: matrix.cc == 'clang'
+      run: make analyze
+    
+    - name: Run tests
+      run: make test
+    
+    - name: Test build artifacts
+      run: |
+        test -f build/archium
+        file build/archium
+        ldd build/archium
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: archium-${{ matrix.cc }}-${{ github.sha }}
+        path: build/archium
+        retention-days: 7
+
+  format-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Install clang-format
+      run: sudo apt-get update && sudo apt-get install -y clang-format
+    
+    - name: Check formatting
+      run: |
+        make format
+        if ! git diff --exit-code; then
+          echo "The following files need formatting:"
+          git diff --name-only
+          echo ""
+          echo "Please run 'make format' locally and commit the changes."
+          exit 1
+        fi
+
+  security-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential libreadline-dev cppcheck
+    
+    - name: Run cppcheck
+      run: |
+        cppcheck --enable=all --inconclusive --std=c99 \
+          --suppress=missingIncludeSystem \
+          --suppress=unusedFunction \
+          --error-exitcode=1 \
+          src/
+    
+    - name: Build and run with AddressSanitizer
+      run: |
+        make clean
+        CC=gcc CFLAGS="-Wall -Wextra -O1 -g -fsanitize=address -fno-omit-frame-pointer" make all
+        timeout 2s ./build/archium --help || true
+
+  multi-platform:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, ubuntu-20.04]
+        
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential libreadline-dev
+    
+    - name: Build
+      run: make all
+    
+    - name: Verify binary
+      run: |
+        test -f build/archium
+        ./build/archium --version || true
