@@ -18,5 +18,6 @@ void parse_and_show_remove_result(const char *output, int exit_code,
                                   const char *package);
 void parse_and_show_generic_result(const char *output, int exit_code,
                                    const char *operation);
+void display_fallback_logo(void);
 
 #endif
