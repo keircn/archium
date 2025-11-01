@@ -21,7 +21,40 @@ void display_random_tip(void) {
   printf("\033[1;35mTip:\033[0m %s\n", archium_tips[idx]);
 }
 
+void display_fallback_logo(void) {
+  printf("\033[1;34m");
+  printf("                     -@                \n");
+  printf("                    .##@               \n");
+  printf("                   .####@              \n");
+  printf("                   @#####@             \n");
+  printf("                 . *######@            \n");
+  printf("                .##@o@#####@           \n");
+  printf("               /############@          \n");
+  printf("              /##############@         \n");
+  printf("             @######@**%%%%######@        \n");
+  printf("            @######`     %%#####o       \n");
+  printf("           @######@       ######%%      \n");
+  printf("         -@#######h       ######@.`    \n");
+  printf("        /#####h**``       `**%%%%@####@   \n");
+  printf("       @H@*`                    `*%%%%#@  \n");
+  printf("      *`                            `* \n");
+  printf("\033[0m\n\n");
+}
+
 void display_version(void) {
+  FILE *file = fopen("version.txt", "r");
+  if (file) {
+    printf("\033[1;34m\n");
+    char line[256];
+    while (fgets(line, sizeof(line), file)) {
+      printf("%s", line);
+    }
+    printf("\033[0m\n");
+    fclose(file);
+  } else {
+    display_fallback_logo();
+  }
+
   int pm_check = check_package_manager();
   const char *package_manager;
   switch (pm_check) {
@@ -45,22 +78,6 @@ void display_version(void) {
   build_time[5] = '\0';
 
   printf(
-      "\033[1;34m"
-      "                                                  \n"
-      "                                                  \n"
-      "                        ██                        \n"
-      "                       ████                       \n"
-      "                      ██████                      \n"
-      "                     ███  ███                     \n"
-      "                    ███    ███                    \n"
-      "                   ███      ███                   \n"
-      "                  ███        ███                  \n"
-      "                 ████████     ███                 \n"
-      "                ███   █████    ███                \n"
-      "               ███       █████  ███               \n"
-      "              ██████████████████████              \033[0m\n\n"
-      "                                                  \n"
-      "                                                  \n"
       "\033[1;36mArchium v%s\033[0m - \033[1;32mFast & easy package management "
       "for Arch Linux\033[0m\n"
       "\033[0mWritten in \033[1mC\033[0m and powered by \033[1mYAY\033[0m, "
