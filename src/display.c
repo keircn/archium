@@ -1,6 +1,6 @@
 #include <time.h>
 
-#include "archium.h"
+#include "include/archium.h"
 
 static const char *archium_tips[] = {
     "Use 'h' or 'help' to see all available commands.",

@@ -1,4 +1,4 @@
-#include "archium.h"
+#include "include/archium.h"
 
 void cache_pacman_commands(void) {
   if (cached_commands) {

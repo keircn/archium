@@ -1,4 +1,4 @@
-#include "archium.h"
+#include "include/archium.h"
 
 static void execute_command(const char *command, const char *log_message) {
   int ret = system(command);

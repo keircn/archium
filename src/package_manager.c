@@ -1,4 +1,4 @@
-#include "archium.h"
+#include "include/archium.h"
 
 int check_archium_file(void) { return archium_config_check_paru_preference(); }
 

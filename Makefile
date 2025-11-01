@@ -12,7 +12,7 @@ TARNAME = archium-$(VERSION)
 SRC = $(wildcard $(SRC_DIR)/*.c)
 OBJ = $(SRC:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
 TARGET = $(BUILD_DIR)/archium
-VERSION_HEADER = $(SRC_DIR)/version.h
+VERSION_HEADER = $(SRC_DIR)/include/version.h
 
 .PHONY: all clean install uninstall install-completions test debug release format version-header check analyze
 
@@ -28,7 +28,7 @@ version-header:
 	@echo "#endif" >> $(VERSION_HEADER)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -I$(SRC_DIR)/include -c $< -o $@
 
 $(TARGET): $(OBJ)
 	$(CC) $(OBJ) -o $@ $(LDFLAGS)
@@ -60,14 +60,14 @@ release: clean all
 	tar -czvf $(BUILD_DIR)/$(TARNAME).tar.gz -C $(BUILD_DIR) release
 
 format:
-	clang-format -i $(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/*.h)
+	clang-format -i $(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/include/*.h)
 
 test: $(TARGET)
 	@test -x $(TARGET) # I'll add tests eventually... probably
 
 check: version-header
 	@mkdir -p $(BUILD_DIR)/analysis
-	$(CC) $(ANALYSIS_FLAGS) -fsyntax-only $(wildcard $(SRC_DIR)/*.c) 2> $(BUILD_DIR)/analysis/check.log || true
+	$(CC) $(ANALYSIS_FLAGS) -I$(SRC_DIR)/include -fsyntax-only $(wildcard $(SRC_DIR)/*.c) 2> $(BUILD_DIR)/analysis/check.log || true
 	@if [ -s $(BUILD_DIR)/analysis/check.log ]; then \
 		echo "Found issues:"; \
 		cat $(BUILD_DIR)/analysis/check.log; \
@@ -77,5 +77,5 @@ check: version-header
 
 analyze: check
 	@if command -v clang-tidy >/dev/null 2>&1; then \
-		clang-tidy $(wildcard $(SRC_DIR)/*.c) -- $(CFLAGS) -I$(SRC_DIR) 2>/dev/null | head -20; \
+		clang-tidy $(wildcard $(SRC_DIR)/*.c) -- $(CFLAGS) -I$(SRC_DIR)/include 2>/dev/null | head -20; \
 	fi

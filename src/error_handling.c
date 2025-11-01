@@ -2,7 +2,7 @@
 #include <stdarg.h>
 #include <time.h>
 
-#include "archium.h"
+#include "include/archium.h"
 
 ArchiumConfig config = {0};
 

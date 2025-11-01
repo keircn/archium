@@ -2,7 +2,7 @@
 #include <sys/ioctl.h>
 #include <sys/wait.h>
 
-#include "archium.h"
+#include "include/archium.h"
 
 typedef struct {
   int *running;

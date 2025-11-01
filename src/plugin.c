@@ -2,7 +2,7 @@
 #include <dlfcn.h>
 #include <sys/stat.h>
 
-#include "archium.h"
+#include "include/archium.h"
 
 #ifndef DT_REG
 #define DT_REG 8

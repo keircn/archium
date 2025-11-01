@@ -1,4 +1,4 @@
-#include "archium.h"
+#include "include/archium.h"
 
 char **cached_commands = NULL;
 
