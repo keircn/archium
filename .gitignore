@@ -10,4 +10,4 @@ build
 *.md
 !README.md
 
-src/version.h
+src/include/version.h
