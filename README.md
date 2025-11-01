@@ -4,6 +4,8 @@
 
 Archium is a command-line tool for managing packages on Arch Linux. It provides a simple and intuitive interface for common package management tasks using `yay`, `paru`, or `pacman`. Archium is a faithful fork of [Archie](https://github.com/TuxForge/archie) by [Gurov](https://github.com/Gur0v).
 
+[![CI](https://github.com/keircn/archium/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/keircn/archium/actions/workflows/ci.yml)
+
 ## What it actually does
 
 It's a simple wrapper around pacman/yay/paru that gives you short commands and tab completion. Written in C so it's fast and doesn't eat your RAM.
