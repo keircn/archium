@@ -85,7 +85,7 @@ void display_version(void) {
       "\033[0mPackage Manager: \033[1;36m%s\033[0m (Version: "
       "\033[1;36m%s\033[0m)\n"
       "\033[0mBuild Date: \033[1;33m%.3s%s %s\033[0m\n\n"
-      "\033[0mThis program is subject to the terms of the \033[1;31mGPL "
+      "\033[0mThis program is subject to the terms of the \033[1;31mMIT "
       "License\033[0m\n"
       "\033[0mArchie originally created by \033[1;36mGurov\033[0m\n"
       "\033[0mArchium forked and maintained by \033[1;36mKeiran\033[0m\n\n"
