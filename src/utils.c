@@ -254,3 +254,77 @@ int is_valid_command(const char *command) {
 
   return 0;
 }
+
+int sanitize_shell_input(const char *input, char *output, size_t output_size) {
+  if (!input || !output || output_size == 0) {
+    return 0;
+  }
+
+  size_t input_len = strlen(input);
+  if (input_len == 0) {
+    output[0] = '\0';
+    return 1;
+  }
+
+  size_t out_pos = 0;
+  for (size_t i = 0; i < input_len && out_pos < output_size - 1; i++) {
+    char c = input[i];
+
+    if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '+' ||
+        c == ':') {
+      output[out_pos++] = c;
+    } else if (c == ' ' && out_pos > 0 && out_pos < output_size - 2) {
+      output[out_pos++] = ' ';
+    } else if (c == '/' && out_pos > 0 && out_pos < output_size - 2) {
+      output[out_pos++] = '/';
+    } else {
+      return 0;
+    }
+  }
+
+  output[out_pos] = '\0';
+  return 1;
+}
+
+int validate_package_name(const char *package) {
+  if (!package || strlen(package) == 0 || strlen(package) > 64) {
+    return 0;
+  }
+
+  for (size_t i = 0; package[i]; i++) {
+    char c = package[i];
+    if (!isalnum(c) && c != '-' && c != '_' && c != '.' && c != '+') {
+      return 0;
+    }
+  }
+
+  if (package[0] == '-' || package[0] == '.' || package[0] == '+') {
+    return 0;
+  }
+
+  return 1;
+}
+
+int validate_file_path(const char *path) {
+  if (!path || strlen(path) == 0 || strlen(path) > 4096) {
+    return 0;
+  }
+
+  if (strstr(path, "..") != NULL) {
+    return 0;
+  }
+
+  if (path[0] == '/') {
+    return 0;
+  }
+
+  for (size_t i = 0; path[i]; i++) {
+    char c = path[i];
+    if (!isalnum(c) && c != '/' && c != '-' && c != '_' && c != '.' &&
+        c != '+') {
+      return 0;
+    }
+  }
+
+  return 1;
+}

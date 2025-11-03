@@ -17,10 +17,14 @@
 #include "version.h"
 
 #define MAX_INPUT_LENGTH 256
-#define COMMAND_BUFFER_SIZE 512
+#define COMMAND_BUFFER_SIZE 1024
 #define MAX_RETRIES 3
 #define TIMEOUT_SECONDS 30
 #define ARCHIUM_REPO_URL "https://github.com/keircn/archium.git"
+
+int sanitize_shell_input(const char *input, char *output, size_t output_size);
+int validate_package_name(const char *package);
+int validate_file_path(const char *path);
 
 #include "autocomplete.h"
 #include "commands.h"

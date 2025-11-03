@@ -33,6 +33,13 @@ char *get_package_manager_version(const char *package_manager) {
     return strdup("unknown");
   }
 
+  if (!validate_package_name(package_manager)) {
+    fprintf(stderr,
+            "\033[1;31mError: Invalid package manager name: %s\033[0m\n",
+            package_manager);
+    return strdup("unknown");
+  }
+
   char command[COMMAND_BUFFER_SIZE];
   snprintf(command, sizeof(command), "%s --version | head -n 1",
            package_manager);
@@ -78,17 +85,32 @@ void install_yay(void) {
     exit(EXIT_FAILURE);
   }
 
+  if (!validate_file_path(cache_dir)) {
+    fprintf(stderr, "\033[1;31mError: Invalid cache directory path.\033[0m\n");
+    exit(EXIT_FAILURE);
+  }
+
+  char sanitized_cache_dir[512];
+  if (!sanitize_shell_input(cache_dir, sanitized_cache_dir,
+                            sizeof(sanitized_cache_dir))) {
+    fprintf(stderr,
+            "\033[1;31mError: Cache directory contains invalid "
+            "characters.\033[0m\n");
+    exit(EXIT_FAILURE);
+  }
+
   char command[COMMAND_BUFFER_SIZE];
   char output_buffer[4096];
-  int ret = snprintf(command, sizeof(command),
-                     "mkdir -p %s/setup && "
-                     "cd %s/setup && "
-                     "git clone https://aur.archlinux.org/yay-bin.git && "
-                     "cd yay-bin && "
-                     "makepkg -scCi && "
-                     "cd && "
-                     "rm -rf %s/setup",
-                     cache_dir, cache_dir, cache_dir);
+  int ret =
+      snprintf(command, sizeof(command),
+               "mkdir -p %s/setup && "
+               "cd %s/setup && "
+               "git clone https://aur.archlinux.org/yay-bin.git && "
+               "cd yay-bin && "
+               "makepkg -scCi && "
+               "cd && "
+               "rm -rf %s/setup",
+               sanitized_cache_dir, sanitized_cache_dir, sanitized_cache_dir);
 
   if (ret >= (int)sizeof(command)) {
     fprintf(stderr, "\033[1;31mError: Command string too long.\033[0m\n");

@@ -161,7 +161,23 @@ void update_system(const char *package_manager, const char *package) {
   char output_buffer[4096];
 
   if (package) {
-    snprintf(command, sizeof(command), "%s -S %s", package_manager, package);
+    if (!validate_package_name(package)) {
+      fprintf(stderr, "\033[1;31mError: Invalid package name: %s\033[0m\n",
+              package);
+      return;
+    }
+
+    char sanitized_package[256];
+    if (!sanitize_shell_input(package, sanitized_package,
+                              sizeof(sanitized_package))) {
+      fprintf(
+          stderr,
+          "\033[1;31mError: Package name contains invalid characters\033[0m\n");
+      return;
+    }
+
+    snprintf(command, sizeof(command), "%s -S %s", package_manager,
+             sanitized_package);
     int result = execute_command_with_output_capture(
         command, "Upgrading package", output_buffer, sizeof(output_buffer));
     parse_and_show_install_result(output_buffer, result, package);
@@ -178,8 +194,23 @@ void clear_build_cache() {
   char output_buffer[1024];
 
   if (cache_dir) {
+    if (!validate_file_path(cache_dir)) {
+      fprintf(stderr,
+              "\033[1;31mError: Invalid cache directory path.\033[0m\n");
+      return;
+    }
+
+    char sanitized_cache_dir[512];
+    if (!sanitize_shell_input(cache_dir, sanitized_cache_dir,
+                              sizeof(sanitized_cache_dir))) {
+      fprintf(stderr,
+              "\033[1;31mError: Cache directory contains invalid "
+              "characters.\033[0m\n");
+      return;
+    }
+
     char command[COMMAND_BUFFER_SIZE];
-    snprintf(command, sizeof(command), "rm -rf %s/*", cache_dir);
+    snprintf(command, sizeof(command), "rm -rf %s/*", sanitized_cache_dir);
     int result = execute_command_with_output_capture(
         command, "Clearing Archium cache", output_buffer,
         sizeof(output_buffer));
@@ -206,7 +237,28 @@ void list_orphans() {
 void install_package(const char *package_manager, const char *packages) {
   char command[COMMAND_BUFFER_SIZE];
   char output_buffer[4096];
-  snprintf(command, sizeof(command), "%s -S %s", package_manager, packages);
+
+  char sanitized_packages[512];
+  if (!sanitize_shell_input(packages, sanitized_packages,
+                            sizeof(sanitized_packages))) {
+    fprintf(
+        stderr,
+        "\033[1;31mError: Package names contain invalid characters\033[0m\n");
+    return;
+  }
+
+  char *token = strtok(sanitized_packages, " ");
+  while (token != NULL) {
+    if (!validate_package_name(token)) {
+      fprintf(stderr, "\033[1;31mError: Invalid package name: %s\033[0m\n",
+              token);
+      return;
+    }
+    token = strtok(NULL, " ");
+  }
+
+  snprintf(command, sizeof(command), "%s -S %s", package_manager,
+           sanitized_packages);
   int result = execute_command_with_output_capture(
       command, "Installing packages", output_buffer, sizeof(output_buffer));
   parse_and_show_install_result(output_buffer, result, packages);
@@ -215,7 +267,28 @@ void install_package(const char *package_manager, const char *packages) {
 void remove_package(const char *package_manager, const char *packages) {
   char command[COMMAND_BUFFER_SIZE];
   char output_buffer[4096];
-  snprintf(command, sizeof(command), "%s -R %s", package_manager, packages);
+
+  char sanitized_packages[512];
+  if (!sanitize_shell_input(packages, sanitized_packages,
+                            sizeof(sanitized_packages))) {
+    fprintf(
+        stderr,
+        "\033[1;31mError: Package names contain invalid characters\033[0m\n");
+    return;
+  }
+
+  char *token = strtok(sanitized_packages, " ");
+  while (token != NULL) {
+    if (!validate_package_name(token)) {
+      fprintf(stderr, "\033[1;31mError: Invalid package name: %s\033[0m\n",
+              token);
+      return;
+    }
+    token = strtok(NULL, " ");
+  }
+
+  snprintf(command, sizeof(command), "%s -R %s", package_manager,
+           sanitized_packages);
   int result = execute_command_with_output_capture(
       command, "Removing packages", output_buffer, sizeof(output_buffer));
   parse_and_show_remove_result(output_buffer, result, packages);
@@ -224,7 +297,28 @@ void remove_package(const char *package_manager, const char *packages) {
 void purge_package(const char *package_manager, const char *packages) {
   char command[COMMAND_BUFFER_SIZE];
   char output_buffer[4096];
-  snprintf(command, sizeof(command), "%s -Rns %s", package_manager, packages);
+
+  char sanitized_packages[512];
+  if (!sanitize_shell_input(packages, sanitized_packages,
+                            sizeof(sanitized_packages))) {
+    fprintf(
+        stderr,
+        "\033[1;31mError: Package names contain invalid characters\033[0m\n");
+    return;
+  }
+
+  char *token = strtok(sanitized_packages, " ");
+  while (token != NULL) {
+    if (!validate_package_name(token)) {
+      fprintf(stderr, "\033[1;31mError: Invalid package name: %s\033[0m\n",
+              token);
+      return;
+    }
+    token = strtok(NULL, " ");
+  }
+
+  snprintf(command, sizeof(command), "%s -Rns %s", package_manager,
+           sanitized_packages);
   int result = execute_command_with_output_capture(
       command, "Purging packages", output_buffer, sizeof(output_buffer));
   parse_and_show_remove_result(output_buffer, result, packages);
@@ -274,7 +368,18 @@ void clean_orphans(const char *package_manager) {
 
 void search_package(const char *package_manager, const char *package) {
   char command[COMMAND_BUFFER_SIZE];
-  snprintf(command, sizeof(command), "%s -Ss %s", package_manager, package);
+
+  char sanitized_package[256];
+  if (!sanitize_shell_input(package, sanitized_package,
+                            sizeof(sanitized_package))) {
+    fprintf(
+        stderr,
+        "\033[1;31mError: Package name contains invalid characters\033[0m\n");
+    return;
+  }
+
+  snprintf(command, sizeof(command), "%s -Ss %s", package_manager,
+           sanitized_package);
   printf("\033[1;34mSearching for package: %s\033[0m\n", package);
   execute_command(command, NULL);
 }
@@ -286,7 +391,24 @@ void list_installed_packages(void) {
 
 void show_package_info(const char *package_manager, const char *package) {
   char command[COMMAND_BUFFER_SIZE];
-  snprintf(command, sizeof(command), "%s -Si %s", package_manager, package);
+
+  if (!validate_package_name(package)) {
+    fprintf(stderr, "\033[1;31mError: Invalid package name: %s\033[0m\n",
+            package);
+    return;
+  }
+
+  char sanitized_package[256];
+  if (!sanitize_shell_input(package, sanitized_package,
+                            sizeof(sanitized_package))) {
+    fprintf(
+        stderr,
+        "\033[1;31mError: Package name contains invalid characters\033[0m\n");
+    return;
+  }
+
+  snprintf(command, sizeof(command), "%s -Si %s", package_manager,
+           sanitized_package);
   printf("\033[1;34mShowing information for package: %s\033[0m\n", package);
   execute_command(command, NULL);
 }
@@ -299,7 +421,23 @@ void check_package_updates(void) {
 void display_dependency_tree(const char *package_manager, const char *package) {
   (void)package_manager;
   char command[COMMAND_BUFFER_SIZE];
-  snprintf(command, sizeof(command), "pactree %s", package);
+
+  if (!validate_package_name(package)) {
+    fprintf(stderr, "\033[1;31mError: Invalid package name: %s\033[0m\n",
+            package);
+    return;
+  }
+
+  char sanitized_package[256];
+  if (!sanitize_shell_input(package, sanitized_package,
+                            sizeof(sanitized_package))) {
+    fprintf(
+        stderr,
+        "\033[1;31mError: Package name contains invalid characters\033[0m\n");
+    return;
+  }
+
+  snprintf(command, sizeof(command), "pactree %s", sanitized_package);
   printf("\033[1;34mDisplaying dependency tree for package: %s\033[0m\n",
          package);
   execute_command(command, NULL);
@@ -459,8 +597,20 @@ void find_package_owner(const char *file) {
     return;
   }
 
+  if (!validate_file_path(file)) {
+    fprintf(stderr, "\033[1;31mError: Invalid file path: %s\033[0m\n", file);
+    return;
+  }
+
   char command[COMMAND_BUFFER_SIZE];
-  snprintf(command, sizeof(command), "pacman -Qo %s", file);
+  char sanitized_file[4096];
+  if (!sanitize_shell_input(file, sanitized_file, sizeof(sanitized_file))) {
+    fprintf(stderr,
+            "\033[1;31mError: File path contains invalid characters\033[0m\n");
+    return;
+  }
+
+  snprintf(command, sizeof(command), "pacman -Qo %s", sanitized_file);
   printf("\033[1;34mFinding package owner for: %s\033[0m\n", file);
   execute_command(command, NULL);
 }
