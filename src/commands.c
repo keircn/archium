@@ -67,14 +67,20 @@ ArchiumError handle_command(const char *input, const char *package_manager) {
     char packages[MAX_INPUT_LENGTH];
     get_user_input(packages, "Enter package names to install: ");
     install_package(package_manager, packages);
+  } else if (strncmp(input, "i ", 2) == 0) {
+    install_package(package_manager, input + 2);
   } else if (strcmp(input, "r") == 0) {
     char packages[MAX_INPUT_LENGTH];
     get_user_input(packages, "Enter package names to remove: ");
     remove_package(package_manager, packages);
+  } else if (strncmp(input, "r ", 2) == 0) {
+    remove_package(package_manager, input + 2);
   } else if (strcmp(input, "p") == 0) {
     char packages[MAX_INPUT_LENGTH];
     get_user_input(packages, "Enter package names to purge: ");
     purge_package(package_manager, packages);
+  } else if (strncmp(input, "p ", 2) == 0) {
+    purge_package(package_manager, input + 2);
   } else if (strcmp(input, "c") == 0) {
     clean_cache(package_manager);
   } else if (strcmp(input, "cc") == 0) {
@@ -87,18 +93,24 @@ ArchiumError handle_command(const char *input, const char *package_manager) {
     char package[MAX_INPUT_LENGTH];
     get_user_input(package, "Enter package name to search: ");
     search_package(package_manager, package);
+  } else if (strncmp(input, "s ", 2) == 0) {
+    search_package(package_manager, input + 2);
   } else if (strcmp(input, "l") == 0) {
     list_installed_packages();
   } else if (strcmp(input, "?") == 0) {
     char package[MAX_INPUT_LENGTH];
     get_user_input(package, "Enter package name to show info: ");
     show_package_info(package_manager, package);
+  } else if (strncmp(input, "? ", 2) == 0) {
+    show_package_info(package_manager, input + 2);
   } else if (strcmp(input, "cu") == 0) {
     check_package_updates();
   } else if (strcmp(input, "dt") == 0) {
     char package[MAX_INPUT_LENGTH];
     get_user_input(package, "Enter package name to view dependencies: ");
     display_dependency_tree(package_manager, package);
+  } else if (strncmp(input, "dt ", 3) == 0) {
+    display_dependency_tree(package_manager, input + 3);
   } else if (strcmp(input, "si") == 0) {
     list_packages_by_size();
   } else if (strcmp(input, "re") == 0) {
@@ -109,6 +121,8 @@ ArchiumError handle_command(const char *input, const char *package_manager) {
     char file[MAX_INPUT_LENGTH];
     get_user_input(file, "Enter file path: ");
     find_package_owner(file);
+  } else if (strncmp(input, "ow ", 3) == 0) {
+    find_package_owner(input + 3);
   } else if (strcmp(input, "ba") == 0) {
     backup_pacman_config();
   } else if (strcmp(input, "config") == 0) {

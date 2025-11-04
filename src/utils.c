@@ -244,7 +244,11 @@ int is_valid_command(const char *command) {
     }
   }
 
-  if (strncmp(command, "u ", 2) == 0 || strncmp(command, "h ", 2) == 0) {
+  if (strncmp(command, "u ", 2) == 0 || strncmp(command, "h ", 2) == 0 ||
+      strncmp(command, "i ", 2) == 0 || strncmp(command, "r ", 2) == 0 ||
+      strncmp(command, "p ", 2) == 0 || strncmp(command, "s ", 2) == 0 ||
+      strncmp(command, "? ", 2) == 0 || strncmp(command, "dt ", 3) == 0 ||
+      strncmp(command, "ow ", 3) == 0) {
     return 1;
   }
 
