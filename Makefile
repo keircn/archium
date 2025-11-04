@@ -1,7 +1,15 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -O2 -g
+
+CFLAGS = -Wall -Wextra -O3 -march=native -flto -DNDEBUG
+LDFLAGS = -lreadline -ldl -ldl -lpthread -flto
+
+RELEASE_CFLAGS = -Wall -Wextra -O2 -mtune=generic -flto -DNDEBUG -s
+RELEASE_LDFLAGS = -lreadline -ldl -ldl -lpthread -flto -s
+
+DEBUG_CFLAGS = -Wall -Wextra -O0 -g3 -DDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer
+DEBUG_LDFLAGS = -lreadline -ldl -ldl -lpthread -fsanitize=address,undefined
+
 ANALYSIS_FLAGS = -Wall -Wextra -Wformat=2 -Wshadow -Wstrict-prototypes -Wmissing-prototypes -fanalyzer
-LDFLAGS = -lreadline -ldl -ldl -lpthread
 
 BUILD_DIR = build
 SRC_DIR = src
@@ -14,7 +22,7 @@ OBJ = $(SRC:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
 TARGET = $(BUILD_DIR)/archium
 VERSION_HEADER = $(SRC_DIR)/include/version.h
 
-.PHONY: all clean install uninstall install-completions test debug release format version-header check analyze
+.PHONY: all clean install uninstall install-completions test debug release release-static format version-header check analyze profile benchmark
 
 all: $(BUILD_DIR) version-header $(TARGET)
 
@@ -46,18 +54,47 @@ clean:
 	rm -rf $(BUILD_DIR)
 	rm -f $(VERSION_HEADER)
 
-debug:
+debug: clean
+	@mkdir -p $(BUILD_DIR)
+	@$(MAKE) version-header
+	$(CC) $(DEBUG_CFLAGS) -I$(SRC_DIR)/include -c $(SRC_DIR)/main.c -o $(BUILD_DIR)/main.o
+	$(CC) $(DEBUG_CFLAGS) -I$(SRC_DIR)/include -c $(SRC_DIR)/autocomplete.c -o $(BUILD_DIR)/autocomplete.o
+	$(CC) $(DEBUG_CFLAGS) -I$(SRC_DIR)/include -c $(SRC_DIR)/commands.c -o $(BUILD_DIR)/commands.o
+	$(CC) $(DEBUG_CFLAGS) -I$(SRC_DIR)/include -c $(SRC_DIR)/config.c -o $(BUILD_DIR)/config.o
+	$(CC) $(DEBUG_CFLAGS) -I$(SRC_DIR)/include -c $(SRC_DIR)/display.c -o $(BUILD_DIR)/display.o
+	$(CC) $(DEBUG_CFLAGS) -I$(SRC_DIR)/include -c $(SRC_DIR)/error_handling.c -o $(BUILD_DIR)/error_handling.o
+	$(CC) $(DEBUG_CFLAGS) -I$(SRC_DIR)/include -c $(SRC_DIR)/package_manager.c -o $(BUILD_DIR)/package_manager.o
+	$(CC) $(DEBUG_CFLAGS) -I$(SRC_DIR)/include -c $(SRC_DIR)/plugin.c -o $(BUILD_DIR)/plugin.o
+	$(CC) $(DEBUG_CFLAGS) -I$(SRC_DIR)/include -c $(SRC_DIR)/utils.c -o $(BUILD_DIR)/utils.o
+	$(CC) $(OBJ) -o $(TARGET) $(DEBUG_LDFLAGS)
+	@echo "$(TARGET)"
+
+info:
 	@echo "Source files: $(SRC)"
 	@echo "Object files: $(OBJ)"
 	@echo "Target: $(TARGET)"
 	@echo "Build directory: $(BUILD_DIR)"
 	@echo "Install directory: $(DESTDIR)/bin"
+	@echo "Current CFLAGS: $(CFLAGS)"
+	@echo "Current LDFLAGS: $(LDFLAGS)"
 
-release: clean all
-	strip $(TARGET)
+release: clean
+	@mkdir -p $(BUILD_DIR)
+	@$(MAKE) version-header
+	$(CC) $(RELEASE_CFLAGS) -I$(SRC_DIR)/include -c $(SRC_DIR)/main.c -o $(BUILD_DIR)/main.o
+	$(CC) $(RELEASE_CFLAGS) -I$(SRC_DIR)/include -c $(SRC_DIR)/autocomplete.c -o $(BUILD_DIR)/autocomplete.o
+	$(CC) $(RELEASE_CFLAGS) -I$(SRC_DIR)/include -c $(SRC_DIR)/commands.c -o $(BUILD_DIR)/commands.o
+	$(CC) $(RELEASE_CFLAGS) -I$(SRC_DIR)/include -c $(SRC_DIR)/config.c -o $(BUILD_DIR)/config.o
+	$(CC) $(RELEASE_CFLAGS) -I$(SRC_DIR)/include -c $(SRC_DIR)/display.c -o $(BUILD_DIR)/display.o
+	$(CC) $(RELEASE_CFLAGS) -I$(SRC_DIR)/include -c $(SRC_DIR)/error_handling.c -o $(BUILD_DIR)/error_handling.o
+	$(CC) $(RELEASE_CFLAGS) -I$(SRC_DIR)/include -c $(SRC_DIR)/package_manager.c -o $(BUILD_DIR)/package_manager.o
+	$(CC) $(RELEASE_CFLAGS) -I$(SRC_DIR)/include -c $(SRC_DIR)/plugin.c -o $(BUILD_DIR)/plugin.o
+	$(CC) $(RELEASE_CFLAGS) -I$(SRC_DIR)/include -c $(SRC_DIR)/utils.c -o $(BUILD_DIR)/utils.o
+	$(CC) $(OBJ) -o $(TARGET) $(RELEASE_LDFLAGS)
 	mkdir -p $(BUILD_DIR)/release
 	cp $(TARGET) $(BUILD_DIR)/release/archium
 	tar -czvf $(BUILD_DIR)/$(TARNAME).tar.gz -C $(BUILD_DIR) release
+	@echo "Release built: $(BUILD_DIR)/$(TARNAME).tar.gz"
 
 format:
 	clang-format -i $(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/include/*.h)
