@@ -195,11 +195,19 @@ void update_system(const char *package_manager, const char *package) {
     int result = execute_command_with_output_capture(
         command, "Upgrading package", output_buffer, sizeof(output_buffer));
     parse_and_show_install_result(output_buffer, result, package);
+
+    if (result == 0) {
+      invalidate_package_cache();
+    }
   } else {
     snprintf(command, sizeof(command), "%s -Syu --noconfirm", package_manager);
     int result = execute_command_with_output_capture(
         command, "Upgrading system", output_buffer, sizeof(output_buffer));
     parse_and_show_upgrade_result(output_buffer, result);
+
+    if (result == 0) {
+      invalidate_package_cache();
+    }
   }
 }
 
@@ -276,6 +284,10 @@ void install_package(const char *package_manager, const char *packages) {
   int result = execute_command_with_output_capture(
       command, "Installing packages", output_buffer, sizeof(output_buffer));
   parse_and_show_install_result(output_buffer, result, packages);
+
+  if (result == 0) {
+    invalidate_package_cache();
+  }
 }
 
 void remove_package(const char *package_manager, const char *packages) {
@@ -306,6 +318,10 @@ void remove_package(const char *package_manager, const char *packages) {
   int result = execute_command_with_output_capture(
       command, "Removing packages", output_buffer, sizeof(output_buffer));
   parse_and_show_remove_result(output_buffer, result, packages);
+
+  if (result == 0) {
+    invalidate_package_cache();
+  }
 }
 
 void purge_package(const char *package_manager, const char *packages) {
