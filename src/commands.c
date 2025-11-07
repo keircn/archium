@@ -757,7 +757,12 @@ char **list_cached_versions(const char *package, int *count) {
 
   char line[512];
   while (fgets(line, sizeof(line), fp) != NULL) {
-    line[strcspn(line, "\n")] = 0;
+    size_t len = strcspn(line, "\n");
+    if (len < sizeof(line)) {
+      line[len] = 0;
+    } else {
+      line[sizeof(line) - 1] = 0;
+    }
 
     char *filename = strrchr(line, '/');
     if (filename) {

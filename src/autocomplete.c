@@ -23,7 +23,12 @@ static void load_cache_from_file(const char *cache_path) {
   int command_count = 0;
 
   while (fgets(line, sizeof(line), fp) != NULL) {
-    line[strcspn(line, "\n")] = 0;
+    size_t len = strcspn(line, "\n");
+    if (len < sizeof(line)) {
+      line[len] = 0;
+    } else {
+      line[sizeof(line) - 1] = 0;
+    }
     if (strlen(line) == 0) continue;
 
     command_count++;
@@ -101,10 +106,15 @@ void cache_pacman_commands(void) {
   }
 
   while (fgets(path, sizeof(path), fp) != NULL) {
+    size_t len = strcspn(path, "\n");
+    if (len < sizeof(path)) {
+      path[len] = 0;
+    } else {
+      path[sizeof(path) - 1] = 0;
+    }
     command_count++;
     cached_commands =
         realloc(cached_commands, sizeof(char *) * (command_count + 1));
-    path[strcspn(path, "\n")] = 0;
     cached_commands[command_count - 1] = strdup(path);
   }
 
