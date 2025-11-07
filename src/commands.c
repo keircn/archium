@@ -75,6 +75,12 @@ ArchiumError handle_command(const char *input, const char *package_manager) {
     remove_package(package_manager, packages);
   } else if (strncmp(input, "r ", 2) == 0) {
     remove_package(package_manager, input + 2);
+  } else if (strcmp(input, "d") == 0) {
+    char packages[MAX_INPUT_LENGTH];
+    get_user_input(packages, "Enter package names to downgrade: ");
+    downgrade_package(package_manager, packages);
+  } else if (strncmp(input, "d ", 2) == 0) {
+    downgrade_package(package_manager, input + 2);
   } else if (strcmp(input, "p") == 0) {
     char packages[MAX_INPUT_LENGTH];
     get_user_input(packages, "Enter package names to purge: ");
@@ -718,4 +724,153 @@ void configure_preferences(void) {
   } else {
     printf("\033[1;31mInvalid choice.\033[0m\n");
   }
+}
+
+char **list_cached_versions(const char *package, int *count) {
+  char command[COMMAND_BUFFER_SIZE];
+  char **versions = NULL;
+  *count = 0;
+
+  if (!validate_package_name(package)) {
+    fprintf(stderr, "\033[1;31mError: Invalid package name: %s\033[0m\n",
+            package);
+    return NULL;
+  }
+
+  char sanitized_package[256];
+  if (!sanitize_shell_input(package, sanitized_package,
+                            sizeof(sanitized_package))) {
+    fprintf(
+        stderr,
+        "\033[1;31mError: Package name contains invalid characters\033[0m\n");
+    return NULL;
+  }
+
+  snprintf(command, sizeof(command),
+           "ls -1 /var/cache/pacman/pkg/%s-*.pkg.tar.zst 2>/dev/null | sort -V",
+           sanitized_package);
+
+  FILE *fp = popen(command, "r");
+  if (!fp) {
+    return NULL;
+  }
+
+  char line[512];
+  while (fgets(line, sizeof(line), fp) != NULL) {
+    line[strcspn(line, "\n")] = 0;
+
+    char *filename = strrchr(line, '/');
+    if (filename) {
+      filename++;
+    } else {
+      filename = line;
+    }
+
+    char *version_start = strstr(filename, sanitized_package);
+    if (version_start) {
+      version_start += strlen(sanitized_package);
+      if (*version_start == '-') {
+        version_start++;
+      }
+
+      char *version_end = strstr(version_start, "-");
+      if (version_end) {
+        *version_end = '\0';
+
+        versions = realloc(versions, sizeof(char *) * (*count + 1));
+        if (versions) {
+          versions[*count] = strdup(version_start);
+          (*count)++;
+        }
+      }
+    }
+  }
+  pclose(fp);
+
+  return versions;
+}
+
+void downgrade_package(const char *package_manager, const char *packages) {
+  char command[COMMAND_BUFFER_SIZE];
+  char output_buffer[4096];
+
+  char sanitized_packages[512];
+  if (!sanitize_shell_input(packages, sanitized_packages,
+                            sizeof(sanitized_packages))) {
+    fprintf(
+        stderr,
+        "\033[1;31mError: Package names contain invalid characters\033[0m\n");
+    return;
+  }
+
+  char *packages_copy = strdup(sanitized_packages);
+  char *token = strtok(packages_copy, " ");
+
+  while (token != NULL) {
+    if (!validate_package_name(token)) {
+      fprintf(stderr, "\033[1;31mError: Invalid package name: %s\033[0m\n",
+              token);
+      free(packages_copy);
+      return;
+    }
+
+    int version_count = 0;
+    char **versions = list_cached_versions(token, &version_count);
+
+    if (version_count == 0) {
+      printf("\033[1;33mNo cached versions found for package: %s\033[0m\n",
+             token);
+    } else {
+      printf("\033[1;34mAvailable cached versions for %s:\033[0m\n", token);
+      for (int i = 0; i < version_count; i++) {
+        printf("  \033[1;32m%d\033[0m: %s\n", i + 1, versions[i]);
+      }
+
+      char choice[16];
+      get_user_input(choice, "Select version to downgrade to (number): ");
+
+      int selected = atoi(choice);
+      if (selected > 0 && selected <= version_count) {
+        char package_file[512];
+        snprintf(package_file, sizeof(package_file),
+                 "/var/cache/pacman/pkg/%s-%s.pkg.tar.zst", token,
+                 versions[selected - 1]);
+
+        printf("\033[1;34mDowngrading %s to version %s...\033[0m\n", token,
+               versions[selected - 1]);
+
+        if (strcmp(package_manager, "pacman") == 0) {
+          snprintf(command, sizeof(command), "sudo %s -U %s", package_manager,
+                   package_file);
+        } else {
+          snprintf(command, sizeof(command), "%s -S %s --needed --noconfirm",
+                   package_manager, token);
+        }
+
+        int result = execute_command_with_output_capture(
+            command, "Downgrading package", output_buffer,
+            sizeof(output_buffer));
+        parse_and_show_install_result(output_buffer, result, token);
+
+        if (result == 0) {
+          printf("\033[1;32mPackage %s downgraded successfully!\033[0m\n",
+                 token);
+        } else {
+          printf("\033[1;31mFailed to downgrade %s\033[0m\n", token);
+        }
+      } else {
+        printf("\033[1;31mInvalid selection.\033[0m\n");
+      }
+
+      for (int i = 0; i < version_count; i++) {
+        free(versions[i]);
+      }
+      free(versions);
+    }
+
+    token = strtok(NULL, " ");
+  }
+
+  free(packages_copy);
+  invalidate_package_cache();
 }

@@ -147,6 +147,9 @@ void display_help_category(const char *category) {
     printf("\033[1;32mi\033[0m           - Install packages\n");
     printf("\033[1;32mr\033[0m           - Remove packages\n");
     printf(
+        "\033[1;32md\033[0m           - Downgrade packages to cached "
+        "versions\n");
+    printf(
         "\033[1;32mp\033[0m           - Purge packages (remove with "
         "dependencies)\n");
     printf("\033[1;32ms\033[0m           - Search for packages\n");
@@ -196,7 +199,8 @@ void display_help_quick(void) {
   printf("\n\033[1;33mQuick Reference:\033[0m\n");
   printf(
       "\033[1;32mi\033[0m install  \033[1;32mr\033[0m remove   "
-      "\033[1;32ms\033[0m search   \033[1;32mu\033[0m update\n");
+      "\033[1;32md\033[0m downgrade \033[1;32ms\033[0m search   "
+      "\033[1;32mu\033[0m update\n");
   printf(
       "\033[1;32ml\033[0m list     \033[1;32mc\033[0m clean    "
       "\033[1;32mo\033[0m orphans  \033[1;32m?\033[0m info\n");
@@ -219,6 +223,15 @@ void display_help_command(const char *command) {
     printf("\033[1;36mExample:\033[0m Remove firefox\n");
     printf("  Archium $ r\n");
     printf("  Enter package names to remove: firefox\n");
+  } else if (strcmp(command, "d") == 0) {
+    printf("\033[1;33mDowngrade Command:\033[0m \033[1;32md\033[0m\n");
+    printf("Downgrade packages to previously cached versions.\n");
+    printf("Useful when a new version causes issues.\n");
+    printf("\033[1;36mExample:\033[0m Downgrade firefox\n");
+    printf("  Archium $ d\n");
+    printf("  Enter package names to downgrade: firefox\n");
+    printf(
+        "\033[1;33mNote:\033[0m Requires cached versions in pacman cache.\n");
   } else if (strcmp(command, "u") == 0) {
     printf("\033[1;33mUpdate Command:\033[0m \033[1;32mu\033[0m [package]\n");
     printf("Update entire system or specific package.\n");

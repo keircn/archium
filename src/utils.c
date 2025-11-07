@@ -233,9 +233,9 @@ void get_input(char *input, const char *prompt) {
 
 int is_valid_command(const char *command) {
   const char *valid_commands[] = {
-      "u",  "i",  "r",      "p",    "c",  "o",  "s",  "h",  "q",
-      "l",  "?",  "cu",     "dt",   "cc", "lo", "si", "re", "ex",
-      "ow", "ba", "config", "help", "pl", "pd", "pe"};
+      "u",  "i",  "r",  "d",      "p",    "c",  "o",  "s",  "h",
+      "q",  "l",  "?",  "cu",     "dt",   "cc", "lo", "si", "re",
+      "ex", "ow", "ba", "config", "help", "pl", "pd", "pe"};
   int num_commands = sizeof(valid_commands) / sizeof(valid_commands[0]);
 
   for (int i = 0; i < num_commands; i++) {
@@ -246,9 +246,9 @@ int is_valid_command(const char *command) {
 
   if (strncmp(command, "u ", 2) == 0 || strncmp(command, "h ", 2) == 0 ||
       strncmp(command, "i ", 2) == 0 || strncmp(command, "r ", 2) == 0 ||
-      strncmp(command, "p ", 2) == 0 || strncmp(command, "s ", 2) == 0 ||
-      strncmp(command, "? ", 2) == 0 || strncmp(command, "dt ", 3) == 0 ||
-      strncmp(command, "ow ", 3) == 0) {
+      strncmp(command, "d ", 2) == 0 || strncmp(command, "p ", 2) == 0 ||
+      strncmp(command, "s ", 2) == 0 || strncmp(command, "? ", 2) == 0 ||
+      strncmp(command, "dt ", 3) == 0 || strncmp(command, "ow ", 3) == 0) {
     return 1;
   }
 
