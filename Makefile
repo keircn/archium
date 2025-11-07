@@ -1,13 +1,13 @@
 CC = gcc
 
 CFLAGS = -Wall -Wextra -O3 -march=native -flto -DNDEBUG
-LDFLAGS = -lreadline -ldl -ldl -lpthread -flto
+LDFLAGS = -lreadline -ldl -lpthread -flto
 
 RELEASE_CFLAGS = -Wall -Wextra -O2 -mtune=generic -flto -DNDEBUG -s
-RELEASE_LDFLAGS = -lreadline -ldl -ldl -lpthread -flto -s
+RELEASE_LDFLAGS = -lreadline -ldl -lpthread -flto -s
 
 DEBUG_CFLAGS = -Wall -Wextra -O0 -g3 -DDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer
-DEBUG_LDFLAGS = -lreadline -ldl -ldl -lpthread -fsanitize=address,undefined
+DEBUG_LDFLAGS = -lreadline -ldl -lpthread -fsanitize=address,undefined
 
 ANALYSIS_FLAGS = -Wall -Wextra -Wformat=2 -Wshadow -Wstrict-prototypes -Wmissing-prototypes -fanalyzer
 
