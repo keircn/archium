@@ -126,8 +126,8 @@ void display_help(void) {
       "  \033[1;32mpackages\033[0m  - Package operations (install, remove, "
       "search)\n");
   printf(
-      "  \033[1;32msystem\033[0m    - System maintenance (update, clean, "
-      "orphans)\n");
+      "  \033[1;32msystem\033[0m    - System utilities (health, maintenance, "
+      "diagnostics)\n");
   printf(
       "  \033[1;32minfo\033[0m      - Information commands (list, show, "
       "dependencies)\n");
@@ -156,7 +156,10 @@ void display_help_category(const char *category) {
     printf(
         "\033[1;32mu\033[0m [package] - Update system or specific package\n");
   } else if (strcmp(category, "system") == 0) {
-    printf("\n\033[1;33mSystem Maintenance:\033[0m\n");
+    printf("\n\033[1;33mSystem Utilities:\033[0m\n");
+    printf(
+        "\033[1;32mhealth\033[0m      - System health check (disk, integrity, "
+        "services)\n");
     printf("\033[1;32mc\033[0m           - Clean package cache\n");
     printf("\033[1;32mcc\033[0m          - Clear build cache\n");
     printf("\033[1;32mo\033[0m           - Clean orphaned packages\n");
@@ -206,7 +209,8 @@ void display_help_quick(void) {
       "\033[1;32mo\033[0m orphans  \033[1;32m?\033[0m info\n");
   printf(
       "\033[1;32mq\033[0m quit     \033[1;32mh\033[0m help     "
-      "\033[1;32mconfig\033[0m       \033[1;32mpl\033[0m list\n");
+      "\033[1;32mhealth\033[0m check   \033[1;32mconfig\033[0m       "
+      "\033[1;32mpl\033[0m list\n");
 }
 
 void display_help_command(const char *command) {
@@ -232,6 +236,19 @@ void display_help_command(const char *command) {
     printf("  Enter package names to downgrade: firefox\n");
     printf(
         "\033[1;33mNote:\033[0m Requires cached versions in pacman cache.\n");
+  } else if (strcmp(command, "health") == 0) {
+    printf("\033[1;33mHealth Check Command:\033[0m \033[1;32mhealth\033[0m\n");
+    printf("Perform comprehensive system health diagnostics.\n");
+    printf(
+        "Checks disk space, package integrity, system services, and more.\n");
+    printf("\033[1;36mExample:\033[0m Run system health check\n");
+    printf("  Archium $ health\n");
+    printf("\033[1;33mChecks performed:\033[0m\n");
+    printf("  • Disk space usage analysis\n");
+    printf("  • Package file integrity verification\n");
+    printf("  • System service status\n");
+    printf("  • Memory usage monitoring\n");
+    printf("  • Memory usage monitoring\n");
   } else if (strcmp(command, "u") == 0) {
     printf("\033[1;33mUpdate Command:\033[0m \033[1;32mu\033[0m [package]\n");
     printf("Update entire system or specific package.\n");

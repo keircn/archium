@@ -131,6 +131,8 @@ ArchiumError handle_command(const char *input, const char *package_manager) {
     find_package_owner(input + 3);
   } else if (strcmp(input, "ba") == 0) {
     backup_pacman_config();
+  } else if (strcmp(input, "health") == 0) {
+    system_health_check();
   } else if (strcmp(input, "config") == 0) {
     configure_preferences();
   } else if (strcmp(input, "pl") == 0) {
@@ -878,4 +880,180 @@ void downgrade_package(const char *package_manager, const char *packages) {
 
   free(packages_copy);
   invalidate_package_cache();
+}
+
+void system_health_check(void) {
+  printf(
+      "\033[1;"
+      "34m╔════════════════════════════════════════════════════════════╗\033["
+      "0m\n");
+  printf(
+      "\033[1;34m║                    SYSTEM HEALTH CHECK                    "
+      " ║\033[0m\n");
+  printf(
+      "\033[1;"
+      "34m╚════════════════════════════════════════════════════════════╝\033["
+      "0m\n\n");
+
+  char command[COMMAND_BUFFER_SIZE];
+  int issues_found = 0;
+
+  printf("\033[1;33mDisk Space Analysis:\033[0m\n");
+  snprintf(command, sizeof(command), "df -h | grep -E '^/dev/' | head -5");
+  FILE *fp = popen(command, "r");
+  if (fp) {
+    char line[256];
+    while (fgets(line, sizeof(line), fp)) {
+      size_t len = strcspn(line, "\n");
+      if (len < sizeof(line)) {
+        line[len] = 0;
+      }
+
+      char *usage = strchr(line, ' ');
+      if (usage) {
+        while (*usage == ' ') usage++;
+        char *percent = strchr(usage, '%');
+        if (percent) {
+          int usage_val = atoi(percent - 2);
+          if (usage_val > 90) {
+            printf("  \033[1;31m[✖] %s\033[0m\n", line);
+            issues_found++;
+          } else if (usage_val > 80) {
+            printf("  \033[1;33m[⚠] %s\033[0m\n", line);
+          } else {
+            printf("  \033[1;32m[✓] %s\033[0m\n", line);
+          }
+        }
+      }
+    }
+    pclose(fp);
+  }
+
+  printf("\n\033[1;33mSystem Integrity:\033[0m\n");
+  snprintf(command, sizeof(command),
+           "pacman -Qk 2>/dev/null | grep -v '0 missing files'");
+  fp = popen(command, "r");
+  if (fp) {
+    char line[256];
+    int integrity_issues = 0;
+    while (fgets(line, sizeof(line), fp)) {
+      size_t len = strcspn(line, "\n");
+      if (len < sizeof(line)) {
+        line[len] = 0;
+      }
+      if (strlen(line) > 0) {
+        printf("  \033[1;31m[✖] %s\033[0m\n", line);
+        integrity_issues++;
+        issues_found++;
+      }
+    }
+    pclose(fp);
+    if (integrity_issues == 0) {
+      printf(
+          "  \033[1;32m[✓] All installed packages have valid file "
+          "integrity\033[0m\n");
+    }
+  }
+
+  printf("\n\033[1;33mSystem Services Status:\033[0m\n");
+  snprintf(command, sizeof(command),
+           "systemctl --failed --no-legend 2>/dev/null | head -5");
+  fp = popen(command, "r");
+  if (fp) {
+    char line[256];
+    int failed_services = 0;
+    while (fgets(line, sizeof(line), fp) && failed_services < 3) {
+      size_t len = strcspn(line, "\n");
+      if (len < sizeof(line)) {
+        line[len] = 0;
+      }
+      if (strlen(line) > 0) {
+        printf("  \033[1;31m[✖] %s\033[0m\n", line);
+        failed_services++;
+        issues_found++;
+      }
+    }
+    pclose(fp);
+    if (failed_services == 0) {
+      printf("  \033[1;32m[✓] No failed system services\033[0m\n");
+    } else if (failed_services == 3) {
+      printf("  \033[1;33m... (showing first 3, more may exist)\033[0m\n");
+    }
+  }
+
+  printf("\n\033[1;33mPackage Database:\033[0m\n");
+  snprintf(command, sizeof(command), "pacman -Qm 2>/dev/null | wc -l");
+  fp = popen(command, "r");
+  if (fp) {
+    char foreign_count[16];
+    if (fgets(foreign_count, sizeof(foreign_count), fp)) {
+      int count = atoi(foreign_count);
+      if (count > 50) {
+        printf("  \033[1;33m[⚠] %d foreign/aur packages installed\033[0m\n",
+               count);
+      } else {
+        printf("  \033[1;32m[✓] %d foreign/aur packages installed\033[0m\n",
+               count);
+      }
+    }
+    pclose(fp);
+  }
+
+  printf("\n\033[1;33mMemory Usage:\033[0m\n");
+  snprintf(command, sizeof(command), "free -h | grep '^Mem:'");
+  fp = popen(command, "r");
+  if (fp) {
+    char line[256];
+    if (fgets(line, sizeof(line), fp)) {
+      size_t len = strcspn(line, "\n");
+      if (len < sizeof(line)) {
+        line[len] = 0;
+      }
+
+      char *total = strchr(line, ':');
+      if (total) {
+        total++;
+        while (*total == ' ') total++;
+        char *used = strchr(total, ' ');
+        if (used) {
+          used++;
+          while (*used == ' ') used++;
+          char *available = strchr(used, ' ');
+          if (available) {
+            available++;
+            while (*available == ' ') available++;
+
+            printf("  \033[1;36m[ℹ] %s\033[0m\n", line);
+          }
+        }
+      }
+    }
+    pclose(fp);
+  }
+
+  printf(
+      "\n\033[1;"
+      "34m╔════════════════════════════════════════════════════════════╗\033["
+      "0m\n");
+  if (issues_found == 0) {
+    printf(
+        "\033[1;34m║            \033[1;32m[✓] SYSTEM HEALTHY - No issues "
+        "found\033[1;34m            ║\033[0m\n");
+  } else if (issues_found <= 3) {
+    printf(
+        "\033[1;34m║                \033[1;33m[⚠] %d minor issues "
+        "detected\033[1;34m                 ║\033[0m\n",
+        issues_found);
+  } else {
+    printf(
+        "\033[1;34m║                \033[1;31m[✖] %d issues need "
+        "attention\033[1;34m                 ║\033[0m\n",
+        issues_found);
+  }
+  printf(
+      "\033[1;"
+      "34m╚════════════════════════════════════════════════════════════╝\033["
+      "0m\n\n");
+
+  log_action("System health check completed");
 }
