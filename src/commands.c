@@ -528,7 +528,7 @@ void perform_self_update(void) {
     return;
   }
 
-  ret = snprintf(command, sizeof(command), "git clone %.256s %.256s",
+  ret = snprintf(command, sizeof(command), "git clone -q %.256s %.256s",
                  ARCHIUM_REPO_URL, clone_dir);
   if (ret >= (int)sizeof(command)) {
     archium_report_error(ARCHIUM_ERROR_INVALID_INPUT, "Command string too long",
