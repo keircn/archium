@@ -784,11 +784,28 @@ char **list_cached_versions(const char *package, int *count) {
       if (version_end) {
         *version_end = '\0';
 
-        versions = realloc(versions, sizeof(char *) * (*count + 1));
-        if (versions) {
-          versions[*count] = strdup(version_start);
-          (*count)++;
+        char **new_versions = realloc(versions, sizeof(char *) * (*count + 1));
+        if (!new_versions) {
+          pclose(fp);
+          for (int i = 0; i < *count; i++) {
+            free(versions[i]);
+          }
+          free(versions);
+          *count = 0;
+          return NULL;
         }
+        versions = new_versions;
+        versions[*count] = strdup(version_start);
+        if (!versions[*count]) {
+          pclose(fp);
+          for (int i = 0; i < *count; i++) {
+            free(versions[i]);
+          }
+          free(versions);
+          *count = 0;
+          return NULL;
+        }
+        (*count)++;
       }
     }
   }
@@ -811,6 +828,10 @@ void downgrade_package(const char *package_manager, const char *packages) {
   }
 
   char *packages_copy = strdup(sanitized_packages);
+  if (!packages_copy) {
+    fprintf(stderr, "\033[1;31mError: Memory allocation failed\033[0m\n");
+    return;
+  }
   char *token = strtok(packages_copy, " ");
 
   while (token != NULL) {
