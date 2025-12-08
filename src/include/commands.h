@@ -15,6 +15,5 @@ void perform_self_update(void);
 void downgrade_package(const char *package_manager, const char *packages);
 char **list_cached_versions(const char *package, int *count);
 void system_health_check(void);
-void system_health_check(void);
 
 #endif
