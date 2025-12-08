@@ -32,9 +32,18 @@ static void load_cache_from_file(const char *cache_path) {
     if (strlen(line) == 0) continue;
 
     command_count++;
-    cached_commands =
+    char **new_commands =
         realloc(cached_commands, sizeof(char *) * (command_count + 1));
+    if (!new_commands) {
+      fclose(fp);
+      return;
+    }
+    cached_commands = new_commands;
     cached_commands[command_count - 1] = strdup(line);
+    if (!cached_commands[command_count - 1]) {
+      fclose(fp);
+      return;
+    }
   }
 
   fclose(fp);
@@ -42,9 +51,16 @@ static void load_cache_from_file(const char *cache_path) {
   const char *custom_cmds[] = {"check", "info", "s"};
   for (int i = 0; i < 3; i++) {
     command_count++;
-    cached_commands =
+    char **new_commands =
         realloc(cached_commands, sizeof(char *) * (command_count + 1));
+    if (!new_commands) {
+      return;
+    }
+    cached_commands = new_commands;
     cached_commands[command_count - 1] = strdup(custom_cmds[i]);
+    if (!cached_commands[command_count - 1]) {
+      return;
+    }
   }
 
   if (cached_commands) {
@@ -113,9 +129,18 @@ void cache_pacman_commands(void) {
       path[sizeof(path) - 1] = 0;
     }
     command_count++;
-    cached_commands =
+    char **new_commands =
         realloc(cached_commands, sizeof(char *) * (command_count + 1));
+    if (!new_commands) {
+      pclose(fp);
+      return;
+    }
+    cached_commands = new_commands;
     cached_commands[command_count - 1] = strdup(path);
+    if (!cached_commands[command_count - 1]) {
+      pclose(fp);
+      return;
+    }
   }
 
   pclose(fp);
@@ -123,9 +148,16 @@ void cache_pacman_commands(void) {
   const char *custom_cmds[] = {"check", "info", "s"};
   for (int i = 0; i < 3; i++) {
     command_count++;
-    cached_commands =
+    char **new_commands =
         realloc(cached_commands, sizeof(char *) * (command_count + 1));
+    if (!new_commands) {
+      return;
+    }
+    cached_commands = new_commands;
     cached_commands[command_count - 1] = strdup(custom_cmds[i]);
+    if (!cached_commands[command_count - 1]) {
+      return;
+    }
   }
 
   if (cached_commands) {
