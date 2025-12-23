@@ -89,7 +89,7 @@ void display_version(void) {
       "License\033[0m\n"
       "\033[0mArchie originally created by \033[1;36mGurov\033[0m\n"
       "\033[0mArchium forked and maintained by \033[1;36mKeiran\033[0m\n\n"
-      "\033[0mGitHub: \033[1;34mhttps://github.com/keircn/archium\033[0m\n",
+      "\033[0mGitHub: \033[1;34mhttps://codeberg.org/keys/archium\033[0m\n",
       ARCHIUM_VERSION, package_manager, pm_version, __DATE__, &__DATE__[3],
       build_time);
 

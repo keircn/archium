@@ -20,7 +20,7 @@
 #define COMMAND_BUFFER_SIZE 1024
 #define MAX_RETRIES 3
 #define TIMEOUT_SECONDS 30
-#define ARCHIUM_REPO_URL "https://github.com/keircn/archium.git"
+#define ARCHIUM_REPO_URL "https://codeberg.org/keys/archium"
 
 int sanitize_shell_input(const char *input, char *output, size_t output_size);
 int validate_package_name(const char *package);
