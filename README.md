@@ -47,7 +47,7 @@ That's it. No revolutionary new package format, no reinventing the wheel. Just l
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/keircn/archium.git
+git clone https://codeberg.org/keys/archium.git
 cd archium
 ```
 
@@ -201,6 +201,7 @@ Build with: `gcc -fPIC -shared -o hello.so hello.c`
 - Enable verbose logging with `--verbose` or `-V` to create detailed logs at `$HOME/.config/archium/archium.log`.
 
 - If Archium fails to upgrade to a newer version, try cleaning the cache using your preferred AUR helper and reinstalling:
+
   ```bash
   yay -Scc --noconfirm && yay -S archium --noconfirm
   paru -Scc --noconfirm && paru -S archium --noconfirm
