@@ -130,6 +130,13 @@ void install_yay(void) {
 }
 
 void prompt_install_yay(void) {
+  if (config.batch_mode || config.json_output) {
+    fprintf(stderr,
+            "\033[1;31mError: No suitable package manager is installed and "
+            "interactive install is disabled.\033[0m\n");
+    exit(EXIT_FAILURE);
+  }
+
   char response[10];
   printf("\033[1;31mError: No suitable package manager is installed.\033[0m\n");
   sleep(1);

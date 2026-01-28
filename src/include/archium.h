@@ -14,7 +14,9 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "version.h"
+#ifndef ARCHIUM_VERSION
+#define ARCHIUM_VERSION "1.10.1"
+#endif
 
 #define MAX_INPUT_LENGTH 256
 #define COMMAND_BUFFER_SIZE 1024

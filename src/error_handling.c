@@ -76,6 +76,8 @@ ArchiumError parse_arguments(int argc, char *argv[]) {
   config.version = 0;
   config.exec_mode = 0;
   config.exec_command = NULL;
+  config.json_output = 0;
+  config.batch_mode = 0;
 
   for (int i = 1; i < argc; i++) {
     if (strcmp(argv[i], "--verbose") == 0 || strcmp(argv[i], "-V") == 0) {
@@ -94,6 +96,10 @@ ArchiumError parse_arguments(int argc, char *argv[]) {
     } else if (strcmp(argv[i], "--self-update") == 0) {
       perform_self_update();
       exit(ARCHIUM_SUCCESS);
+    } else if (strcmp(argv[i], "--json") == 0) {
+      config.json_output = 1;
+    } else if (strcmp(argv[i], "--batch") == 0) {
+      config.batch_mode = 1;
     } else if (argv[i][0] == '-') {
       fprintf(stderr, "\033[1;31mError: Unknown option: %s\033[0m\n", argv[i]);
       fprintf(stderr,
@@ -108,6 +114,26 @@ ArchiumError parse_arguments(int argc, char *argv[]) {
 void archium_report_error(ArchiumError error_code, const char *context,
                           const char *input) {
   if (error_code == ARCHIUM_SUCCESS) return;
+  if (config.json_output) {
+    const char *msg = get_error_string(error_code);
+    char esc_msg[512];
+    size_t j = 0;
+    for (size_t i = 0; msg[i] && j + 1 < sizeof(esc_msg); i++) {
+      if (msg[i] == '"') {
+        if (j + 2 < sizeof(esc_msg)) {
+          esc_msg[j++] = '\\';
+          esc_msg[j++] = '"';
+        }
+      } else {
+        esc_msg[j++] = msg[i];
+      }
+    }
+    esc_msg[j] = '\0';
+    fprintf(stderr, "{\"error\": {\"code\": %d, \"message\": \"%s\"}}\n",
+            error_code, esc_msg);
+    return;
+  }
+
   if (config.verbose) {
     if (input && strlen(input) > 0) {
       fprintf(stderr,

@@ -8,6 +8,8 @@ typedef struct {
   int version;
   int exec_mode;
   char *exec_command;
+  int json_output;
+  int batch_mode;
 } ArchiumConfig;
 
 extern ArchiumConfig config;

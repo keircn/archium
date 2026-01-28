@@ -88,6 +88,13 @@ int execute_command_with_spinner(const char *command, const char *message) {
   pthread_t spinner_tid;
   spinner_data_t spinner_data = {&running, message ? message : "Processing"};
 
+  if (config.batch_mode || config.json_output) {
+    char silent_command[1024];
+    snprintf(silent_command, sizeof(silent_command),
+             "%s 2>/dev/null >/dev/null", command);
+    return system(silent_command);
+  }
+
   if (pthread_create(&spinner_tid, NULL, spinner_thread, &spinner_data) != 0) {
     return system(command);
   }
@@ -110,6 +117,16 @@ int execute_command_with_output_capture(const char *command,
   int running = 1;
   pthread_t spinner_tid;
   spinner_data_t spinner_data = {&running, message ? message : "Processing"};
+
+  if (config.batch_mode || config.json_output) {
+    FILE *fp = popen(command, "r");
+    if (fp == NULL) return -1;
+    if (output_buffer && buffer_size > 0) {
+      size_t bytes_read = fread(output_buffer, 1, buffer_size - 1, fp);
+      output_buffer[bytes_read] = '\0';
+    }
+    return pclose(fp);
+  }
 
   if (pthread_create(&spinner_tid, NULL, spinner_thread, &spinner_data) != 0) {
     FILE *fp = popen(command, "r");
@@ -144,6 +161,12 @@ int execute_command_with_output_capture(const char *command,
 }
 
 void parse_and_show_upgrade_result(const char *output, int exit_code) {
+  if (config.json_output) {
+    printf(
+        "{\"operation\": \"upgrade\", \"exit_code\": %d, \"output\": \"%s\"}\n",
+        exit_code, output ? output : "");
+    return;
+  }
   if (exit_code == 0) {
     if (strstr(output, "there is nothing to do") ||
         strstr(output, "nothing to upgrade") || strstr(output, "up to date")) {
@@ -173,6 +196,13 @@ void parse_and_show_upgrade_result(const char *output, int exit_code) {
 
 void parse_and_show_install_result(const char *output, int exit_code,
                                    const char *package) {
+  if (config.json_output) {
+    printf(
+        "{\"operation\": \"install\", \"package\": \"%s\", \"exit_code\": %d, "
+        "\"output\": \"%s\"}\n",
+        package ? package : "", exit_code, output ? output : "");
+    return;
+  }
   if (exit_code == 0) {
     if (strstr(output, "already installed") || strstr(output, "up to date")) {
       printf("\r\033[33m◦\033[0m Package '%s' is already installed\n", package);
@@ -187,6 +217,13 @@ void parse_and_show_install_result(const char *output, int exit_code,
 
 void parse_and_show_remove_result(const char *output, int exit_code,
                                   const char *package) {
+  if (config.json_output) {
+    printf(
+        "{\"operation\": \"remove\", \"package\": \"%s\", \"exit_code\": %d, "
+        "\"output\": \"%s\"}\n",
+        package ? package : "", exit_code, output ? output : "");
+    return;
+  }
   if (exit_code == 0) {
     if (strstr(output, "not found") || strstr(output, "not installed")) {
       printf("\r\033[33m◦\033[0m Package '%s' was not installed\n", package);
@@ -200,6 +237,11 @@ void parse_and_show_remove_result(const char *output, int exit_code,
 
 void parse_and_show_generic_result(const char *output __attribute__((unused)),
                                    int exit_code, const char *operation) {
+  if (config.json_output) {
+    printf("{\"operation\": \"%s\", \"exit_code\": %d}\n", operation,
+           exit_code);
+    return;
+  }
   if (exit_code == 0) {
     printf("\r\033[32m✓\033[0m %s completed successfully\n", operation);
   } else {

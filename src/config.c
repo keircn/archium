@@ -112,6 +112,21 @@ int archium_config_init(void) {
   }
 
   config_initialized = 1;
+  char *json_pref = archium_config_get_preference("json_output");
+  if (json_pref) {
+    if (strcmp(json_pref, "1") == 0 || strcmp(json_pref, "true") == 0) {
+      config.json_output = 1;
+    }
+    free(json_pref);
+  }
+
+  char *batch_pref = archium_config_get_preference("batch_mode");
+  if (batch_pref) {
+    if (strcmp(batch_pref, "1") == 0 || strcmp(batch_pref, "true") == 0) {
+      config.batch_mode = 1;
+    }
+    free(batch_pref);
+  }
   return 1;
 }
 
@@ -229,6 +244,20 @@ int archium_config_set_preference(const char *key, const char *value) {
 
   if (!found) {
     fprintf(temp_fp, "%s=%s\n", key, value);
+  }
+
+  if (strcmp(key, "json_output") == 0) {
+    if (strcmp(value, "1") == 0 || strcmp(value, "true") == 0) {
+      config.json_output = 1;
+    } else {
+      config.json_output = 0;
+    }
+  } else if (strcmp(key, "batch_mode") == 0) {
+    if (strcmp(value, "1") == 0 || strcmp(value, "true") == 0) {
+      config.batch_mode = 1;
+    } else {
+      config.batch_mode = 0;
+    }
   }
 
   fclose(fp);
