@@ -14,6 +14,14 @@
 #include <time.h>
 #include <unistd.h>
 
+#ifdef __has_include
+#if __has_include("version.h")
+#include "version.h"
+#endif
+#else
+#include "version.h"
+#endif
+
 #ifndef ARCHIUM_VERSION
 #define ARCHIUM_VERSION "1.10.1"
 #endif

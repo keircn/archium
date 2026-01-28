@@ -4,7 +4,6 @@
 
 set -e
 
-# Change to project root directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$PROJECT_ROOT"
@@ -16,84 +15,84 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 print_status() {
-    echo -e "${BLUE}[INFO]${NC} $1"
+  echo -e "${BLUE}[INFO]${NC} $1"
 }
 
 print_success() {
-    echo -e "${GREEN}[SUCCESS]${NC} $1"
+  echo -e "${GREEN}[SUCCESS]${NC} $1"
 }
 
 print_warning() {
-    echo -e "${YELLOW}[WARNING]${NC} $1"
+  echo -e "${YELLOW}[WARNING]${NC} $1"
 }
 
 print_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
+  echo -e "${RED}[ERROR]${NC} $1"
 }
 
-if ! git rev-parse --git-dir > /dev/null 2>&1; then
-    print_error "Not in a git repository"
-    exit 1
+if ! git rev-parse --git-dir >/dev/null 2>&1; then
+  print_error "Not in a git repository"
+  exit 1
 fi
 
 if ! git diff-index --quiet HEAD --; then
-    print_error "Working tree is not clean. Please commit or stash changes first."
-    exit 1
+  print_error "Working tree is not clean. Please commit or stash changes first."
+  exit 1
 fi
 
 if [ ! -f ".VERSION" ]; then
-    print_error "VERSION file not found"
-    exit 1
+  print_error "VERSION file not found"
+  exit 1
 fi
 
 CURRENT_VERSION=$(cat .VERSION)
 print_status "Current version: $CURRENT_VERSION"
 
-IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"
+IFS='.' read -r MAJOR MINOR PATCH <<<"$CURRENT_VERSION"
 
 if [ $# -eq 0 ]; then
-    echo "Usage: $0 [major|minor|patch|custom] [version]"
-    echo "Current version: $CURRENT_VERSION"
-    exit 1
+  echo "Usage: $0 [major|minor|patch|custom] [version]"
+  echo "Current version: $CURRENT_VERSION"
+  exit 1
 fi
 
 BUMP_TYPE=$1
 
 case $BUMP_TYPE in
-    "major")
-        NEW_MAJOR=$((MAJOR + 1))
-        NEW_MINOR=0
-        NEW_PATCH=0
-        NEW_VERSION="$NEW_MAJOR.$NEW_MINOR.$NEW_PATCH"
-        ;;
-    "minor")
-        NEW_MAJOR=$MAJOR
-        NEW_MINOR=$((MINOR + 1))
-        NEW_PATCH=0
-        NEW_VERSION="$NEW_MAJOR.$NEW_MINOR.$NEW_PATCH"
-        ;;
-    "patch")
-        NEW_MAJOR=$MAJOR
-        NEW_MINOR=$MINOR
-        NEW_PATCH=$((PATCH + 1))
-        NEW_VERSION="$NEW_MAJOR.$NEW_MINOR.$NEW_PATCH"
-        ;;
-    "custom")
-        if [ $# -ne 2 ]; then
-            print_error "Custom version requires a version argument"
-            echo "Usage: $0 custom <version>"
-            exit 1
-        fi
-        NEW_VERSION=$2
-        if ! [[ $NEW_VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            print_error "Invalid version format. Use semantic versioning (e.g., 1.2.3)"
-            exit 1
-        fi
-        ;;
-    *)
-        print_error "Invalid bump type. Use: major, minor, patch, or custom"
-        exit 1
-        ;;
+"major")
+  NEW_MAJOR=$((MAJOR + 1))
+  NEW_MINOR=0
+  NEW_PATCH=0
+  NEW_VERSION="$NEW_MAJOR.$NEW_MINOR.$NEW_PATCH"
+  ;;
+"minor")
+  NEW_MAJOR=$MAJOR
+  NEW_MINOR=$((MINOR + 1))
+  NEW_PATCH=0
+  NEW_VERSION="$NEW_MAJOR.$NEW_MINOR.$NEW_PATCH"
+  ;;
+"patch")
+  NEW_MAJOR=$MAJOR
+  NEW_MINOR=$MINOR
+  NEW_PATCH=$((PATCH + 1))
+  NEW_VERSION="$NEW_MAJOR.$NEW_MINOR.$NEW_PATCH"
+  ;;
+"custom")
+  if [ $# -ne 2 ]; then
+    print_error "Custom version requires a version argument"
+    echo "Usage: $0 custom <version>"
+    exit 1
+  fi
+  NEW_VERSION=$2
+  if ! [[ $NEW_VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    print_error "Invalid version format. Use semantic versioning (e.g., 1.2.3)"
+    exit 1
+  fi
+  ;;
+*)
+  print_error "Invalid bump type. Use: major, minor, patch, or custom"
+  exit 1
+  ;;
 esac
 
 print_status "Bumping version from $CURRENT_VERSION to $NEW_VERSION"
@@ -101,32 +100,39 @@ print_status "Bumping version from $CURRENT_VERSION to $NEW_VERSION"
 read -p "Continue? (y/N): " -n 1 -r
 echo
 if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    print_warning "Version bump cancelled"
-    exit 0
+  print_warning "Version bump cancelled"
+  exit 0
 fi
 
-echo "$NEW_VERSION" > .VERSION
+echo "$NEW_VERSION" >.VERSION
 print_success "Updated .VERSION file"
 
 if grep -q "v$CURRENT_VERSION" README.md; then
-    sed -i "s/v$CURRENT_VERSION/v$NEW_VERSION/g" README.md
-    print_success "Updated README.md"
+  sed -i "s/v$CURRENT_VERSION/v$NEW_VERSION/g" README.md
+  print_success "Updated README.md"
+fi
+
+if [ -f "src/include/archium.h" ]; then
+  if grep -q '#define ARCHIUM_VERSION' src/include/archium.h; then
+    sed -i "s/#define ARCHIUM_VERSION \".*\"/#define ARCHIUM_VERSION \"$NEW_VERSION\"/" src/include/archium.h
+    print_success "Updated src/include/archium.h"
+  fi
 fi
 
 print_status "Building project with new version..."
-make clean > /dev/null 2>&1
-if make all > /dev/null 2>&1; then
-    print_success "Build successful"
+make clean >/dev/null 2>&1
+if make all >/dev/null 2>&1; then
+  print_success "Build successful"
 else
-    print_error "Build failed! Rolling back changes..."
-    echo "$CURRENT_VERSION" > .VERSION
-    git checkout README.md 2>/dev/null || true
-    exit 1
+  print_error "Build failed! Rolling back changes..."
+  echo "$CURRENT_VERSION" >.VERSION
+  git checkout README.md 2>/dev/null || true
+  exit 1
 fi
 
 print_status "Creating git commit and tag..."
 
-git add .VERSION README.md
+git add .VERSION README.md src/include/archium.h 2>/dev/null || true
 
 git commit -m "Bump version to $NEW_VERSION
 
@@ -137,10 +143,10 @@ git tag -a "v$NEW_VERSION" -m "Release version $NEW_VERSION"
 print_success "Created commit and tag v$NEW_VERSION"
 
 print_status "Creating release archive..."
-if make release > /dev/null 2>&1; then
-    print_success "Release archive created: build/archium-$NEW_VERSION.tar.gz"
+if make release >/dev/null 2>&1; then
+  print_success "Release archive created: build/archium-$NEW_VERSION.tar.gz"
 else
-    print_warning "Release creation failed, but version bump was successful"
+  print_warning "Release creation failed, but version bump was successful"
 fi
 
 print_success "Version bump complete!"

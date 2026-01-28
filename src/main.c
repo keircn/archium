@@ -76,11 +76,27 @@ int main(int argc, char *argv[]) {
   }
 
   if (!config.json_output) {
-    printf("\033[1;36m╔════════════════════════════════════════╗\033[0m\n");
-    printf("\033[1;36m║      Welcome to Archium v%s         ║\033[0m\n",
-           ARCHIUM_VERSION);
-    printf("\033[1;36m║      Type \"h\" for help                 ║\033[0m\n");
-    printf("\033[1;36m╚════════════════════════════════════════╝\033[0m\n");
+    const int inner_width = 40;
+    printf("\033[1;36m╔");
+    for (int i = 0; i < inner_width; ++i) putchar('═');
+    printf("╗\033[0m\n");
+
+    char buf[256];
+    snprintf(buf, sizeof(buf), "Welcome to Archium v%s", ARCHIUM_VERSION);
+    int pad = (inner_width - (int)strlen(buf)) / 2;
+    if (pad < 0) pad = 0;
+    printf("\033[1;36m║%*s%s%*s║\033[0m\n", pad, "", buf,
+           inner_width - pad - (int)strlen(buf), "");
+
+    snprintf(buf, sizeof(buf), "Type \"h\" for help");
+    pad = (inner_width - (int)strlen(buf)) / 2;
+    if (pad < 0) pad = 0;
+    printf("\033[1;36m║%*s%s%*s║\033[0m\n", pad, "", buf,
+           inner_width - pad - (int)strlen(buf), "");
+
+    printf("\033[1;36m╚");
+    for (int i = 0; i < inner_width; ++i) putchar('═');
+    printf("╝\033[0m\n");
 
     display_random_tip();
 
