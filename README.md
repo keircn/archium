@@ -207,6 +207,11 @@ ArchiumError archium_plugin_execute(const char *args, const char *package_manage
 
 Build with: `gcc -fPIC -shared -o hello.so hello.c`
 
+### Examples
+
+Example plugins are available in `examples/`, including a basic hello plugin and
+a v2 plugin using hooks. See `examples/README.md` for build steps.
+
 ## Notes
 
 - Archium uses `yay` by default. If you only have `paru` installed, it will use `paru`.
