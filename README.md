@@ -179,6 +179,19 @@ ArchiumError archium_plugin_execute(const char *args, const char *package_manage
 void archium_plugin_cleanup(void);             // Optional cleanup
 ```
 
+Optional hooks (API v2):
+
+```c
+int archium_plugin_get_api_version(void);      // Return ARCHIUM_PLUGIN_API_VERSION
+void archium_plugin_init(const ArchiumPluginContext *ctx);
+ArchiumError archium_plugin_before_command(const ArchiumPluginContext *ctx);
+void archium_plugin_after_command(const ArchiumPluginContext *ctx, ArchiumError result);
+void archium_plugin_on_exit(const ArchiumPluginContext *ctx);
+```
+
+The `ArchiumPluginContext` provides `command`, `args`, `package_manager`,
+config paths, and logging/command helper callbacks.
+
 ### Plugin Example
 
 ```c

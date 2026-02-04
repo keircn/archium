@@ -26,12 +26,43 @@ static void get_user_input(char *buffer, const char *prompt) {
 ArchiumError handle_command(const char *input, const char *package_manager) {
   log_action(input);
 
+  if (!input) {
+    return ARCHIUM_ERROR_INVALID_INPUT;
+  }
+
+  while (*input == ' ') {
+    input++;
+  }
+
+  char command_token[MAX_INPUT_LENGTH];
+  const char *args = "";
+  const char *space = strchr(input, ' ');
+  size_t command_len = space ? (size_t)(space - input) : strlen(input);
+  if (command_len >= sizeof(command_token)) {
+    command_len = sizeof(command_token) - 1;
+  }
+  memcpy(command_token, input, command_len);
+  command_token[command_len] = '\0';
+  if (space && *(space + 1) != '\0') {
+    args = space + 1;
+  }
+
+  ArchiumError hook_result =
+      archium_plugin_before_command(command_token, args, package_manager);
+  if (hook_result != ARCHIUM_SUCCESS) {
+    return hook_result;
+  }
+
   if (!is_valid_command(input)) {
+    archium_plugin_after_command(command_token, args, package_manager,
+                                 ARCHIUM_ERROR_INVALID_INPUT);
     return ARCHIUM_ERROR_INVALID_INPUT;
   }
 
   if (strcmp(input, "h") == 0 || strcmp(input, "help") == 0) {
     display_help();
+    archium_plugin_after_command(command_token, args, package_manager,
+                                 ARCHIUM_SUCCESS);
     return ARCHIUM_SUCCESS;
   }
 
@@ -48,6 +79,8 @@ ArchiumError handle_command(const char *input, const char *package_manager) {
     } else {
       display_help_command(help_arg);
     }
+    archium_plugin_after_command(command_token, args, package_manager,
+                                 ARCHIUM_SUCCESS);
     return ARCHIUM_SUCCESS;
   }
 
@@ -55,6 +88,7 @@ ArchiumError handle_command(const char *input, const char *package_manager) {
       strcmp(input, "exit") == 0) {
     printf("Exiting Archium.\n");
     cleanup_cached_commands();
+    archium_plugin_notify_exit(command_token, args, package_manager);
     archium_plugin_cleanup();
     exit(0);
   }
@@ -160,10 +194,15 @@ ArchiumError handle_command(const char *input, const char *package_manager) {
     } else {
       printf("\033[1;31mFailed to create example plugin.\033[0m\n");
     }
-  } else if (archium_plugin_is_plugin_command(input)) {
-    return archium_plugin_execute(input, "", package_manager);
+  } else if (archium_plugin_is_plugin_command(command_token)) {
+    ArchiumError result =
+        archium_plugin_execute(command_token, args, package_manager);
+    archium_plugin_after_command(command_token, args, package_manager, result);
+    return result;
   }
 
+  archium_plugin_after_command(command_token, args, package_manager,
+                               ARCHIUM_SUCCESS);
   return ARCHIUM_SUCCESS;
 }
 
