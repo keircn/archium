@@ -280,8 +280,25 @@ int is_valid_command(const char *command) {
       "ex", "ow", "ba", "health", "config", "help", "pl", "pd", "pe"};
   int num_commands = sizeof(valid_commands) / sizeof(valid_commands[0]);
 
+  if (!command) {
+    return 0;
+  }
+
+  while (*command == ' ') {
+    command++;
+  }
+
+  char token[MAX_INPUT_LENGTH];
+  const char *space = strchr(command, ' ');
+  size_t token_len = space ? (size_t)(space - command) : strlen(command);
+  if (token_len >= sizeof(token)) {
+    token_len = sizeof(token) - 1;
+  }
+  memcpy(token, command, token_len);
+  token[token_len] = '\0';
+
   for (int i = 0; i < num_commands; i++) {
-    if (strcmp(command, valid_commands[i]) == 0) {
+    if (strcmp(token, valid_commands[i]) == 0) {
       return 1;
     }
   }
@@ -294,7 +311,7 @@ int is_valid_command(const char *command) {
     return 1;
   }
 
-  if (archium_plugin_is_plugin_command(command)) {
+  if (archium_plugin_is_plugin_command(token)) {
     return 1;
   }
 
