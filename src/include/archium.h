@@ -23,7 +23,7 @@
 #endif
 
 #ifndef ARCHIUM_VERSION
-#define ARCHIUM_VERSION "1.10.2"
+#define ARCHIUM_VERSION "1.10.3"
 #endif
 
 #define MAX_INPUT_LENGTH 256

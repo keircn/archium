@@ -69,7 +69,7 @@ When you run `archium`, you will see the following prompt:
 
 ```plaintext
 ╔════════════════════════════════════════╗
-║      Welcome to Archium v1.10.2        ║
+║      Welcome to Archium v1.10.3        ║
 ║      Type "h" for help                 ║
 ╚════════════════════════════════════════╝
 Archium $ u
