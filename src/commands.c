@@ -1,5 +1,100 @@
 #include "include/archium.h"
 
+typedef enum {
+  CMD_FLAG_NONE = 0,
+  CMD_FLAG_HAS_ARGS = 1,
+  CMD_FLAG_INTERACTIVE = 2,
+} CommandFlags;
+
+typedef enum {
+  CMD_TYPE_SIMPLE,
+  CMD_TYPE_WITH_PM,
+  CMD_TYPE_WITH_PM_ARGS,
+  CMD_TYPE_ARGS_ONLY,
+} CommandType;
+
+typedef struct {
+  const char *name;
+  CommandType type;
+  CommandFlags flags;
+  union {
+    void (*simple)(void);
+    void (*with_pm)(const char *pm);
+    void (*with_pm_args)(const char *pm, const char *args);
+    void (*args_only)(const char *args);
+  } handler;
+} CommandEntry;
+
+static const CommandEntry command_table[] = {
+    {"c", CMD_TYPE_WITH_PM, CMD_FLAG_NONE, {.with_pm = clean_cache}},
+    {"cc", CMD_TYPE_SIMPLE, CMD_FLAG_NONE, {.simple = clear_build_cache}},
+    {"l", CMD_TYPE_SIMPLE, CMD_FLAG_NONE, {.simple = list_installed_packages}},
+    {"cu", CMD_TYPE_SIMPLE, CMD_FLAG_NONE, {.simple = check_package_updates}},
+    {"si", CMD_TYPE_SIMPLE, CMD_FLAG_NONE, {.simple = list_packages_by_size}},
+    {"re", CMD_TYPE_SIMPLE, CMD_FLAG_NONE, {.simple = list_recent_installs}},
+    {"ex", CMD_TYPE_SIMPLE, CMD_FLAG_NONE, {.simple = list_explicit_installs}},
+    {"ba", CMD_TYPE_SIMPLE, CMD_FLAG_NONE, {.simple = backup_pacman_config}},
+    {"health", CMD_TYPE_SIMPLE, CMD_FLAG_NONE, {.simple = system_health_check}},
+    {"config",
+     CMD_TYPE_SIMPLE,
+     CMD_FLAG_NONE,
+     {.simple = configure_preferences}},
+    {"pl",
+     CMD_TYPE_SIMPLE,
+     CMD_FLAG_NONE,
+     {.simple = archium_plugin_list_loaded}},
+    {"o", CMD_TYPE_WITH_PM, CMD_FLAG_NONE, {.with_pm = clean_orphans}},
+    {"lo", CMD_TYPE_SIMPLE, CMD_FLAG_NONE, {.simple = list_orphans}},
+    {"u",
+     CMD_TYPE_WITH_PM_ARGS,
+     CMD_FLAG_HAS_ARGS | CMD_FLAG_INTERACTIVE,
+     {.with_pm_args = update_system}},
+    {"i",
+     CMD_TYPE_WITH_PM_ARGS,
+     CMD_FLAG_HAS_ARGS | CMD_FLAG_INTERACTIVE,
+     {.with_pm_args = install_package}},
+    {"r",
+     CMD_TYPE_WITH_PM_ARGS,
+     CMD_FLAG_HAS_ARGS | CMD_FLAG_INTERACTIVE,
+     {.with_pm_args = remove_package}},
+    {"d",
+     CMD_TYPE_WITH_PM_ARGS,
+     CMD_FLAG_HAS_ARGS | CMD_FLAG_INTERACTIVE,
+     {.with_pm_args = downgrade_package}},
+    {"p",
+     CMD_TYPE_WITH_PM_ARGS,
+     CMD_FLAG_HAS_ARGS | CMD_FLAG_INTERACTIVE,
+     {.with_pm_args = purge_package}},
+    {"s",
+     CMD_TYPE_WITH_PM_ARGS,
+     CMD_FLAG_HAS_ARGS | CMD_FLAG_INTERACTIVE,
+     {.with_pm_args = search_package}},
+    {"?",
+     CMD_TYPE_WITH_PM_ARGS,
+     CMD_FLAG_HAS_ARGS | CMD_FLAG_INTERACTIVE,
+     {.with_pm_args = show_package_info}},
+    {"dt",
+     CMD_TYPE_WITH_PM_ARGS,
+     CMD_FLAG_HAS_ARGS | CMD_FLAG_INTERACTIVE,
+     {.with_pm_args = display_dependency_tree}},
+    {"ow",
+     CMD_TYPE_ARGS_ONLY,
+     CMD_FLAG_HAS_ARGS | CMD_FLAG_INTERACTIVE,
+     {.args_only = find_package_owner}},
+};
+
+static const size_t command_table_size =
+    sizeof(command_table) / sizeof(command_table[0]);
+
+static const CommandEntry *find_command(const char *cmd) {
+  for (size_t i = 0; i < command_table_size; i++) {
+    if (strcmp(cmd, command_table[i].name) == 0) {
+      return &command_table[i];
+    }
+  }
+  return NULL;
+}
+
 static void execute_command(const char *command, const char *log_message) {
   int ret = system(command);
   if (ret != 0) {
@@ -97,85 +192,7 @@ ArchiumError handle_command(const char *input, const char *package_manager) {
     exit(0);
   }
 
-  if (strcmp(input, "u") == 0) {
-    update_system(package_manager, NULL);
-  } else if (strncmp(input, "u ", 2) == 0) {
-    update_system(package_manager, input + 2);
-  } else if (strcmp(input, "i") == 0) {
-    char packages[MAX_INPUT_LENGTH];
-    get_user_input(packages, "Enter package names to install: ");
-    install_package(package_manager, packages);
-  } else if (strncmp(input, "i ", 2) == 0) {
-    install_package(package_manager, input + 2);
-  } else if (strcmp(input, "r") == 0) {
-    char packages[MAX_INPUT_LENGTH];
-    get_user_input(packages, "Enter package names to remove: ");
-    remove_package(package_manager, packages);
-  } else if (strncmp(input, "r ", 2) == 0) {
-    remove_package(package_manager, input + 2);
-  } else if (strcmp(input, "d") == 0) {
-    char packages[MAX_INPUT_LENGTH];
-    get_user_input(packages, "Enter package names to downgrade: ");
-    downgrade_package(package_manager, packages);
-  } else if (strncmp(input, "d ", 2) == 0) {
-    downgrade_package(package_manager, input + 2);
-  } else if (strcmp(input, "p") == 0) {
-    char packages[MAX_INPUT_LENGTH];
-    get_user_input(packages, "Enter package names to purge: ");
-    purge_package(package_manager, packages);
-  } else if (strncmp(input, "p ", 2) == 0) {
-    purge_package(package_manager, input + 2);
-  } else if (strcmp(input, "c") == 0) {
-    clean_cache(package_manager);
-  } else if (strcmp(input, "cc") == 0) {
-    clear_build_cache();
-  } else if (strcmp(input, "o") == 0) {
-    clean_orphans(package_manager);
-  } else if (strcmp(input, "lo") == 0) {
-    list_orphans();
-  } else if (strcmp(input, "s") == 0) {
-    char package[MAX_INPUT_LENGTH];
-    get_user_input(package, "Enter package name to search: ");
-    search_package(package_manager, package);
-  } else if (strncmp(input, "s ", 2) == 0) {
-    search_package(package_manager, input + 2);
-  } else if (strcmp(input, "l") == 0) {
-    list_installed_packages();
-  } else if (strcmp(input, "?") == 0) {
-    char package[MAX_INPUT_LENGTH];
-    get_user_input(package, "Enter package name to show info: ");
-    show_package_info(package_manager, package);
-  } else if (strncmp(input, "? ", 2) == 0) {
-    show_package_info(package_manager, input + 2);
-  } else if (strcmp(input, "cu") == 0) {
-    check_package_updates();
-  } else if (strcmp(input, "dt") == 0) {
-    char package[MAX_INPUT_LENGTH];
-    get_user_input(package, "Enter package name to view dependencies: ");
-    display_dependency_tree(package_manager, package);
-  } else if (strncmp(input, "dt ", 3) == 0) {
-    display_dependency_tree(package_manager, input + 3);
-  } else if (strcmp(input, "si") == 0) {
-    list_packages_by_size();
-  } else if (strcmp(input, "re") == 0) {
-    list_recent_installs();
-  } else if (strcmp(input, "ex") == 0) {
-    list_explicit_installs();
-  } else if (strcmp(input, "ow") == 0) {
-    char file[MAX_INPUT_LENGTH];
-    get_user_input(file, "Enter file path: ");
-    find_package_owner(file);
-  } else if (strncmp(input, "ow ", 3) == 0) {
-    find_package_owner(input + 3);
-  } else if (strcmp(input, "ba") == 0) {
-    backup_pacman_config();
-  } else if (strcmp(input, "health") == 0) {
-    system_health_check();
-  } else if (strcmp(input, "config") == 0) {
-    configure_preferences();
-  } else if (strcmp(input, "pl") == 0) {
-    archium_plugin_list_loaded();
-  } else if (strcmp(input, "pd") == 0) {
+  if (strcmp(input, "pd") == 0) {
     const char *plugin_dir = archium_config_get_plugin_dir();
     if (plugin_dir) {
       printf("\033[1;32mPlugin directory: %s\033[0m\n", plugin_dir);
@@ -198,11 +215,59 @@ ArchiumError handle_command(const char *input, const char *package_manager) {
     } else {
       printf("\033[1;31mFailed to create example plugin.\033[0m\n");
     }
-  } else if (archium_plugin_is_plugin_command(command_token)) {
-    ArchiumError result =
-        archium_plugin_execute(command_token, args, package_manager);
-    archium_plugin_after_command(command_token, args, package_manager, result);
-    return result;
+  } else {
+    const CommandEntry *cmd = find_command(command_token);
+    if (cmd) {
+      if (cmd->type == CMD_TYPE_SIMPLE) {
+        cmd->handler.simple();
+      } else if (cmd->type == CMD_TYPE_WITH_PM) {
+        cmd->handler.with_pm(package_manager);
+      } else if (cmd->type == CMD_TYPE_WITH_PM_ARGS) {
+        if ((cmd->flags & CMD_FLAG_HAS_ARGS) && args && *args != '\0') {
+          cmd->handler.with_pm_args(package_manager, args);
+        } else if (cmd->flags & CMD_FLAG_INTERACTIVE) {
+          char user_input[MAX_INPUT_LENGTH];
+          const char *prompt = NULL;
+          if (strcmp(cmd->name, "u") == 0) {
+            prompt = "Enter package names to update: ";
+          } else if (strcmp(cmd->name, "i") == 0) {
+            prompt = "Enter package names to install: ";
+          } else if (strcmp(cmd->name, "r") == 0) {
+            prompt = "Enter package names to remove: ";
+          } else if (strcmp(cmd->name, "d") == 0) {
+            prompt = "Enter package names to downgrade: ";
+          } else if (strcmp(cmd->name, "p") == 0) {
+            prompt = "Enter package names to purge: ";
+          } else if (strcmp(cmd->name, "s") == 0) {
+            prompt = "Enter package name to search: ";
+          } else if (strcmp(cmd->name, "?") == 0) {
+            prompt = "Enter package name to show info: ";
+          } else if (strcmp(cmd->name, "dt") == 0) {
+            prompt = "Enter package name to view dependencies: ";
+          }
+          if (prompt) {
+            get_user_input(user_input, prompt);
+            cmd->handler.with_pm_args(package_manager, user_input);
+          }
+        } else {
+          cmd->handler.with_pm_args(package_manager, args);
+        }
+      } else if (cmd->type == CMD_TYPE_ARGS_ONLY) {
+        if ((cmd->flags & CMD_FLAG_HAS_ARGS) && args && *args != '\0') {
+          cmd->handler.args_only(args);
+        } else if (cmd->flags & CMD_FLAG_INTERACTIVE) {
+          char user_input[MAX_INPUT_LENGTH];
+          get_user_input(user_input, "Enter file path: ");
+          cmd->handler.args_only(user_input);
+        }
+      }
+    } else if (archium_plugin_is_plugin_command(command_token)) {
+      ArchiumError result =
+          archium_plugin_execute(command_token, args, package_manager);
+      archium_plugin_after_command(command_token, args, package_manager,
+                                   result);
+      return result;
+    }
   }
 
   archium_plugin_after_command(command_token, args, package_manager,
@@ -949,14 +1014,16 @@ void downgrade_package(const char *package_manager, const char *packages) {
 void system_health_check(void) {
   printf(
       "\033[1;"
-      "34m╔════════════════════════════════════════════════════════════╗\033["
+      "34m+================================================================+"
+      "\033["
       "0m\n");
   printf(
-      "\033[1;34m║                    SYSTEM HEALTH CHECK                    "
-      " ║\033[0m\n");
+      "\033[1;34m|                    SYSTEM HEALTH CHECK                    "
+      " |\033[0m\n");
   printf(
       "\033[1;"
-      "34m╚════════════════════════════════════════════════════════════╝\033["
+      "34m+================================================================+"
+      "\033["
       "0m\n\n");
 
   char command[COMMAND_BUFFER_SIZE];
@@ -980,12 +1047,12 @@ void system_health_check(void) {
         if (percent) {
           int usage_val = atoi(percent - 2);
           if (usage_val > 90) {
-            printf("  \033[1;31m[✖] %s\033[0m\n", line);
+            printf("  \033[1;31m[x] %s\033[0m\n", line);
             issues_found++;
           } else if (usage_val > 80) {
-            printf("  \033[1;33m[⚠] %s\033[0m\n", line);
+            printf("  \033[1;33m[!] %s\033[0m\n", line);
           } else {
-            printf("  \033[1;32m[✓] %s\033[0m\n", line);
+            printf("  \033[1;32m[*] %s\033[0m\n", line);
           }
         }
       }
@@ -1006,7 +1073,7 @@ void system_health_check(void) {
         line[len] = 0;
       }
       if (strlen(line) > 0) {
-        printf("  \033[1;31m[✖] %s\033[0m\n", line);
+        printf("  \033[1;31m[x] %s\033[0m\n", line);
         integrity_issues++;
         issues_found++;
       }
@@ -1014,7 +1081,7 @@ void system_health_check(void) {
     pclose(fp);
     if (integrity_issues == 0) {
       printf(
-          "  \033[1;32m[✓] All installed packages have valid file "
+          "  \033[1;32m[*] All installed packages have valid file "
           "integrity\033[0m\n");
     }
   }
@@ -1032,14 +1099,14 @@ void system_health_check(void) {
         line[len] = 0;
       }
       if (strlen(line) > 0) {
-        printf("  \033[1;31m[✖] %s\033[0m\n", line);
+        printf("  \033[1;31m[x] %s\033[0m\n", line);
         failed_services++;
         issues_found++;
       }
     }
     pclose(fp);
     if (failed_services == 0) {
-      printf("  \033[1;32m[✓] No failed system services\033[0m\n");
+      printf("  \033[1;32m[*] No failed system services\033[0m\n");
     } else if (failed_services == 3) {
       printf("  \033[1;33m... (showing first 3, more may exist)\033[0m\n");
     }
@@ -1087,7 +1154,7 @@ void system_health_check(void) {
             available++;
             while (*available == ' ') available++;
 
-            printf("  \033[1;36m[ℹ] %s\033[0m\n", line);
+            printf("  \033[1;36m[i] %s\033[0m\n", line);
           }
         }
       }
@@ -1097,26 +1164,28 @@ void system_health_check(void) {
 
   printf(
       "\n\033[1;"
-      "34m╔════════════════════════════════════════════════════════════╗\033["
+      "34m+================================================================+"
+      "\033["
       "0m\n");
   if (issues_found == 0) {
     printf(
-        "\033[1;34m║            \033[1;32m[✓] SYSTEM HEALTHY - No issues "
-        "found\033[1;34m            ║\033[0m\n");
+        "\033[1;34m|            \033[1;32m[*] SYSTEM HEALTHY - No issues "
+        "found\033[1;34m            |\033[0m\n");
   } else if (issues_found <= 3) {
     printf(
-        "\033[1;34m║                \033[1;33m[⚠] %d minor issues "
-        "detected\033[1;34m                 ║\033[0m\n",
+        "\033[1;34m|                \033[1;33m[!] %d minor issues "
+        "detected\033[1;34m                 |\033[0m\n",
         issues_found);
   } else {
     printf(
-        "\033[1;34m║                \033[1;31m[✖] %d issues need "
-        "attention\033[1;34m                 ║\033[0m\n",
+        "\033[1;34m|                \033[1;31m[x] %d issues need "
+        "attention\033[1;34m                 |\033[0m\n",
         issues_found);
   }
   printf(
       "\033[1;"
-      "34m╚════════════════════════════════════════════════════════════╝\033["
+      "34m+================================================================+"
+      "\033["
       "0m\n\n");
 
   log_action("System health check completed");
