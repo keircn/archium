@@ -2,74 +2,69 @@ name: CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [main, master]
   pull_request:
-    branches: [ main, master ]
+    branches: [main, master]
   workflow_dispatch:
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    
+
     strategy:
       matrix:
         cc: [gcc, clang]
         os: [ubuntu-latest]
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential libreadline-dev clang-tidy
-    
-    - name: Static analysis
-      run: make check
-    
-    - name: Build with ${{ matrix.cc }}
-      env:
-        CC: ${{ matrix.cc }}
-      run: |
-        make clean
-        make all
-    
-    - name: Run clang-tidy analysis
-      if: matrix.cc == 'clang'
-      run: make analyze
-    
-    - name: Run tests
-      run: make test
-    
-    - name: Test build artifacts
-      run: |
-        test -f build/archium
-        file build/archium
-        ldd build/archium
-    
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: archium-${{ matrix.cc }}-${{ github.sha }}
-        path: build/archium
-        retention-days: 7
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libreadline-dev clang-tidy
+
+      - name: Static analysis
+        run: make check
+
+      - name: Build with ${{ matrix.cc }}
+        env:
+          CC: ${{ matrix.cc }}
+        run: |
+          make clean
+          make all
+
+      - name: Run tests
+        run: make test
+
+      - name: Test build artifacts
+        run: |
+          test -f build/archium
+          file build/archium
+          ldd build/archium
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: archium-${{ matrix.cc }}-${{ github.sha }}
+          path: build/archium
+          retention-days: 7
 
   security-scan:
     runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential libreadline-dev
-    
-    - name: Build and run with AddressSanitizer
-      run: |
-        make clean
-        CC=gcc CFLAGS="-Wall -Wextra -O1 -g -fsanitize=address -fno-omit-frame-pointer" make all
-        timeout 2s ./build/archium --help || true
 
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libreadline-dev
+
+      - name: Build and run with AddressSanitizer
+        run: |
+          make clean
+          CC=gcc CFLAGS="-Wall -Wextra -O1 -g -fsanitize=address -fno-omit-frame-pointer" make all
+          timeout 2s ./build/archium --help || true

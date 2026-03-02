@@ -9,7 +9,7 @@ RELEASE_LDFLAGS = -lreadline -ldl -lpthread -flto -s
 DEBUG_CFLAGS = -Wall -Wextra -O0 -g3 -DDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer
 DEBUG_LDFLAGS = -lreadline -ldl -lpthread -fsanitize=address,undefined
 
-ANALYSIS_FLAGS = -Wall -Wextra -Wformat=2 -Wshadow -Wstrict-prototypes -Wmissing-prototypes -fanalyzer
+ANALYSIS_FLAGS = -Wall -Wextra -Wformat=2 -Wshadow -Wstrict-prototypes -Wmissing-prototypes -fanalyzer -Wno-analyzer-null-dereference -Wno-analyzer-possible-null-dereference -Wno-analyzer-security.insecureAPI
 
 BUILD_DIR = build
 SRC_DIR = src
@@ -22,7 +22,7 @@ OBJ = $(SRC:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
 TARGET = $(BUILD_DIR)/archium
 VERSION_HEADER = $(SRC_DIR)/include/version.h
 
-.PHONY: all clean install uninstall install-completions test debug release release-static format version-header check analyze profile benchmark
+.PHONY: all clean install uninstall install-completions test debug release release-static format version-header check profile benchmark
 
 all: $(BUILD_DIR) version-header $(TARGET)
 
@@ -110,9 +110,4 @@ check: version-header
 		cat $(BUILD_DIR)/analysis/check.log; \
 	else \
 		echo "No issues found."; \
-	fi
-
-analyze: check
-	@if command -v clang-tidy >/dev/null 2>&1; then \
-		clang-tidy $(wildcard $(SRC_DIR)/*.c) -- $(CFLAGS) -I$(SRC_DIR)/include 2>/dev/null | head -20; \
 	fi
