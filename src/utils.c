@@ -160,6 +160,8 @@ int execute_command_with_output_capture(const char *command,
   return result;
 }
 
+int execute_command_native(const char *command) { return system(command); }
+
 void parse_and_show_upgrade_result(const char *output, int exit_code) {
   if (config.json_output) {
     printf(

@@ -11,5 +11,6 @@ int execute_command_with_output_capture(const char *command,
                                         const char *message,
                                         char *output_buffer,
                                         size_t buffer_size);
+int execute_command_native(const char *command);
 
 #endif

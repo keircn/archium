@@ -10,6 +10,7 @@ typedef struct {
   char *exec_command;
   int json_output;
   int batch_mode;
+  int use_native_output;
 } ArchiumConfig;
 
 extern ArchiumConfig config;

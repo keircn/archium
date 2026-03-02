@@ -119,6 +119,9 @@ void display_cli_help(void) {
   printf(
       "  \033[1;32m--batch\033[0m      - Non-interactive batch mode (no "
       "prompts)\n");
+  printf(
+      "  \033[1;32m--custom-output\033[0m, \033[1;32m-c\033[0m - Use custom "
+      "Archium output (default: native)\n");
   printf("\n\033[1;33mExample:\033[0m\n");
   printf("  \033[1;32marchium --exec u\033[0m - Update the system\n");
   printf("  \033[1;32marchium --exec i\033[0m - Install packages\n");

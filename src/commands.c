@@ -290,6 +290,42 @@ void update_system(const char *package_manager, const char *package) {
   char command[COMMAND_BUFFER_SIZE];
   char output_buffer[4096];
 
+  if (config.use_native_output) {
+    if (package) {
+      if (!validate_package_name(package)) {
+        fprintf(stderr, "\033[1;31mError: Invalid package name: %s\033[0m\n",
+                package);
+        return;
+      }
+
+      char sanitized_package[SMALL_BUFFER_SIZE];
+      if (!sanitize_shell_input(package, sanitized_package,
+                                sizeof(sanitized_package))) {
+        fprintf(stderr,
+                "\033[1;31mError: Package name contains invalid "
+                "characters\033[0m\n");
+        return;
+      }
+
+      snprintf(command, sizeof(command), "%s -S %s", package_manager,
+               sanitized_package);
+      int result = execute_command_native(command);
+
+      if (result == 0) {
+        invalidate_package_cache();
+      }
+    } else {
+      snprintf(command, sizeof(command), "%s -Syu --noconfirm",
+               package_manager);
+      int result = execute_command_native(command);
+
+      if (result == 0) {
+        invalidate_package_cache();
+      }
+    }
+    return;
+  }
+
   if (package) {
     if (!validate_package_name(package)) {
       fprintf(stderr, "\033[1;31mError: Invalid package name: %s\033[0m\n",
@@ -397,6 +433,15 @@ void install_package(const char *package_manager, const char *packages) {
 
   snprintf(command, sizeof(command), "%s -S %s", package_manager,
            sanitized_packages);
+
+  if (config.use_native_output) {
+    int result = execute_command_native(command);
+    if (result == 0) {
+      invalidate_package_cache();
+    }
+    return;
+  }
+
   int result = execute_command_with_output_capture(
       command, "Installing packages", output_buffer, sizeof(output_buffer));
   parse_and_show_install_result(output_buffer, result, packages);
@@ -431,6 +476,15 @@ void remove_package(const char *package_manager, const char *packages) {
 
   snprintf(command, sizeof(command), "%s -R %s", package_manager,
            sanitized_packages);
+
+  if (config.use_native_output) {
+    int result = execute_command_native(command);
+    if (result == 0) {
+      invalidate_package_cache();
+    }
+    return;
+  }
+
   int result = execute_command_with_output_capture(
       command, "Removing packages", output_buffer, sizeof(output_buffer));
   parse_and_show_remove_result(output_buffer, result, packages);
@@ -465,6 +519,12 @@ void purge_package(const char *package_manager, const char *packages) {
 
   snprintf(command, sizeof(command), "%s -Rns %s", package_manager,
            sanitized_packages);
+
+  if (config.use_native_output) {
+    execute_command_native(command);
+    return;
+  }
+
   int result = execute_command_with_output_capture(
       command, "Purging packages", output_buffer, sizeof(output_buffer));
   parse_and_show_remove_result(output_buffer, result, packages);
@@ -474,6 +534,12 @@ void clean_cache(const char *package_manager) {
   char command[COMMAND_BUFFER_SIZE];
   char output_buffer[2048];
   snprintf(command, sizeof(command), "%s -Sc --noconfirm", package_manager);
+
+  if (config.use_native_output) {
+    execute_command_native(command);
+    return;
+  }
+
   int result = execute_command_with_output_capture(
       command, "Cleaning package cache", output_buffer, sizeof(output_buffer));
   parse_and_show_generic_result(output_buffer, result,
@@ -505,6 +571,12 @@ void clean_orphans(const char *package_manager) {
   char output_buffer[2048];
   snprintf(command, sizeof(command), "%s -Rns %s", package_manager,
            orphaned_packages);
+
+  if (config.use_native_output) {
+    execute_command_native(command);
+    return;
+  }
+
   int result =
       execute_command_with_output_capture(command, "Cleaning orphaned packages",
                                           output_buffer, sizeof(output_buffer));
@@ -983,16 +1055,21 @@ void downgrade_package(const char *package_manager, const char *packages) {
                    package_manager, token);
         }
 
-        int result = execute_command_with_output_capture(
-            command, "Downgrading package", output_buffer,
-            sizeof(output_buffer));
-        parse_and_show_install_result(output_buffer, result, token);
-
-        if (result == 0) {
-          printf("\033[1;32mPackage %s downgraded successfully!\033[0m\n",
-                 token);
+        if (config.use_native_output) {
+          execute_command_native(command);
+          printf("\033[1;32mDowngrade operation completed.\033[0m\n");
         } else {
-          printf("\033[1;31mFailed to downgrade %s\033[0m\n", token);
+          int result = execute_command_with_output_capture(
+              command, "Downgrading package", output_buffer,
+              sizeof(output_buffer));
+          parse_and_show_install_result(output_buffer, result, token);
+
+          if (result == 0) {
+            printf("\033[1;32mPackage %s downgraded successfully!\033[0m\n",
+                   token);
+          } else {
+            printf("\033[1;31mFailed to downgrade %s\033[0m\n", token);
+          }
         }
       } else {
         printf("\033[1;31mInvalid selection.\033[0m\n");

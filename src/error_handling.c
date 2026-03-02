@@ -78,6 +78,7 @@ ArchiumError parse_arguments(int argc, char *argv[]) {
   config.exec_command = NULL;
   config.json_output = 0;
   config.batch_mode = 0;
+  config.use_native_output = 1;
 
   for (int i = 1; i < argc; i++) {
     if (strcmp(argv[i], "--verbose") == 0 || strcmp(argv[i], "-V") == 0) {
@@ -100,6 +101,9 @@ ArchiumError parse_arguments(int argc, char *argv[]) {
       config.json_output = 1;
     } else if (strcmp(argv[i], "--batch") == 0) {
       config.batch_mode = 1;
+    } else if (strcmp(argv[i], "--custom-output") == 0 ||
+               strcmp(argv[i], "-c") == 0) {
+      config.use_native_output = 0;
     } else if (argv[i][0] == '-') {
       fprintf(stderr, "\033[1;31mError: Unknown option: %s\033[0m\n", argv[i]);
       fprintf(stderr,
