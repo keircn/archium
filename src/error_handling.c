@@ -116,7 +116,7 @@ void archium_report_error(ArchiumError error_code, const char *context,
   if (error_code == ARCHIUM_SUCCESS) return;
   if (config.json_output) {
     const char *msg = get_error_string(error_code);
-    char esc_msg[512];
+    char esc_msg[MEDIUM_BUFFER_SIZE];
     size_t j = 0;
     for (size_t i = 0; msg[i] && j + 1 < sizeof(esc_msg); i++) {
       if (msg[i] == '"') {
@@ -302,7 +302,7 @@ ArchiumError archium_retry_operation(ArchiumRetryFunc func, void *user_data,
     }
   }
 
-  char retry_context[256];
+  char retry_context[SMALL_BUFFER_SIZE];
   snprintf(retry_context, sizeof(retry_context),
            "Operation '%s' failed after %d attempts",
            operation_name ? operation_name : "unknown", max_retries);

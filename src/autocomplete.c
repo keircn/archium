@@ -19,7 +19,7 @@ static void load_cache_from_file(const char *cache_path) {
     return;
   }
 
-  char line[256];
+  char line[SMALL_BUFFER_SIZE];
   int command_count = 0;
 
   while (fgets(line, sizeof(line), fp) != NULL) {
@@ -97,7 +97,7 @@ void cache_pacman_commands(void) {
     return;
   }
 
-  char cache_path[512];
+  char cache_path[MEDIUM_BUFFER_SIZE];
   size_t cache_dir_len = strlen(cache_dir);
   size_t file_len = strlen(PACKAGE_CACHE_FILE);
   if (cache_dir_len + file_len + 2 > sizeof(cache_path)) {
@@ -222,7 +222,7 @@ void invalidate_package_cache(void) {
 
   size_t cache_dir_len = strlen(cache_dir);
   size_t file_len = strlen(PACKAGE_CACHE_FILE);
-  char cache_path[512];
+  char cache_path[MEDIUM_BUFFER_SIZE];
   if (cache_dir_len + file_len + 2 > sizeof(cache_path)) {
     return;
   }

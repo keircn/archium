@@ -33,6 +33,9 @@
 #define TIMEOUT_SECONDS 30
 #define ARCHIUM_REPO_URL "https://codeberg.org/keys/archium"
 
+#define SMALL_BUFFER_SIZE 256
+#define MEDIUM_BUFFER_SIZE 512
+
 int sanitize_shell_input(const char *input, char *output, size_t output_size);
 int validate_package_name(const char *package);
 int validate_file_path(const char *path);

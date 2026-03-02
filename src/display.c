@@ -45,7 +45,7 @@ void display_version(void) {
   FILE *file = fopen("version.txt", "r");
   if (file) {
     printf("\033[1;34m\n");
-    char line[256];
+    char line[SMALL_BUFFER_SIZE];
     while (fgets(line, sizeof(line), file)) {
       printf("%s", line);
     }

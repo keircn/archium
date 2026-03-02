@@ -297,7 +297,7 @@ void update_system(const char *package_manager, const char *package) {
       return;
     }
 
-    char sanitized_package[256];
+    char sanitized_package[SMALL_BUFFER_SIZE];
     if (!sanitize_shell_input(package, sanitized_package,
                               sizeof(sanitized_package))) {
       fprintf(
@@ -338,7 +338,7 @@ void clear_build_cache() {
       return;
     }
 
-    char sanitized_cache_dir[512];
+    char sanitized_cache_dir[MEDIUM_BUFFER_SIZE];
     if (!sanitize_shell_input(cache_dir, sanitized_cache_dir,
                               sizeof(sanitized_cache_dir))) {
       fprintf(stderr,
@@ -376,7 +376,7 @@ void install_package(const char *package_manager, const char *packages) {
   char command[COMMAND_BUFFER_SIZE];
   char output_buffer[4096];
 
-  char sanitized_packages[512];
+  char sanitized_packages[MEDIUM_BUFFER_SIZE];
   if (!sanitize_shell_input(packages, sanitized_packages,
                             sizeof(sanitized_packages))) {
     fprintf(
@@ -410,7 +410,7 @@ void remove_package(const char *package_manager, const char *packages) {
   char command[COMMAND_BUFFER_SIZE];
   char output_buffer[4096];
 
-  char sanitized_packages[512];
+  char sanitized_packages[MEDIUM_BUFFER_SIZE];
   if (!sanitize_shell_input(packages, sanitized_packages,
                             sizeof(sanitized_packages))) {
     fprintf(
@@ -444,7 +444,7 @@ void purge_package(const char *package_manager, const char *packages) {
   char command[COMMAND_BUFFER_SIZE];
   char output_buffer[4096];
 
-  char sanitized_packages[512];
+  char sanitized_packages[MEDIUM_BUFFER_SIZE];
   if (!sanitize_shell_input(packages, sanitized_packages,
                             sizeof(sanitized_packages))) {
     fprintf(
@@ -865,7 +865,7 @@ char **list_cached_versions(const char *package, int *count) {
     return NULL;
   }
 
-  char line[512];
+  char line[MEDIUM_BUFFER_SIZE];
   while (fgets(line, sizeof(line), fp) != NULL) {
     size_t len = strcspn(line, "\n");
     if (len < sizeof(line)) {
@@ -926,7 +926,7 @@ void downgrade_package(const char *package_manager, const char *packages) {
   char command[COMMAND_BUFFER_SIZE];
   char output_buffer[4096];
 
-  char sanitized_packages[512];
+  char sanitized_packages[MEDIUM_BUFFER_SIZE];
   if (!sanitize_shell_input(packages, sanitized_packages,
                             sizeof(sanitized_packages))) {
     fprintf(
@@ -967,7 +967,7 @@ void downgrade_package(const char *package_manager, const char *packages) {
 
       int selected = atoi(choice);
       if (selected > 0 && selected <= version_count) {
-        char package_file[512];
+        char package_file[MEDIUM_BUFFER_SIZE];
         snprintf(package_file, sizeof(package_file),
                  "/var/cache/pacman/pkg/%s-%s.pkg.tar.zst", token,
                  versions[selected - 1]);
@@ -1033,7 +1033,7 @@ void system_health_check(void) {
   snprintf(command, sizeof(command), "df -h | grep -E '^/dev/' | head -5");
   FILE *fp = popen(command, "r");
   if (fp) {
-    char line[256];
+    char line[SMALL_BUFFER_SIZE];
     while (fgets(line, sizeof(line), fp)) {
       size_t len = strcspn(line, "\n");
       if (len < sizeof(line)) {
@@ -1065,7 +1065,7 @@ void system_health_check(void) {
            "pacman -Qk 2>/dev/null | grep -v '0 missing files'");
   fp = popen(command, "r");
   if (fp) {
-    char line[256];
+    char line[SMALL_BUFFER_SIZE];
     int integrity_issues = 0;
     while (fgets(line, sizeof(line), fp)) {
       size_t len = strcspn(line, "\n");
@@ -1091,7 +1091,7 @@ void system_health_check(void) {
            "systemctl --failed --no-legend 2>/dev/null | head -5");
   fp = popen(command, "r");
   if (fp) {
-    char line[256];
+    char line[SMALL_BUFFER_SIZE];
     int failed_services = 0;
     while (fgets(line, sizeof(line), fp) && failed_services < 3) {
       size_t len = strcspn(line, "\n");
@@ -1134,7 +1134,7 @@ void system_health_check(void) {
   snprintf(command, sizeof(command), "free -h | grep '^Mem:'");
   fp = popen(command, "r");
   if (fp) {
-    char line[256];
+    char line[SMALL_BUFFER_SIZE];
     if (fgets(line, sizeof(line), fp)) {
       size_t len = strcspn(line, "\n");
       if (len < sizeof(line)) {

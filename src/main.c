@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
       term_width = w.ws_col;
     }
 
-    char buf[256];
+    char buf[SMALL_BUFFER_SIZE];
     if (term_width >= 50) {
       int inner_width = (term_width > 70) ? 50 : term_width - 10;
 

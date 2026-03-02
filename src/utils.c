@@ -89,7 +89,7 @@ int execute_command_with_spinner(const char *command, const char *message) {
   spinner_data_t spinner_data = {&running, message ? message : "Processing"};
 
   if (config.batch_mode || config.json_output) {
-    char silent_command[1024];
+    char silent_command[COMMAND_BUFFER_SIZE];
     snprintf(silent_command, sizeof(silent_command),
              "%s 2>/dev/null >/dev/null", command);
     return system(silent_command);
@@ -99,7 +99,7 @@ int execute_command_with_spinner(const char *command, const char *message) {
     return system(command);
   }
 
-  char silent_command[1024];
+  char silent_command[COMMAND_BUFFER_SIZE];
   snprintf(silent_command, sizeof(silent_command), "%s 2>/dev/null >/dev/null",
            command);
   int result = system(silent_command);

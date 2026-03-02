@@ -90,7 +90,7 @@ void install_yay(void) {
     exit(EXIT_FAILURE);
   }
 
-  char sanitized_cache_dir[512];
+  char sanitized_cache_dir[MEDIUM_BUFFER_SIZE];
   if (!sanitize_shell_input(cache_dir, sanitized_cache_dir,
                             sizeof(sanitized_cache_dir))) {
     fprintf(stderr,

@@ -15,7 +15,7 @@
 typedef struct {
   char name[MAX_PLUGIN_NAME_LENGTH];
   char command[MAX_PLUGIN_COMMAND_LENGTH];
-  char description[256];
+  char description[SMALL_BUFFER_SIZE];
   void *handle;
   ArchiumError (*execute)(const char *args, const char *package_manager);
   int (*get_api_version)(void);
@@ -89,7 +89,7 @@ int archium_plugin_init(void) {
       continue;
     }
 
-    char plugin_path[1024];
+    char plugin_path[COMMAND_BUFFER_SIZE];
     int ret = snprintf(plugin_path, sizeof(plugin_path), "%s/%s", plugin_dir,
                        entry->d_name);
     if (ret >= (int)sizeof(plugin_path)) {
@@ -317,7 +317,7 @@ int archium_plugin_create_example(void) {
 
   archium_plugin_set_base_context();
 
-  char example_path[1024];
+  char example_path[COMMAND_BUFFER_SIZE];
   int ret =
       snprintf(example_path, sizeof(example_path), "%s/example.c", plugin_dir);
   if (ret >= (int)sizeof(example_path)) {
@@ -421,7 +421,7 @@ int archium_plugin_create_example(void) {
 
   fclose(fp);
 
-  char makefile_path[1024];
+  char makefile_path[COMMAND_BUFFER_SIZE];
   ret =
       snprintf(makefile_path, sizeof(makefile_path), "%s/Makefile", plugin_dir);
   if (ret >= (int)sizeof(makefile_path)) {
