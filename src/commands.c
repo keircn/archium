@@ -3,7 +3,9 @@
 static void execute_command(const char *command, const char *log_message) {
   int ret = system(command);
   if (ret != 0) {
-    fprintf(stderr, "\033[1;31mError: Command failed: %s\033[0m\n", command);
+    fputs("\033[1;31mError: Command failed: \033[0m", stderr);
+    fputs(command, stderr);
+    fputc('\n', stderr);
     if (config.verbose) {
       printf("\033[1;31m[Status]\033[0m Command failed (exit code: %d)\n", ret);
     }
@@ -41,7 +43,9 @@ ArchiumError handle_command(const char *input, const char *package_manager) {
   if (command_len >= sizeof(command_token)) {
     command_len = sizeof(command_token) - 1;
   }
-  memcpy(command_token, input, command_len);
+  for (size_t i = 0; i < command_len; i++) {
+    command_token[i] = input[i];
+  }
   command_token[command_len] = '\0';
   if (space && *(space + 1) != '\0') {
     args = space + 1;

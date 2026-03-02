@@ -78,7 +78,8 @@ static void save_cache_to_file(const char *cache_path) {
     if (strcmp(cached_commands[i], "check") != 0 &&
         strcmp(cached_commands[i], "info") != 0 &&
         strcmp(cached_commands[i], "s") != 0) {
-      fprintf(fp, "%s\n", cached_commands[i]);
+      fputs(cached_commands[i], fp);
+      fputc('\n', fp);
     }
   }
 
@@ -92,15 +93,27 @@ void cache_pacman_commands(void) {
 
   const char *cache_dir = archium_config_get_cache_dir();
   if (!cache_dir) {
-    fprintf(stderr, "\033[1;31mError: Failed to get cache directory.\033[0m\n");
+    fputs("\033[1;31mError: Failed to get cache directory.\033[0m\n", stderr);
     return;
   }
 
   char cache_path[512];
-  if (snprintf(cache_path, sizeof(cache_path), "%s/%s", cache_dir,
-               PACKAGE_CACHE_FILE) >= (int)sizeof(cache_path)) {
-    fprintf(stderr, "\033[1;31mError: Cache path too long.\033[0m\n");
+  size_t cache_dir_len = strlen(cache_dir);
+  size_t file_len = strlen(PACKAGE_CACHE_FILE);
+  if (cache_dir_len + file_len + 2 > sizeof(cache_path)) {
+    fputs("\033[1;31mError: Cache path too long.\033[0m\n", stderr);
     return;
+  }
+
+  char *dst = cache_path;
+  const char *src = cache_dir;
+  for (size_t i = 0; i < cache_dir_len; i++) {
+    *dst++ = *src++;
+  }
+  *dst++ = '/';
+  src = PACKAGE_CACHE_FILE;
+  for (size_t i = 0; i <= file_len; i++) {
+    *dst++ = *src++;
   }
 
   if (is_cache_valid(cache_path)) {
@@ -117,7 +130,7 @@ void cache_pacman_commands(void) {
 
   fp = popen("pacman -Ssq", "r");
   if (fp == NULL) {
-    fprintf(stderr, "\033[1;31mFailed to run command\033[0m\n");
+    fputs("\033[1;31mFailed to run command\033[0m\n", stderr);
     return;
   }
 
@@ -173,6 +186,9 @@ char *command_generator(const char *text, int state) {
 
   if (!cached_commands) {
     cache_pacman_commands();
+    if (!cached_commands) {
+      return NULL;
+    }
   }
 
   if (!state) {
@@ -180,10 +196,10 @@ char *command_generator(const char *text, int state) {
     len = strlen(text);
   }
 
-  while (cached_commands && cached_commands[list_index]) {
-    const char *name = cached_commands[list_index];
-    list_index++;
+  for (int i = list_index; cached_commands[i] != NULL; i++) {
+    const char *name = cached_commands[i];
     if (strncmp(name, text, len) == 0) {
+      list_index = i + 1;
       return strdup(name);
     }
   }
@@ -204,10 +220,22 @@ void invalidate_package_cache(void) {
     return;
   }
 
+  size_t cache_dir_len = strlen(cache_dir);
+  size_t file_len = strlen(PACKAGE_CACHE_FILE);
   char cache_path[512];
-  if (snprintf(cache_path, sizeof(cache_path), "%s/%s", cache_dir,
-               PACKAGE_CACHE_FILE) >= (int)sizeof(cache_path)) {
+  if (cache_dir_len + file_len + 2 > sizeof(cache_path)) {
     return;
+  }
+
+  char *dst = cache_path;
+  const char *src = cache_dir;
+  for (size_t i = 0; i < cache_dir_len; i++) {
+    *dst++ = *src++;
+  }
+  *dst++ = '/';
+  src = PACKAGE_CACHE_FILE;
+  for (size_t i = 0; i <= file_len; i++) {
+    *dst++ = *src++;
   }
 
   unlink(cache_path);
