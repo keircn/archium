@@ -17,23 +17,13 @@ r firefox   # remove firefox
 s neovim    # search for neovim
 ```
 
-That's it. No revolutionary new package format, no reinventing the wheel. Just less typing.
-
-### Why you might want this
-
-- Fast startup - C binary, not a Python script that takes 2 seconds to import modules
-- Works with what you have - uses yay/paru if available, falls back to pacman
-- Tab completion - actually works and completes package names
-- Sane defaults - figures out your preferred AUR helper automatically
-- Plugin system - write custom commands if you want (optional)
-
 ### The good bits
 
 - 60KB binary
 - Uses readline for proper command line editing
 - Supports bash/fish/zsh completions
 - Config lives in ~/.config/archium/ like it should
-- MIT licensed
+- BSD3 licensed
 
 ## Installation
 
@@ -47,7 +37,7 @@ That's it. No revolutionary new package format, no reinventing the wheel. Just l
 ### 1. Clone the Repository
 
 ```bash
-git clone https://codeberg.org/keys/archium.git
+git clone https://github.com/keircn/archium
 cd archium
 ```
 
@@ -64,17 +54,6 @@ sudo make install
 ```
 
 ## Usage
-
-When you run `archium`, you will see the following prompt:
-
-```plaintext
-╔════════════════════════════════════════╗
-║      Welcome to Archium v1.10.4        ║
-║      Type "h" for help                 ║
-╚════════════════════════════════════════╝
-Archium $ u
-Upgrading system...
-```
 
 ### Command-Line Arguments
 
@@ -227,7 +206,7 @@ a v2 plugin using hooks. See `examples/README.md` for build steps.
 
 ## License
 
-This program is licensed under the **MIT License**.  
+This program is licensed under the **BSD 3-Clause License**.  
 See the [LICENSE](./LICENSE) file for details.
 
 ## Contact
