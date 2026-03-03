@@ -31,7 +31,7 @@
 #define COMMAND_BUFFER_SIZE 1024
 #define MAX_RETRIES 3
 #define TIMEOUT_SECONDS 30
-#define ARCHIUM_REPO_URL "https://codeberg.org/keys/archium"
+#define ARCHIUM_REPO_URL "https://github.com/keircn/archium"
 
 #define SMALL_BUFFER_SIZE 256
 #define MEDIUM_BUFFER_SIZE 512
