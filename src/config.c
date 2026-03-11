@@ -1,6 +1,8 @@
 #include "include/archium.h"
 
 #define CONFIG_BUFFER_SIZE 1024
+#define CONFIG_KEY_MAX_LEN 64
+#define CONFIG_VALUE_MAX_LEN 256
 
 static char config_dir_path[CONFIG_BUFFER_SIZE];
 static char log_file_path[CONFIG_BUFFER_SIZE];
@@ -9,6 +11,96 @@ static char cache_dir_path[CONFIG_BUFFER_SIZE];
 static char plugin_dir_path[CONFIG_BUFFER_SIZE];
 
 static int config_initialized = 0;
+
+static int is_boolean_value(const char *value) {
+  if (!value) {
+    return 0;
+  }
+
+  return strcmp(value, "0") == 0 || strcmp(value, "1") == 0 ||
+         strcmp(value, "false") == 0 || strcmp(value, "true") == 0;
+}
+
+static int validate_preference_key_value(const char *key, const char *value) {
+  if (!key || !value || key[0] == '\0' || value[0] == '\0') {
+    return 0;
+  }
+
+  if (strlen(key) >= CONFIG_KEY_MAX_LEN ||
+      strlen(value) >= CONFIG_VALUE_MAX_LEN) {
+    return 0;
+  }
+
+  if (strcmp(key, "package_manager") == 0) {
+    return strcmp(value, "yay") == 0 || strcmp(value, "paru") == 0;
+  }
+
+  if (strcmp(key, "json_output") == 0 || strcmp(key, "batch_mode") == 0) {
+    return is_boolean_value(value);
+  }
+
+  return 0;
+}
+
+static int validate_preference_line(const char *line) {
+  if (!line) {
+    return 0;
+  }
+
+  if (line[0] == '\0' || line[0] == '#') {
+    return 1;
+  }
+
+  const char *sep = strchr(line, '=');
+  if (!sep || sep == line || *(sep + 1) == '\0') {
+    return 0;
+  }
+
+  char key[CONFIG_KEY_MAX_LEN];
+  char value[CONFIG_VALUE_MAX_LEN];
+  size_t key_len = (size_t)(sep - line);
+  size_t value_len = strlen(sep + 1);
+
+  if (key_len == 0 || key_len >= sizeof(key) || value_len == 0 ||
+      value_len >= sizeof(value)) {
+    return 0;
+  }
+
+  memcpy(key, line, key_len);
+  key[key_len] = '\0';
+  memcpy(value, sep + 1, value_len + 1);
+
+  return validate_preference_key_value(key, value);
+}
+
+static int validate_preferences_file(void) {
+  FILE *fp = fopen(preference_file_path, "r");
+  if (!fp) {
+    return 1;
+  }
+
+  char line[CONFIG_BUFFER_SIZE];
+  int line_number = 0;
+  int all_valid = 1;
+
+  while (fgets(line, sizeof(line), fp)) {
+    line_number++;
+    line[strcspn(line, "\n")] = '\0';
+
+    if (!validate_preference_line(line)) {
+      all_valid = 0;
+      if (config.verbose) {
+        char msg[CONFIG_BUFFER_SIZE];
+        snprintf(msg, sizeof(msg), "Invalid preference on line %d",
+                 line_number);
+        log_debug(msg);
+      }
+    }
+  }
+
+  fclose(fp);
+  return all_valid;
+}
 
 static int ensure_directory_exists(const char *path) {
   struct stat st = {0};
@@ -112,6 +204,12 @@ int archium_config_init(void) {
   }
 
   config_initialized = 1;
+
+  if (!validate_preferences_file()) {
+    archium_report_error(ARCHIUM_ERROR_CONFIG_INVALID,
+                         "Preferences file contains invalid entries", NULL);
+  }
+
   char *json_pref = archium_config_get_preference("json_output");
   if (json_pref) {
     if (strcmp(json_pref, "1") == 0 || strcmp(json_pref, "true") == 0) {
@@ -204,6 +302,12 @@ int archium_config_set_preference(const char *key, const char *value) {
     return 0;
   }
 
+  if (!validate_preference_key_value(key, value)) {
+    archium_report_error(ARCHIUM_ERROR_CONFIG_INVALID,
+                         "Invalid preference key or value", key);
+    return 0;
+  }
+
   FILE *fp = fopen(preference_file_path, "a+");
   if (!fp) {
     archium_report_error(ARCHIUM_ERROR_SYSTEM_CALL,
@@ -278,6 +382,10 @@ char *archium_config_get_preference(const char *key) {
     return NULL;
   }
 
+  if (!key || key[0] == '\0' || strlen(key) >= CONFIG_KEY_MAX_LEN) {
+    return NULL;
+  }
+
   FILE *fp = fopen(preference_file_path, "r");
   if (!fp) {
     return NULL;
@@ -286,6 +394,9 @@ char *archium_config_get_preference(const char *key) {
   char line[CONFIG_BUFFER_SIZE];
   while (fgets(line, sizeof(line), fp)) {
     line[strcspn(line, "\n")] = '\0';
+    if (!validate_preference_line(line)) {
+      continue;
+    }
     if (strncmp(line, key, strlen(key)) == 0 && line[strlen(key)] == '=') {
       fclose(fp);
       return strdup(line + strlen(key) + 1);
