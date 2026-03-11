@@ -271,6 +271,30 @@ static int ensure_directory_exists(const char *path) {
   return 1;
 }
 
+static int ensure_preferences_file_exists(void) {
+  struct stat st = {0};
+  if (stat(preference_file_path, &st) == 0) {
+    return S_ISREG(st.st_mode);
+  }
+
+  FILE *fp = fopen(preference_file_path, "w");
+  if (!fp) {
+    return 0;
+  }
+
+  fputs("# Archium default preferences\n", fp);
+  fputs("package_manager=yay\n", fp);
+  fputs("json_output=0\n", fp);
+  fputs("batch_mode=0\n", fp);
+  fputs("use_native_output=1\n", fp);
+  fputs("show_welcome=1\n", fp);
+  fputs("show_tips=1\n", fp);
+  fputs("cache_ttl_seconds=3600\n", fp);
+
+  fclose(fp);
+  return 1;
+}
+
 static int init_config_paths(void) {
   const char *home = getenv("HOME");
   if (!home) {
@@ -357,6 +381,12 @@ int archium_config_init(void) {
   if (!ensure_directory_exists(plugin_dir_path)) {
     archium_report_error(ARCHIUM_ERROR_SYSTEM_CALL,
                          "Failed to create Archium plugin directory", NULL);
+    return 0;
+  }
+
+  if (!ensure_preferences_file_exists()) {
+    archium_report_error(ARCHIUM_ERROR_SYSTEM_CALL,
+                         "Failed to initialize preferences file", NULL);
     return 0;
   }
 
