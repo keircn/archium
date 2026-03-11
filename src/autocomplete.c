@@ -1,6 +1,5 @@
 #include "include/archium.h"
 
-#define CACHE_TTL_SECONDS 3600
 #define PACKAGE_CACHE_FILE "packages.cache"
 
 static void free_command_cache(char **commands, int count) {
@@ -21,7 +20,7 @@ static int is_cache_valid(const char *cache_path) {
   }
 
   time_t now = time(NULL);
-  return (now - cache_stat.st_mtime) < CACHE_TTL_SECONDS;
+  return (now - cache_stat.st_mtime) < config.cache_ttl_seconds;
 }
 
 static void load_cache_from_file(const char *cache_path) {

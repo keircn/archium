@@ -78,39 +78,43 @@ int main(int argc, char *argv[]) {
   if (!config.json_output) {
     struct winsize w;
     int term_width = 80;
-    if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &w) == 0) {
-      term_width = w.ws_col;
+    if (config.show_welcome) {
+      if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &w) == 0) {
+        term_width = w.ws_col;
+      }
+
+      char buf[SMALL_BUFFER_SIZE];
+      if (term_width >= 50) {
+        int inner_width = (term_width > 70) ? 50 : term_width - 10;
+
+        printf("\033[1;36m+");
+        for (int i = 0; i < inner_width; ++i) printf("-");
+        printf("+\033[0m\n");
+
+        snprintf(buf, sizeof(buf), "Welcome to Archium v%s", ARCHIUM_VERSION);
+        int pad = (inner_width - (int)strlen(buf)) / 2;
+        if (pad < 0) pad = 0;
+        printf("\033[1;36m|%*s%s%*s|\033[0m\n", pad, "", buf,
+               inner_width - pad - (int)strlen(buf), "");
+
+        snprintf(buf, sizeof(buf), "Type \"h\" for help");
+        pad = (inner_width - (int)strlen(buf)) / 2;
+        if (pad < 0) pad = 0;
+        printf("\033[1;36m|%*s%s%*s|\033[0m\n", pad, "", buf,
+               inner_width - pad - (int)strlen(buf), "");
+
+        printf("\033[1;36m+");
+        for (int i = 0; i < inner_width; ++i) printf("-");
+        printf("+\033[0m\n");
+      } else {
+        printf("\033[1;36m> Archium v%s\033[0m\n", ARCHIUM_VERSION);
+        printf("\033[1;36m> Type \"h\" for help\033[0m\n");
+      }
     }
 
-    char buf[SMALL_BUFFER_SIZE];
-    if (term_width >= 50) {
-      int inner_width = (term_width > 70) ? 50 : term_width - 10;
-
-      printf("\033[1;36m+");
-      for (int i = 0; i < inner_width; ++i) printf("-");
-      printf("+\033[0m\n");
-
-      snprintf(buf, sizeof(buf), "Welcome to Archium v%s", ARCHIUM_VERSION);
-      int pad = (inner_width - (int)strlen(buf)) / 2;
-      if (pad < 0) pad = 0;
-      printf("\033[1;36m|%*s%s%*s|\033[0m\n", pad, "", buf,
-             inner_width - pad - (int)strlen(buf), "");
-
-      snprintf(buf, sizeof(buf), "Type \"h\" for help");
-      pad = (inner_width - (int)strlen(buf)) / 2;
-      if (pad < 0) pad = 0;
-      printf("\033[1;36m|%*s%s%*s|\033[0m\n", pad, "", buf,
-             inner_width - pad - (int)strlen(buf), "");
-
-      printf("\033[1;36m+");
-      for (int i = 0; i < inner_width; ++i) printf("-");
-      printf("+\033[0m\n");
-    } else {
-      printf("\033[1;36m> Archium v%s\033[0m\n", ARCHIUM_VERSION);
-      printf("\033[1;36m> Type \"h\" for help\033[0m\n");
+    if (config.show_tips) {
+      display_random_tip();
     }
-
-    display_random_tip();
 
     while (1) {
       char input_line[MAX_INPUT_LENGTH];

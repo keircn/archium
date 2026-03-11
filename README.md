@@ -1,38 +1,25 @@
 # Archium
 
-*Fast & Easy Package Management for Arch Linux*
+Fast and configurable package management for Arch Linux.
 
-Archium is a command-line tool for managing packages on Arch Linux. It provides a simple and intuitive interface for common package management tasks using `yay`, `paru`, or `pacman`. Archium is a faithful fork of [Archie](https://github.com/TuxForge/archie) by [Gurov](https://github.com/Gur0v).
+Archium is a C-based CLI wrapper around `yay`, `paru`, and `pacman` with short
+commands, readline support, and plugin hooks.
 
-[![CI](https://github.com/keircn/archium/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/keircn/archium/actions/workflows/ci.yml)
-
-## What it actually does
-
-It's a simple wrapper around pacman/yay/paru that gives you short commands and tab completion. Written in C so it's fast and doesn't eat your RAM.
-
-```
+```text
 u           # upgrade everything
 i firefox   # install firefox
 r firefox   # remove firefox
 s neovim    # search for neovim
 ```
 
-### The good bits
-
-- 60KB binary
-- Uses readline for proper command line editing
-- Supports bash/fish/zsh completions
-- Config lives in ~/.config/archium/ like it should
-- BSD3 licensed
-
 ## Installation
 
 ### Dependencies
 
-- **`gcc`** - It's written in C, what do you expect?
-- **`yay`** or **`paru`** - AUR helpers for Arch Linux [OPTIONAL]
-- **`git`** - For installing `yay` if it is not already installed [OPTIONAL]
-- **`readline`** - A library for command-line input (likely preinstalled)
+- `gcc`
+- `readline`
+- One of: `yay`, `paru`, or `pacman`
+- `git` (only needed if you choose auto-install flow for `yay`)
 
 ### 1. Clone the Repository
 
@@ -57,13 +44,16 @@ sudo make install
 
 ### Command-Line Arguments
 
-| Argument           | Description                             |
-| ------------------ | --------------------------------------- |
-| `--exec <command>` | Execute a specific command directly     |
-| `--version`, `-v`  | Display version information             |
-| `--verbose`, `-V`  | Enable verbose logging                  |
-| `--help`, `-h`     | Display help for command-line arguments |
-| `--self-update`    | Update Archium to the latest version    |
+| Argument                 | Description                             |
+| ------------------------ | --------------------------------------- |
+| `--exec <command>`       | Execute a specific command directly     |
+| `--version`, `-v`        | Display version information             |
+| `--verbose`, `-V`        | Enable verbose logging                  |
+| `--help`, `-h`           | Display help for command-line arguments |
+| `--self-update`          | Update Archium to the latest version    |
+| `--json`                 | Emit machine-readable output            |
+| `--batch`                | Disable interactive prompts             |
+| `--custom-output`, `-c`  | Use Archium custom output mode          |
 
 To update Archium itself (only for manual installations):
 
@@ -82,42 +72,71 @@ paru -Syu archium
 
 ## Configuration
 
-Archium uses a centralized configuration system located at `$HOME/.config/archium/`:
+Archium stores configuration in `$HOME/.config/archium/`:
 
-- **Configuration Directory**: `$HOME/.config/archium/`
-- **Log File**: `$HOME/.config/archium/archium.log` (when verbose mode is enabled)
-- **Preferences**: `$HOME/.config/archium/preferences`
-- **Cache Directory**: `$HOME/.config/archium/cache/`
+- `preferences` (key/value settings)
+- `archium.log` (when verbose mode is enabled)
+- `cache/` (runtime cache)
+- `plugins/` (plugin `.so` files)
 
-### Setting Package Manager Preference
+### Preferences File
 
-You can set your preferred package manager using the built-in configuration command:
+Path: `$HOME/.config/archium/preferences`
 
-```bash
-archium
+Supported keys:
 
-Archium $ config
-Archium Configuration
-Available preferences:
-1. Package manager preference (yay/paru)
-2. View current configuration directory
-3. View log file location
-Enter your choice (1-3): 1
-Current preference: yay (default)
-Set package manager preference (yay/paru): paru
-Package manager preference set to: paru
-Note: Restart Archium for changes to take effect.
+```ini
+package_manager=yay
+json_output=0
+batch_mode=0
+use_native_output=1
+show_welcome=1
+show_tips=1
+cache_ttl_seconds=3600
 ```
 
-Alternatively, for quick command-line usage:
+Validation rules:
+
+- `package_manager`: `yay` or `paru`
+- `json_output`, `batch_mode`, `use_native_output`, `show_welcome`, `show_tips`:
+  `0`, `1`, `false`, or `true`
+- `cache_ttl_seconds`: integer from `60` to `86400`
+
+Invalid lines are ignored at read-time, and invalid writes/imports are rejected.
+
+### Environment Variable Overrides
+
+Environment variables override file values for the current process:
+
+- `ARCHIUM_PACKAGE_MANAGER`
+- `ARCHIUM_JSON_OUTPUT`
+- `ARCHIUM_BATCH_MODE`
+- `ARCHIUM_NATIVE_OUTPUT`
+- `ARCHIUM_SHOW_WELCOME`
+- `ARCHIUM_SHOW_TIPS`
+- `ARCHIUM_CACHE_TTL_SECONDS`
+
+Example:
+
+```bash
+ARCHIUM_SHOW_TIPS=0 ARCHIUM_CACHE_TTL_SECONDS=120 archium
+```
+
+### Interactive Config Menu
+
+Run:
 
 ```bash
 archium --exec config
 ```
 
-### Legacy Migration
+The config menu supports:
 
-If you have an existing `.archium-use-paru` file in your home directory, Archium will automatically migrate it to the new configuration system and remove the old file.
+- toggling UI/output defaults
+- setting package cache TTL
+- viewing effective configuration
+- exporting/importing preferences
+- backup/restore for preferences
 
 ## Plugin System
 
@@ -193,9 +212,9 @@ a v2 plugin using hooks. See `examples/README.md` for build steps.
 
 ## Notes
 
-- Archium uses `yay` by default. If you only have `paru` installed, it will use `paru`.
-- Use the `config` command within Archium to manage preferences and view configuration paths.
-- Enable verbose logging with `--verbose` or `-V` to create detailed logs at `$HOME/.config/archium/archium.log`.
+- Archium picks package managers in this order: configured preference (if installed), then available fallback (`yay` -> `paru` -> `pacman`).
+- Use `config` (or edit `preferences`) to customize behavior.
+- Enable verbose logging with `--verbose` or `-V`.
 
 - If Archium fails to upgrade to a newer version, try cleaning the cache using your preferred AUR helper and reinstalling:
 
@@ -206,7 +225,7 @@ a v2 plugin using hooks. See `examples/README.md` for build steps.
 
 ## License
 
-This program is licensed under the **BSD 3-Clause License**.  
+This program is licensed under the **BSD 3-Clause License**.
 See the [LICENSE](./LICENSE) file for details.
 
 ## Contact

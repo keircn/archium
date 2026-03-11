@@ -857,11 +857,22 @@ void configure_preferences(void) {
   printf("\033[1;34mArchium Configuration\033[0m\n");
   printf("Available preferences:\n");
   printf("1. Package manager preference (yay/paru)\n");
-  printf("2. View current configuration directory\n");
-  printf("3. View log file location\n");
+  printf("2. Toggle welcome banner (on/off)\n");
+  printf("3. Toggle random tips (on/off)\n");
+  printf("4. Toggle JSON output default (on/off)\n");
+  printf("5. Toggle batch mode default (on/off)\n");
+  printf("6. Toggle native output default (on/off)\n");
+  printf("7. Set package cache TTL in seconds (60-86400)\n");
+  printf("8. Show effective configuration\n");
+  printf("9. Export preferences to file\n");
+  printf("10. Import preferences from file\n");
+  printf("11. Backup preferences\n");
+  printf("12. Restore preferences from backup file\n");
+  printf("13. View current configuration directory\n");
+  printf("14. View log file location\n");
 
   char choice[MAX_INPUT_LENGTH];
-  get_user_input(choice, "Enter your choice (1-3): ");
+  get_user_input(choice, "Enter your choice (1-14): ");
 
   if (strcmp(choice, "1") == 0) {
     printf("\033[1;33mCurrent preference:\033[0m ");
@@ -890,13 +901,95 @@ void configure_preferences(void) {
           "\033[1;31mInvalid choice. Please enter 'yay' or 'paru'.\033[0m\n");
     }
   } else if (strcmp(choice, "2") == 0) {
+    const char *next = config.show_welcome ? "0" : "1";
+    if (archium_config_set_preference("show_welcome", next)) {
+      printf("\033[1;32mWelcome banner is now: %s\033[0m\n",
+             config.show_welcome ? "enabled" : "disabled");
+    } else {
+      printf("\033[1;31mFailed to update preference.\033[0m\n");
+    }
+  } else if (strcmp(choice, "3") == 0) {
+    const char *next = config.show_tips ? "0" : "1";
+    if (archium_config_set_preference("show_tips", next)) {
+      printf("\033[1;32mRandom tips are now: %s\033[0m\n",
+             config.show_tips ? "enabled" : "disabled");
+    } else {
+      printf("\033[1;31mFailed to update preference.\033[0m\n");
+    }
+  } else if (strcmp(choice, "4") == 0) {
+    const char *next = config.json_output ? "0" : "1";
+    if (archium_config_set_preference("json_output", next)) {
+      printf("\033[1;32mJSON output default is now: %s\033[0m\n",
+             config.json_output ? "enabled" : "disabled");
+    } else {
+      printf("\033[1;31mFailed to update preference.\033[0m\n");
+    }
+  } else if (strcmp(choice, "5") == 0) {
+    const char *next = config.batch_mode ? "0" : "1";
+    if (archium_config_set_preference("batch_mode", next)) {
+      printf("\033[1;32mBatch mode default is now: %s\033[0m\n",
+             config.batch_mode ? "enabled" : "disabled");
+    } else {
+      printf("\033[1;31mFailed to update preference.\033[0m\n");
+    }
+  } else if (strcmp(choice, "6") == 0) {
+    const char *next = config.use_native_output ? "0" : "1";
+    if (archium_config_set_preference("use_native_output", next)) {
+      printf("\033[1;32mNative output default is now: %s\033[0m\n",
+             config.use_native_output ? "enabled" : "custom");
+    } else {
+      printf("\033[1;31mFailed to update preference.\033[0m\n");
+    }
+  } else if (strcmp(choice, "7") == 0) {
+    char ttl[MAX_INPUT_LENGTH];
+    get_user_input(ttl, "Enter cache TTL in seconds (60-86400): ");
+    if (archium_config_set_preference("cache_ttl_seconds", ttl)) {
+      printf("\033[1;32mCache TTL set to %d seconds\033[0m\n",
+             config.cache_ttl_seconds);
+    } else {
+      printf("\033[1;31mInvalid TTL value.\033[0m\n");
+    }
+  } else if (strcmp(choice, "8") == 0) {
+    archium_config_print_effective(stdout);
+  } else if (strcmp(choice, "9") == 0) {
+    char path[MAX_INPUT_LENGTH];
+    get_user_input(path, "Export file path: ");
+    if (archium_config_export_preferences(path)) {
+      printf("\033[1;32mPreferences exported to: %s\033[0m\n", path);
+    } else {
+      printf("\033[1;31mFailed to export preferences.\033[0m\n");
+    }
+  } else if (strcmp(choice, "10") == 0) {
+    char path[MAX_INPUT_LENGTH];
+    get_user_input(path, "Import file path: ");
+    if (archium_config_import_preferences(path)) {
+      printf("\033[1;32mPreferences imported successfully.\033[0m\n");
+    } else {
+      printf("\033[1;31mFailed to import preferences.\033[0m\n");
+    }
+  } else if (strcmp(choice, "11") == 0) {
+    char backup_path[MEDIUM_BUFFER_SIZE];
+    if (archium_config_backup_preferences(backup_path, sizeof(backup_path))) {
+      printf("\033[1;32mBackup created: %s\033[0m\n", backup_path);
+    } else {
+      printf("\033[1;31mFailed to create backup.\033[0m\n");
+    }
+  } else if (strcmp(choice, "12") == 0) {
+    char path[MAX_INPUT_LENGTH];
+    get_user_input(path, "Backup file path to restore: ");
+    if (archium_config_restore_preferences(path)) {
+      printf("\033[1;32mPreferences restored successfully.\033[0m\n");
+    } else {
+      printf("\033[1;31mFailed to restore preferences.\033[0m\n");
+    }
+  } else if (strcmp(choice, "13") == 0) {
     const char *config_dir = archium_config_get_config_dir();
     if (config_dir) {
       printf("\033[1;32mConfiguration directory: %s\033[0m\n", config_dir);
     } else {
       printf("\033[1;31mFailed to get configuration directory.\033[0m\n");
     }
-  } else if (strcmp(choice, "3") == 0) {
+  } else if (strcmp(choice, "14") == 0) {
     const char *log_file = archium_config_get_log_file();
     if (log_file) {
       printf("\033[1;32mLog file location: %s\033[0m\n", log_file);

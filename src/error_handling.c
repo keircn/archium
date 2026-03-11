@@ -79,6 +79,9 @@ ArchiumError parse_arguments(int argc, char *argv[]) {
   config.json_output = 0;
   config.batch_mode = 0;
   config.use_native_output = 1;
+  config.show_welcome = 1;
+  config.show_tips = 1;
+  config.cache_ttl_seconds = 3600;
 
   for (int i = 1; i < argc; i++) {
     if (strcmp(argv[i], "--verbose") == 0 || strcmp(argv[i], "-V") == 0) {

@@ -13,8 +13,13 @@ int check_command(const char *command) {
 }
 
 int check_package_manager(void) {
-  if (check_archium_file()) {
+  const char *preferred = archium_config_get_preferred_package_manager();
+
+  if (preferred && strcmp(preferred, "paru") == 0 && check_command("paru")) {
     return 2;  // paru
+  }
+  if (preferred && strcmp(preferred, "yay") == 0 && check_command("yay")) {
+    return 1;  // yay
   }
   if (check_command("yay")) {
     return 1;  // yay
