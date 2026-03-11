@@ -116,7 +116,7 @@ static void execute_command(const char *command, const char *log_message) {
 
 static void get_user_input(char *buffer, const char *prompt) {
   rl_attempted_completion_function = command_completion;
-  get_input(buffer, prompt);
+  get_input(buffer, MAX_INPUT_LENGTH, prompt);
   rl_attempted_completion_function = NULL;
 }
 

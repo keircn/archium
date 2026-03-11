@@ -114,7 +114,7 @@ int main(int argc, char *argv[]) {
 
     while (1) {
       char input_line[MAX_INPUT_LENGTH];
-      get_input(input_line, "\033[1;32mArchium $ \033[0m");
+      get_input(input_line, sizeof(input_line), "\033[1;32mArchium $ \033[0m");
 
       if (*input_line) {
         add_history(input_line);

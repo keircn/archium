@@ -3,6 +3,17 @@
 #define CACHE_TTL_SECONDS 3600
 #define PACKAGE_CACHE_FILE "packages.cache"
 
+static void free_command_cache(char **commands, int count) {
+  if (!commands) {
+    return;
+  }
+
+  for (int i = 0; i < count; i++) {
+    free(commands[i]);
+  }
+  free(commands);
+}
+
 static int is_cache_valid(const char *cache_path) {
   struct stat cache_stat;
   if (stat(cache_path, &cache_stat) != 0) {
@@ -35,12 +46,16 @@ static void load_cache_from_file(const char *cache_path) {
     char **new_commands =
         realloc(cached_commands, sizeof(char *) * (command_count + 1));
     if (!new_commands) {
+      free_command_cache(cached_commands, command_count - 1);
+      cached_commands = NULL;
       fclose(fp);
       return;
     }
     cached_commands = new_commands;
     cached_commands[command_count - 1] = strdup(line);
     if (!cached_commands[command_count - 1]) {
+      free_command_cache(cached_commands, command_count - 1);
+      cached_commands = NULL;
       fclose(fp);
       return;
     }
@@ -54,11 +69,15 @@ static void load_cache_from_file(const char *cache_path) {
     char **new_commands =
         realloc(cached_commands, sizeof(char *) * (command_count + 1));
     if (!new_commands) {
+      free_command_cache(cached_commands, command_count - 1);
+      cached_commands = NULL;
       return;
     }
     cached_commands = new_commands;
     cached_commands[command_count - 1] = strdup(custom_cmds[i]);
     if (!cached_commands[command_count - 1]) {
+      free_command_cache(cached_commands, command_count - 1);
+      cached_commands = NULL;
       return;
     }
   }
@@ -145,12 +164,16 @@ void cache_pacman_commands(void) {
     char **new_commands =
         realloc(cached_commands, sizeof(char *) * (command_count + 1));
     if (!new_commands) {
+      free_command_cache(cached_commands, command_count - 1);
+      cached_commands = NULL;
       pclose(fp);
       return;
     }
     cached_commands = new_commands;
     cached_commands[command_count - 1] = strdup(path);
     if (!cached_commands[command_count - 1]) {
+      free_command_cache(cached_commands, command_count - 1);
+      cached_commands = NULL;
       pclose(fp);
       return;
     }
@@ -164,11 +187,15 @@ void cache_pacman_commands(void) {
     char **new_commands =
         realloc(cached_commands, sizeof(char *) * (command_count + 1));
     if (!new_commands) {
+      free_command_cache(cached_commands, command_count - 1);
+      cached_commands = NULL;
       return;
     }
     cached_commands = new_commands;
     cached_commands[command_count - 1] = strdup(custom_cmds[i]);
     if (!cached_commands[command_count - 1]) {
+      free_command_cache(cached_commands, command_count - 1);
+      cached_commands = NULL;
       return;
     }
   }

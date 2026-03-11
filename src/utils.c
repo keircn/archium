@@ -251,11 +251,15 @@ void parse_and_show_generic_result(const char *output __attribute__((unused)),
   }
 }
 
-void get_input(char *input, const char *prompt) {
+void get_input(char *input, size_t input_size, const char *prompt) {
+  if (!input || input_size == 0) {
+    return;
+  }
+
   while (1) {
     char *line = readline(prompt);
     if (line) {
-      strcpy(input, line);
+      snprintf(input, input_size, "%s", line);
       free(line);
     } else {
       input[0] = '\0';

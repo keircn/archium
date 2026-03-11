@@ -147,9 +147,13 @@ int archium_plugin_init(void) {
       continue;
     }
 
-    strcpy(loaded_plugins[plugin_count].name, name);
-    strcpy(loaded_plugins[plugin_count].command, command);
-    strcpy(loaded_plugins[plugin_count].description, description);
+    snprintf(loaded_plugins[plugin_count].name,
+             sizeof(loaded_plugins[plugin_count].name), "%s", name);
+    snprintf(loaded_plugins[plugin_count].command,
+             sizeof(loaded_plugins[plugin_count].command), "%s", command);
+    snprintf(loaded_plugins[plugin_count].description,
+             sizeof(loaded_plugins[plugin_count].description), "%s",
+             description);
     loaded_plugins[plugin_count].handle = handle;
     loaded_plugins[plugin_count].execute = execute;
     loaded_plugins[plugin_count].get_api_version = get_api_version;

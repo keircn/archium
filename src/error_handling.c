@@ -196,25 +196,25 @@ void archium_error_add_details(ArchiumErrorContext *ctx, const char *details,
 }
 
 const char *archium_error_get_category(ArchiumError error_code) {
-  if (error_code >= ARCHIUM_ERROR_INVALID_INPUT &&
+  if (error_code <= ARCHIUM_ERROR_INVALID_INPUT &&
       error_code >= ARCHIUM_ERROR_BUFFER_OVERFLOW) {
     return "Input/Validation";
-  } else if (error_code >= ARCHIUM_ERROR_SYSTEM_CALL &&
+  } else if (error_code <= ARCHIUM_ERROR_SYSTEM_CALL &&
              error_code >= ARCHIUM_ERROR_PROCESS_FAILED) {
     return "System";
-  } else if (error_code >= ARCHIUM_ERROR_PACKAGE_MANAGER &&
+  } else if (error_code <= ARCHIUM_ERROR_PACKAGE_MANAGER &&
              error_code >= ARCHIUM_ERROR_PACKAGE_DEPENDENCY) {
     return "Package Management";
-  } else if (error_code >= ARCHIUM_ERROR_NETWORK &&
+  } else if (error_code <= ARCHIUM_ERROR_NETWORK &&
              error_code >= ARCHIUM_ERROR_CONNECTION_TIMEOUT) {
     return "Network";
-  } else if (error_code >= ARCHIUM_ERROR_PERMISSION &&
+  } else if (error_code <= ARCHIUM_ERROR_PERMISSION &&
              error_code >= ARCHIUM_ERROR_ACCESS_DENIED) {
     return "Permission/Security";
-  } else if (error_code >= ARCHIUM_ERROR_CONFIG &&
+  } else if (error_code <= ARCHIUM_ERROR_CONFIG &&
              error_code >= ARCHIUM_ERROR_CONFIG_MISSING) {
     return "Configuration";
-  } else if (error_code >= ARCHIUM_ERROR_PLUGIN &&
+  } else if (error_code <= ARCHIUM_ERROR_PLUGIN &&
              error_code >= ARCHIUM_ERROR_PLUGIN_INVALID) {
     return "Plugin";
   }

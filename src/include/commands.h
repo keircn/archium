@@ -1,13 +1,15 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
 
+#include <stddef.h>
+
 #include "config.h"
 #include "error.h"
 
 ArchiumError handle_exec_command(const char *command,
                                  const char *package_manager);
 ArchiumError handle_command(const char *input, const char *package_manager);
-void get_input(char *input, const char *prompt);
+void get_input(char *input, size_t input_size, const char *prompt);
 int is_valid_command(const char *command);
 int check_archium_file(void);
 void install_git(void);
