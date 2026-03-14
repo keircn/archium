@@ -1,5 +1,8 @@
+#include <errno.h>
+#include <fcntl.h>
 #include <pthread.h>
 #include <sys/ioctl.h>
+#include <sys/select.h>
 #include <sys/wait.h>
 
 #include "include/archium.h"
@@ -24,6 +27,146 @@ static int get_terminal_width(void) {
     return w.ws_col;
   }
   return 80;
+}
+
+static int command_uses_pacman_like_output(const char *command) {
+  if (!command) {
+    return 0;
+  }
+
+  return strstr(command, "pacman") != NULL || strstr(command, "yay") != NULL ||
+         strstr(command, "paru") != NULL;
+}
+
+static int command_likely_requires_sudo(const char *command) {
+  if (!command) {
+    return 0;
+  }
+
+  return strstr(command, " -S") != NULL || strstr(command, " -R") != NULL ||
+         strstr(command, " -U") != NULL;
+}
+
+static void ensure_sudo_credentials_for_custom_output(const char *command) {
+  if (config.use_native_output || config.batch_mode || config.json_output) {
+    return;
+  }
+
+  if (!isatty(STDIN_FILENO) || !isatty(STDOUT_FILENO)) {
+    return;
+  }
+
+  if (!command_uses_pacman_like_output(command) ||
+      !command_likely_requires_sudo(command)) {
+    return;
+  }
+
+  if (system("sudo -n -v >/dev/null 2>&1") == 0) {
+    return;
+  }
+
+  fflush(stdout);
+  (void)system("sudo -v");
+}
+
+static int parse_fraction_progress(const char *line, int *current, int *total) {
+  const char *cursor = line;
+  while ((cursor = strchr(cursor, '(')) != NULL) {
+    int parsed_current = 0;
+    int parsed_total = 0;
+    if (sscanf(cursor, "(%d/%d)", &parsed_current, &parsed_total) == 2 &&
+        parsed_total > 0 && parsed_current >= 0) {
+      *current = parsed_current;
+      *total = parsed_total;
+      return 1;
+    }
+    cursor++;
+  }
+
+  return 0;
+}
+
+static int parse_percentage_progress(const char *line, int *percentage) {
+  size_t line_len = strlen(line);
+  for (size_t i = 0; i < line_len; i++) {
+    if (line[i] != '%') {
+      continue;
+    }
+
+    size_t start = i;
+    while (start > 0 && isdigit((unsigned char)line[start - 1])) {
+      start--;
+    }
+
+    if (start == i) {
+      continue;
+    }
+
+    char number[8];
+    size_t number_len = i - start;
+    if (number_len >= sizeof(number)) {
+      continue;
+    }
+
+    memcpy(number, line + start, number_len);
+    number[number_len] = '\0';
+
+    int parsed_percentage = atoi(number);
+    if (parsed_percentage >= 0 && parsed_percentage <= 100) {
+      *percentage = parsed_percentage;
+      return 1;
+    }
+  }
+
+  return 0;
+}
+
+static void update_progress_from_line(const char *line, int prefer_fraction,
+                                      int *current, int *total,
+                                      int *has_progress) {
+  int parsed_current = 0;
+  int parsed_total = 0;
+  int parsed_percentage = 0;
+
+  if (prefer_fraction &&
+      parse_fraction_progress(line, &parsed_current, &parsed_total)) {
+    *current = parsed_current;
+    *total = parsed_total;
+    *has_progress = 1;
+    return;
+  }
+
+  if (parse_percentage_progress(line, &parsed_percentage)) {
+    *current = parsed_percentage;
+    *total = 100;
+    *has_progress = 1;
+    return;
+  }
+
+  if (!prefer_fraction &&
+      parse_fraction_progress(line, &parsed_current, &parsed_total)) {
+    *current = parsed_current;
+    *total = parsed_total;
+    *has_progress = 1;
+  }
+}
+
+static void render_enhanced_indicator(const char *message, int spinner_position,
+                                      int has_progress, int current,
+                                      int total) {
+  if (has_progress && total > 0) {
+    int bounded_current = current;
+    if (bounded_current < 0) {
+      bounded_current = 0;
+    }
+    if (bounded_current > total) {
+      bounded_current = total;
+    }
+    show_progress_bar(bounded_current, total, message);
+    return;
+  }
+
+  show_spinner(spinner_position, message);
 }
 
 void show_progress_bar(int current, int total, const char *prefix) {
@@ -114,9 +257,13 @@ int execute_command_with_output_capture(const char *command,
                                         const char *message,
                                         char *output_buffer,
                                         size_t buffer_size) {
-  int running = 1;
-  pthread_t spinner_tid;
-  spinner_data_t spinner_data = {&running, message ? message : "Processing"};
+  const char *display_message = message ? message : "Processing";
+  int use_interactive_indicator = isatty(STDOUT_FILENO);
+  int prefer_fraction_progress = command_uses_pacman_like_output(command);
+  int spinner_position = 0;
+  int has_progress = 0;
+  int current_progress = 0;
+  int total_progress = 100;
 
   if (config.batch_mode || config.json_output) {
     FILE *fp = popen(command, "r");
@@ -128,34 +275,117 @@ int execute_command_with_output_capture(const char *command,
     return pclose(fp);
   }
 
-  if (pthread_create(&spinner_tid, NULL, spinner_thread, &spinner_data) != 0) {
-    FILE *fp = popen(command, "r");
-    if (fp == NULL) return -1;
-
-    if (output_buffer && buffer_size > 0) {
-      size_t bytes_read = fread(output_buffer, 1, buffer_size - 1, fp);
-      output_buffer[bytes_read] = '\0';
-    }
-
-    return pclose(fp);
+  if (output_buffer && buffer_size > 0) {
+    output_buffer[0] = '\0';
   }
 
-  FILE *fp = popen(command, "r");
+  ensure_sudo_credentials_for_custom_output(command);
+
+  char merged_command[COMMAND_BUFFER_SIZE + 32];
+  if (snprintf(merged_command, sizeof(merged_command), "%s 2>&1", command) >=
+      (int)sizeof(merged_command)) {
+    return system(command);
+  }
+
+  FILE *fp = popen(merged_command, "r");
   if (fp == NULL) {
-    running = 0;
-    pthread_join(spinner_tid, NULL);
     return -1;
   }
 
-  if (output_buffer && buffer_size > 0) {
-    size_t bytes_read = fread(output_buffer, 1, buffer_size - 1, fp);
-    output_buffer[bytes_read] = '\0';
+  int fd = fileno(fp);
+  int original_flags = fcntl(fd, F_GETFL, 0);
+  if (original_flags != -1) {
+    (void)fcntl(fd, F_SETFL, original_flags | O_NONBLOCK);
+  }
+
+  char line_buffer[1024];
+  size_t line_length = 0;
+  size_t captured = 0;
+
+  while (1) {
+    fd_set read_fds;
+    FD_ZERO(&read_fds);
+    FD_SET(fd, &read_fds);
+
+    struct timeval timeout;
+    timeout.tv_sec = 0;
+    timeout.tv_usec = 100000;
+
+    int ready = select(fd + 1, &read_fds, NULL, NULL, &timeout);
+    if (ready < 0) {
+      if (errno == EINTR) {
+        continue;
+      }
+      break;
+    }
+
+    if (ready == 0) {
+      if (use_interactive_indicator) {
+        render_enhanced_indicator(display_message, spinner_position,
+                                  has_progress, current_progress,
+                                  total_progress);
+        spinner_position++;
+      }
+      continue;
+    }
+
+    char chunk[256];
+    ssize_t bytes_read = read(fd, chunk, sizeof(chunk));
+    if (bytes_read < 0) {
+      if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR) {
+        continue;
+      }
+      break;
+    }
+
+    if (bytes_read == 0) {
+      break;
+    }
+
+    for (ssize_t i = 0; i < bytes_read; i++) {
+      unsigned char c = (unsigned char)chunk[i];
+
+      if (output_buffer && buffer_size > 0 && captured < buffer_size - 1) {
+        output_buffer[captured++] = (char)c;
+        output_buffer[captured] = '\0';
+      }
+
+      if (c == '\n' || c == '\r') {
+        line_buffer[line_length] = '\0';
+        if (line_length > 0) {
+          update_progress_from_line(line_buffer, prefer_fraction_progress,
+                                    &current_progress, &total_progress,
+                                    &has_progress);
+        }
+        line_length = 0;
+        continue;
+      }
+
+      if ((isprint(c) || c == '\t') && line_length < sizeof(line_buffer) - 1) {
+        line_buffer[line_length++] = (char)c;
+      }
+    }
+  }
+
+  if (line_length > 0) {
+    line_buffer[line_length] = '\0';
+    update_progress_from_line(line_buffer, prefer_fraction_progress,
+                              &current_progress, &total_progress,
+                              &has_progress);
+  }
+
+  if (use_interactive_indicator) {
+    if (has_progress && total_progress > 0) {
+      if (current_progress < total_progress) {
+        show_progress_bar(total_progress, total_progress, display_message);
+      }
+    } else {
+      printf("\r\033[K");
+      fflush(stdout);
+    }
   }
 
   int result = pclose(fp);
-
-  running = 0;
-  pthread_join(spinner_tid, NULL);
 
   return result;
 }

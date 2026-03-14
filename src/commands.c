@@ -342,7 +342,7 @@ void update_system(const char *package_manager, const char *package) {
       return;
     }
 
-    snprintf(command, sizeof(command), "%s -S %s", package_manager,
+    snprintf(command, sizeof(command), "%s -S --noconfirm %s", package_manager,
              sanitized_package);
     int result = execute_command_with_output_capture(
         command, "Upgrading package", output_buffer, sizeof(output_buffer));
@@ -431,7 +431,7 @@ void install_package(const char *package_manager, const char *packages) {
     token = strtok(NULL, " ");
   }
 
-  snprintf(command, sizeof(command), "%s -S %s", package_manager,
+  snprintf(command, sizeof(command), "%s -S --noconfirm %s", package_manager,
            sanitized_packages);
 
   if (config.use_native_output) {
@@ -474,7 +474,7 @@ void remove_package(const char *package_manager, const char *packages) {
     token = strtok(NULL, " ");
   }
 
-  snprintf(command, sizeof(command), "%s -R %s", package_manager,
+  snprintf(command, sizeof(command), "%s -R --noconfirm %s", package_manager,
            sanitized_packages);
 
   if (config.use_native_output) {
@@ -517,7 +517,7 @@ void purge_package(const char *package_manager, const char *packages) {
     token = strtok(NULL, " ");
   }
 
-  snprintf(command, sizeof(command), "%s -Rns %s", package_manager,
+  snprintf(command, sizeof(command), "%s -Rns --noconfirm %s", package_manager,
            sanitized_packages);
 
   if (config.use_native_output) {
@@ -569,7 +569,7 @@ void clean_orphans(const char *package_manager) {
 
   char command[COMMAND_BUFFER_SIZE];
   char output_buffer[2048];
-  snprintf(command, sizeof(command), "%s -Rns %s", package_manager,
+  snprintf(command, sizeof(command), "%s -Rns --noconfirm %s", package_manager,
            orphaned_packages);
 
   if (config.use_native_output) {
